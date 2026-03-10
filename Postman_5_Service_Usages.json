@@ -1,0 +1,88 @@
+{
+    "info": {
+        "_postman_id": "e1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c71",
+        "name": "5. CRM Service Usages (Contracts)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Add Service to Enterprise (Sub-resource)",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"viettelServiceId\": 1,\n  \"contractNumber\": \"HD12345/V-CA\",\n  \"startDate\": \"2023-01-01\",\n  \"status\": \"ACTIVE\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8080/api/v1/enterprises/1/services",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8080",
+                    "path": [
+                        "api",
+                        "v1",
+                        "enterprises",
+                        "1",
+                        "services"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "List Service Usages by Enterprise",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:8080/api/v1/enterprises/1/services?status=ACTIVE",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8080",
+                    "path": [
+                        "api",
+                        "v1",
+                        "enterprises",
+                        "1",
+                        "services"
+                    ],
+                    "query": [
+                        {
+                            "key": "status",
+                            "value": "ACTIVE"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

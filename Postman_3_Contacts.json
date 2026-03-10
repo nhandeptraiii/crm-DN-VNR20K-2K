@@ -1,0 +1,82 @@
+{
+    "info": {
+        "_postman_id": "c1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6f",
+        "name": "3. CRM Enterprise Contacts Module",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Add Contact (Sub-resource)",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"position\": \"Giám đốc\",\n  \"email\": \"nguyenvana@gmail.com\",\n  \"phone\": \"0123456789\",\n  \"isPrimary\": true\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8080/api/v1/enterprises/1/contacts",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8080",
+                    "path": [
+                        "api",
+                        "v1",
+                        "enterprises",
+                        "1",
+                        "contacts"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "List Contacts by Enterprise ID",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:8080/api/v1/enterprises/1/contacts",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8080",
+                    "path": [
+                        "api",
+                        "v1",
+                        "enterprises",
+                        "1",
+                        "contacts"
+                    ]
+                }
+            }
+        }
+    ]
+}

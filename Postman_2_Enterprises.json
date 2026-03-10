@@ -1,0 +1,123 @@
+{
+    "info": {
+        "_postman_id": "b1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6e",
+        "name": "2. CRM Enterprises Module",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Create Enterprise",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel\",\n  \"taxCode\": \"0101234567\",\n  \"industry\": \"IT & Viễn Thông\",\n  \"employeeCount\": 500,\n  \"address\": \"D29 Phạm Văn Bạch, Cầu Giấy, HN\",\n  \"phone\": \"0988123456\",\n  \"website\": \"viettelsoftware.com\",\n  \"establishedDate\": \"2010-05-15\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8080/api/v1/enterprises",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8080",
+                    "path": [
+                        "api",
+                        "v1",
+                        "enterprises"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get All Enterprises",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:8080/api/v1/enterprises?page=0&size=10&keyword=",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8080",
+                    "path": [
+                        "api",
+                        "v1",
+                        "enterprises"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "0"
+                        },
+                        {
+                            "key": "size",
+                            "value": "10"
+                        },
+                        {
+                            "key": "keyword",
+                            "value": ""
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Enterprise Detail",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:8080/api/v1/enterprises/1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8080",
+                    "path": [
+                        "api",
+                        "v1",
+                        "enterprises",
+                        "1"
+                    ]
+                }
+            }
+        }
+    ]
+}

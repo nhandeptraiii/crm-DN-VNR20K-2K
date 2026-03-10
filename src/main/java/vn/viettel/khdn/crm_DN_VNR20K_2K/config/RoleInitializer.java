@@ -13,7 +13,6 @@ public class RoleInitializer {
     public ApplicationRunner rolesInitializer(RoleService roleService) {
         return args -> {
             roleService.ensureRole("ADMIN", "Toàn quyền hệ thống");
-            roleService.ensureRole("MANAGER", "Quản lý, xem tất cả dữ liệu");
             roleService.ensureRole("CONSULTANT", "Nhân viên tư vấn giải pháp");
         };
     }

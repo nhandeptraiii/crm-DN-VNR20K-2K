@@ -26,32 +26,54 @@
           ],
           "request": {
             "method": "POST",
-            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@viettel.com.vn\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\n  \"email\": \"admin@viettel.com\",\n  \"password\": \"Admin@123\"\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/auth/login",
+              "raw": "http://localhost:8080/login",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "auth", "login" ]
+              "path": [
+                "login"
+              ]
             }
           }
         },
         {
           "name": "1.2. Logout",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/auth/logout",
+              "raw": "http://localhost:8080/logout",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "auth", "logout" ]
+              "path": [
+                "logout"
+              ]
             }
           }
         }
@@ -63,24 +85,52 @@
         {
           "name": "2.0. Get Current User (Me)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:8080/users/me",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "users", "me" ]
+              "path": [
+                "users",
+                "me"
+              ]
             }
           }
         },
         {
           "name": "2.1. Create User (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
-            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"fullName\": \"Nhân viên Sale mới\",\n  \"email\": \"sale1@viettel.com.vn\",\n  \"phone\": \"0988123123\",\n  \"password\": \"sale123\"\n}"
@@ -88,29 +138,58 @@
             "url": {
               "raw": "http://localhost:8080/users",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "users" ]
+              "path": [
+                "users"
+              ]
             }
           }
         },
         {
           "name": "2.2. Get All Users (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:8080/users?page=0&size=10&keyword=&role=",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "users" ],
+              "path": [
+                "users"
+              ],
               "query": [
-                { "key": "page", "value": "0" },
-                { "key": "size", "value": "10" },
-                { "key": "keyword", "value": "" },
-                { "key": "role", "value": "" }
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                },
+                {
+                  "key": "keyword",
+                  "value": ""
+                },
+                {
+                  "key": "role",
+                  "value": ""
+                }
               ]
             }
           }
@@ -118,24 +197,52 @@
         {
           "name": "2.3. Get User By ID (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:8080/users/1",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "users", "1" ]
+              "path": [
+                "users",
+                "1"
+              ]
             }
           }
         },
         {
           "name": "2.4. Update User (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PUT",
-            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"fullName\": \"Nhân viên Sale 1 Edit\",\n  \"phone\": \"0988999999\"\n}"
@@ -143,24 +250,43 @@
             "url": {
               "raw": "http://localhost:8080/users/2",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "users", "2" ]
+              "path": [
+                "users",
+                "2"
+              ]
             }
           }
         },
         {
           "name": "2.5. Delete User (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "http://localhost:8080/users/2",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "users", "2" ]
+              "path": [
+                "users",
+                "2"
+              ]
             }
           }
         }
@@ -172,24 +298,51 @@
         {
           "name": "3.1. Get All Roles (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "http://localhost:8080/roles",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "roles" ]
+              "path": [
+                "roles"
+              ]
             }
           }
         },
         {
           "name": "3.2. Create Role (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
-            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"GUEST\",\n  \"description\": \"Chỉ xem tổng quan\"\n}"
@@ -197,18 +350,36 @@
             "url": {
               "raw": "http://localhost:8080/roles",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "roles" ]
+              "path": [
+                "roles"
+              ]
             }
           }
         },
         {
           "name": "3.3. Assign Role to User (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
-            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"role\": \"CONSULTANT\"\n}"
@@ -216,18 +387,38 @@
             "url": {
               "raw": "http://localhost:8080/roles/2/assign",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "roles", "2", "assign" ]
+              "path": [
+                "roles",
+                "2",
+                "assign"
+              ]
             }
           }
         },
         {
           "name": "3.4. Revoke Role from User (ADMIN)",
           "request": {
-            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
-            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"role\": \"CONSULTANT\"\n}"
@@ -235,9 +426,15 @@
             "url": {
               "raw": "http://localhost:8080/roles/2/revoke",
               "protocol": "http",
-              "host": [ "localhost" ],
+              "host": [
+                "localhost"
+              ],
               "port": "8080",
-              "path": [ "roles", "2", "revoke" ]
+              "path": [
+                "roles",
+                "2",
+                "revoke"
+              ]
             }
           }
         }
@@ -245,7 +442,9 @@
     }
   ],
   "variable": [
-    { "key": "access_token", "value": "" }
+    {
+      "key": "access_token",
+      "value": ""
+    }
   ]
 }
-

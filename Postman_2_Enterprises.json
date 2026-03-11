@@ -16,11 +16,11 @@
           "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel\",\n  \"taxCode\": \"0101234567\",\n  \"industry\": \"IT & Viễn Thông\",\n  \"employeeCount\": 500,\n  \"address\": \"D29 Phạm Văn Bạch, Cầu Giấy, HN\",\n  \"phone\": \"0988123456\",\n  \"website\": \"viettelsoftware.com\",\n  \"establishedDate\": \"2010-05-15\"\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises",
+          "raw": "http://localhost:8080/enterprises",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises" ]
+          "path": [ "enterprises" ]
         }
       }
     },
@@ -31,11 +31,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises?page=0&size=10&keyword=&status=",
+          "raw": "http://localhost:8080/enterprises?page=0&size=10&keyword=&status=",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises" ],
+          "path": [ "enterprises" ],
           "query": [
             { "key": "page", "value": "0" },
             { "key": "size", "value": "10" },
@@ -52,11 +52,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises/1",
+          "raw": "http://localhost:8080/enterprises/1",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises", "1" ]
+          "path": [ "enterprises", "1" ]
         }
       }
     },
@@ -71,11 +71,11 @@
           "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel (Updated)\",\n  \"status\": \"ACTIVE_CUSTOMER\",\n  \"employeeCount\": 600\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises/1",
+          "raw": "http://localhost:8080/enterprises/1",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises", "1" ]
+          "path": [ "enterprises", "1" ]
         }
       }
     },
@@ -86,11 +86,11 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises/1",
+          "raw": "http://localhost:8080/enterprises/1",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises", "1" ]
+          "path": [ "enterprises", "1" ]
         }
       }
     }

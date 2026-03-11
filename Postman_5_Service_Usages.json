@@ -16,11 +16,11 @@
           "raw": "{\n  \"viettelServiceId\": 1,\n  \"contractNumber\": \"HD12345/V-CA\",\n  \"startDate\": \"2023-01-01\",\n  \"status\": \"ACTIVE\"\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises/1/services",
+          "raw": "http://localhost:8080/enterprises/1/services",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises", "1", "services" ]
+          "path": [ "enterprises", "1", "services" ]
         }
       }
     },
@@ -31,11 +31,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises/1/services?status=&page=0&size=10",
+          "raw": "http://localhost:8080/enterprises/1/services?status=&page=0&size=10",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises", "1", "services" ],
+          "path": [ "enterprises", "1", "services" ],
           "query": [
              { "key": "status", "value": "", "description": "ACTIVE, EXPIRED, CANCELLED" },
              { "key": "page", "value": "0" },
@@ -51,11 +51,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises/1/services/1",
+          "raw": "http://localhost:8080/enterprises/1/services/1",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises", "1", "services", "1" ]
+          "path": [ "enterprises", "1", "services", "1" ]
         }
       }
     },
@@ -70,11 +70,11 @@
           "raw": "{\n  \"status\": \"EXPIRED\"\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises/1/services/1",
+          "raw": "http://localhost:8080/enterprises/1/services/1",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises", "1", "services", "1" ]
+          "path": [ "enterprises", "1", "services", "1" ]
         }
       }
     },
@@ -85,11 +85,11 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/enterprises/1/services/1",
+          "raw": "http://localhost:8080/enterprises/1/services/1",
           "protocol": "http",
           "host": [ "localhost" ],
           "port": "8080",
-          "path": [ "api", "v1", "enterprises", "1", "services", "1" ]
+          "path": [ "enterprises", "1", "services", "1" ]
         }
       }
     }

@@ -19,8 +19,7 @@ public class FormatRestResponse implements ResponseBodyAdvice {
     public boolean supports(MethodParameter returnType, Class converterType) {
         Class<?> paramType = returnType.getParameterType();
         return !(byte[].class.equals(paramType)
-                || org.springframework.core.io.Resource.class.isAssignableFrom(paramType)
-                || org.springframework.http.ResponseEntity.class.isAssignableFrom(paramType));
+                || org.springframework.core.io.Resource.class.isAssignableFrom(paramType));
     }
 
     @Override
@@ -39,6 +38,10 @@ public class FormatRestResponse implements ResponseBodyAdvice {
         res.setStatusCode(status);
 
         if (body instanceof String) {
+            return body;
+        }
+
+        if (body instanceof RestResponse) {
             return body;
         }
 

@@ -34,7 +34,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@viettel.com\",\n  \"password\": \"Admin@123\"\n}"
+              "raw": "{\n  \"email\": \"admin@viettel.com\",\n  \"password\": \"123456\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/login",
@@ -133,7 +133,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Nhân viên Sale mới\",\n  \"email\": \"sale1@viettel.com.vn\",\n  \"phone\": \"0988123123\",\n  \"password\": \"sale123\"\n}"
+              "raw": "{\n  \"fullName\": \"Nhân viên Sale mới\",\n  \"email\": \"sale1@viettel.com.vn\",\n  \"phone\": \"0988123123\",\n  \"password\": \"sale123\",\n  \"role\": \"CONSULTANT\",\n  \"dateOfBirth\": \"21-08-2003\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/users",
@@ -164,7 +164,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/users?page=0&size=10&keyword=&role=",
+              "raw": "http://localhost:8080/users?page=0&size=10&keyword=&role=CONSULTANT",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -188,7 +188,7 @@
                 },
                 {
                   "key": "role",
-                  "value": ""
+                  "value": "CONSULTANT"
                 }
               ]
             }
@@ -286,154 +286,6 @@
               "path": [
                 "users",
                 "2"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "3. Roles (Phân Quyền)",
-      "item": [
-        {
-          "name": "3.1. Get All Roles (ADMIN)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{access_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/roles",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "roles"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.2. Create Role (ADMIN)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{access_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"GUEST\",\n  \"description\": \"Chỉ xem tổng quan\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8080/roles",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "roles"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.3. Assign Role to User (ADMIN)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{access_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"role\": \"CONSULTANT\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8080/roles/2/assign",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "roles",
-                "2",
-                "assign"
-              ]
-            }
-          }
-        },
-        {
-          "name": "3.4. Revoke Role from User (ADMIN)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{access_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"role\": \"CONSULTANT\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8080/roles/2/revoke",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "roles",
-                "2",
-                "revoke"
               ]
             }
           }

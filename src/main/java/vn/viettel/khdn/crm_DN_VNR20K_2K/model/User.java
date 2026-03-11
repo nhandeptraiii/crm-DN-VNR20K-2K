@@ -2,27 +2,26 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.model;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
 
 @Getter
 @Setter
@@ -47,9 +46,9 @@ public class User {
     @Column(length = 20)
     private String gender;
 
-    @Column(length = 255)
-    private String avatarUrl;
 
+    @JsonAlias({"date_of_birth", "dateOfBirth"})
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dateOfBirth;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -62,11 +61,9 @@ public class User {
 
     private Instant updatedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private RoleEnum role = RoleEnum.CONSULTANT;
 
     @PrePersist
     public void handleBeforeCreate() {

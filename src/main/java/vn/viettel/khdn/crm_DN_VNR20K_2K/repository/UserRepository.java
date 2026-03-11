@@ -16,20 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     @Query(value = """
-            SELECT DISTINCT u FROM User u
-            LEFT JOIN u.roles r
-            WHERE (:roleName IS NULL OR UPPER(r.name) = :roleName)
-              AND (
-                :keyword IS NULL
-                OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR u.phone LIKE CONCAT('%', :keyword, '%')
-              )
-            """,
-            countQuery = """
-            SELECT COUNT(DISTINCT u) FROM User u
-            LEFT JOIN u.roles r
-            WHERE (:roleName IS NULL OR UPPER(r.name) = :roleName)
+            SELECT u FROM User u
+            WHERE (:role IS NULL OR u.role = :role)
               AND (
                 :keyword IS NULL
                 OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
@@ -37,5 +25,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 OR u.phone LIKE CONCAT('%', :keyword, '%')
               )
             """)
-    Page<User> searchUsers(@Param("roleName") String roleName, @Param("keyword") String keyword, Pageable pageable);
+    Page<User> searchUsers(@Param("role") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, @Param("keyword") String keyword, Pageable pageable);
 }

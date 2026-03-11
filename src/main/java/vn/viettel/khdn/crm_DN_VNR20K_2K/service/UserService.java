@@ -56,9 +56,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<User> searchUsers(String roleName, String keyword,
+    public org.springframework.data.domain.Page<User> searchUsers(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, String keyword,
             org.springframework.data.domain.Pageable pageable) {
-        return userRepository.searchUsers(roleName, keyword, pageable);
+        return userRepository.searchUsers(role, keyword, pageable);
     }
 
     public User updateUser(Long id, User updateData) {
@@ -75,11 +75,12 @@ public class UserService {
         if (updateData.getDateOfBirth() != null) {
             user.setDateOfBirth(updateData.getDateOfBirth());
         }
-        if (updateData.getAvatarUrl() != null) {
-            user.setAvatarUrl(updateData.getAvatarUrl());
-        }
+
         if (updateData.getStatus() != null) {
             user.setStatus(updateData.getStatus());
+        }
+        if (updateData.getRole() != null) {
+            user.setRole(updateData.getRole());
         }
         return userRepository.save(user);
     }

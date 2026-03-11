@@ -1,6 +1,5 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.service;
 
-import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +19,6 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseContactRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.InteractionRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.UserRepository;
-import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.GlobalException;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 
 @Service
@@ -101,8 +99,7 @@ public class InteractionService {
         User currentUser = getCurrentUser();
         Long filterConsultantId = consultantId;
 
-        // RULES: Nếu là CONSULTANT, ép buộc chỉ xem của chính mình
-        boolean isConsultant = currentUser.getRoles().stream().anyMatch(r -> r.getName().equals("CONSULTANT"));
+        boolean isConsultant = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT;
         if (isConsultant) {
             filterConsultantId = currentUser.getId();
         }
@@ -149,8 +146,7 @@ public class InteractionService {
 
     private void checkPermission(Interaction interaction) throws Exception {
         User currentUser = getCurrentUser();
-        boolean isAdminOrManager = currentUser.getRoles().stream()
-                .anyMatch(r -> r.getName().equals("ADMIN") || r.getName().equals("MANAGER"));
+        boolean isAdminOrManager = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ADMIN;
 
         if (!isAdminOrManager && !interaction.getConsultant().getId().equals(currentUser.getId())) {
             throw new Exception("Bạn không có quyền truy cập nhật ký tương tác của người khác!");

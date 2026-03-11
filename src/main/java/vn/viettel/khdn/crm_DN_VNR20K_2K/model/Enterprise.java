@@ -2,6 +2,7 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.model;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,6 +50,7 @@ public class Enterprise {
     private String website;
 
     @Column(name = "established_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate establishedDate;
 
     @Column(length = 30)

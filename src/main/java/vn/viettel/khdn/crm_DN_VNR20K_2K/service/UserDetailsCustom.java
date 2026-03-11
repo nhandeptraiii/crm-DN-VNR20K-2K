@@ -1,7 +1,6 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.service;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,11 +32,11 @@ public class UserDetailsCustom implements UserDetailsService {
         if ("BANNED".equals(normalizedStatus)) {
             throw new DisabledException("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.");
         }
-        Set<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()))
-                .collect(Collectors.toSet());
-        if (authorities.isEmpty()) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        Set<SimpleGrantedAuthority> authorities = new java.util.HashSet<>();
+        if (user.getRole() != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("ROLE_CONSULTANT"));
         }
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(), user.getPassword(), authorities);

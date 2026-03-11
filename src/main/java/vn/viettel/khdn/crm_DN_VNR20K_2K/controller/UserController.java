@@ -1,6 +1,5 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.controller;
 
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -57,9 +56,14 @@ public class UserController {
             int safePage = page != null ? Math.max(page, 0) : 0;
             int safeSize = size != null ? Math.min(Math.max(size, 1), 50) : 10;
             Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Order.asc("fullName")));
-            Page<User> result = userService.searchUsers(
-                    role != null ? role.trim().toUpperCase() : null,
-                    keyword, pageable);
+            vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum roleEnum = null;
+            if (role != null && !role.trim().isEmpty()) {
+                try {
+                    roleEnum = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.valueOf(role.trim().toUpperCase());
+                } catch (Exception ignored) {
+                }
+            }
+            Page<User> result = userService.searchUsers(roleEnum, keyword, pageable);
             return ResponseEntity.ok(result);
         }
         return ResponseEntity.ok(userService.findAll());

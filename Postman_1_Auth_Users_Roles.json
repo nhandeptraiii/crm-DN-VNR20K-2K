@@ -262,7 +262,85 @@
           }
         },
         {
-          "name": "2.5. Delete User (ADMIN)",
+          "name": "2.5. Update My Password (USER)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"sale123\",\n  \"newPassword\": \"sale1234\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/users/me/password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "users",
+                "me",
+                "password"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.6. Reset Password (ADMIN)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"admin_reset_123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/users/2/reset-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "users",
+                "2",
+                "reset-password"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.7. Delete User (ADMIN)",
           "request": {
             "auth": {
               "type": "bearer",

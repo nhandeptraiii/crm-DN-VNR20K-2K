@@ -2,6 +2,7 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.controller;
 
 
 import org.springframework.data.domain.Page;
+import java.util.Map;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqChangePasswordDTO;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqResetPasswordDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.service.UserService;
 
 @RestController
@@ -82,10 +85,26 @@ public class UserController {
         return ResponseEntity.ok(updated);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/me/password")
+    public ResponseEntity<Map<String, String>> changePassword(@Valid @RequestBody ReqChangePasswordDTO req) {
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userService.getUserByEmail(email);
+        userService.changePassword(currentUser.getId(), req.getOldPassword(), req.getNewPassword());
+        return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công!"));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@PathVariable("id") Long id, @Valid @RequestBody ReqResetPasswordDTO req) {
+        userService.resetPassword(id, req.getNewPassword());
+        return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công!"));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Xóa người dùng thành công!"));
     }
 }

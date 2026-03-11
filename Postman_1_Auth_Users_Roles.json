@@ -1,0 +1,235 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "name": "1. CRM Auth, Users & Roles",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Auth (Xác Thực)",
+      "item": [
+        {
+          "name": "1.1. Login (Lấy Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData && jsonData.data && jsonData.data.access_token) {",
+                  "    pm.collectionVariables.set(\"access_token\", jsonData.data.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@viettel.com.vn\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/login",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "auth", "login" ]
+            }
+          }
+        },
+        {
+          "name": "1.2. Logout",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/logout",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "auth", "logout" ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Users (Nhân Viên)",
+      "item": [
+        {
+          "name": "2.1. Create User (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nhân viên Sale mới\",\n  \"email\": \"sale1@viettel.com.vn\",\n  \"phone\": \"0988123123\",\n  \"password\": \"sale123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "users" ]
+            }
+          }
+        },
+        {
+          "name": "2.2. Get All Users (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users?page=0&size=10&keyword=&role=",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "users" ],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "keyword", "value": "" },
+                { "key": "role", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.3. Get User By ID (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/1",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "users", "1" ]
+            }
+          }
+        },
+        {
+          "name": "2.4. Update User (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nhân viên Sale 1 Edit\",\n  \"phone\": \"0988999999\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/2",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "users", "2" ]
+            }
+          }
+        },
+        {
+          "name": "2.5. Delete User (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/2",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "users", "2" ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Roles (Phân Quyền)",
+      "item": [
+        {
+          "name": "3.1. Get All Roles (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/roles",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "roles" ]
+            }
+          }
+        },
+        {
+          "name": "3.2. Create Role (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"GUEST\",\n  \"description\": \"Chỉ xem tổng quan\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/roles",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "roles" ]
+            }
+          }
+        },
+        {
+          "name": "3.3. Assign Role to User (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"CONSULTANT\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/roles/2/assign",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "roles", "2", "assign" ]
+            }
+          }
+        },
+        {
+          "name": "3.4. Revoke Role from User (ADMIN)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"CONSULTANT\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/roles/2/revoke",
+              "protocol": "http",
+              "host": [ "localhost" ],
+              "port": "8080",
+              "path": [ "api", "v1", "roles", "2", "revoke" ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "access_token", "value": "" }
+  ]
+}

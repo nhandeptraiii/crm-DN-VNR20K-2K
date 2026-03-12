@@ -11,7 +11,6 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
 @Setter
 public class ResEnterpriseDTO {
     private Long id;
-    private String enterpriseCode;
     private String name;
     private String taxCode;
     private String industry;

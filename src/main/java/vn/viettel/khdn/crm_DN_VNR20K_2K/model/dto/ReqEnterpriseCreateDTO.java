@@ -37,4 +37,16 @@ public class ReqEnterpriseCreateDTO {
 
     @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
     private String note;
+
+    @Size(max = 150, message = "Họ tên người đại diện tối đa 150 ký tự")
+    private String contactFullName;
+
+    @Size(max = 120, message = "Email người đại diện tối đa 120 ký tự")
+    private String contactEmail;
+
+    @Size(max = 30, message = "SĐT người đại diện tối đa 30 ký tự")
+    private String contactPhone;
+
+    @Size(max = 100, message = "Chức vụ người đại diện tối đa 100 ký tự")
+    private String contactPosition;
 }

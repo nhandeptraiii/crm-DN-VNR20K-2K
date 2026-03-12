@@ -111,7 +111,6 @@ public class EnterpriseServiceUsageService {
         dto.setId(u.getId());
         dto.setEnterpriseId(u.getEnterprise().getId());
         dto.setEnterpriseName(u.getEnterprise().getName());
-        dto.setEnterpriseCode(u.getEnterprise().getEnterpriseCode());
         dto.setViettelServiceId(u.getViettelService().getId());
         dto.setServiceCode(u.getViettelService().getServiceCode());
         dto.setServiceName(u.getViettelService().getServiceName());

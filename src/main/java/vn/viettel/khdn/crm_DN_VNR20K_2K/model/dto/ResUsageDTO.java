@@ -15,7 +15,6 @@ public class ResUsageDTO {
     // Enterprise Info
     private Long enterpriseId;
     private String enterpriseName;
-    private String enterpriseCode;
 
     // Viettel Service Info
     private Long viettelServiceId;

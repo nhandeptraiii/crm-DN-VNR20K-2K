@@ -19,13 +19,10 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
 
     boolean existsByTaxCode(String taxCode);
 
-    boolean existsByEnterpriseCode(String enterpriseCode);
-
     @Query("SELECT e FROM Enterprise e WHERE "
             + "(:keyword IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')) "
             + "OR LOWER(e.taxCode) LIKE LOWER(CONCAT('%', :keyword, '%')) "
-            + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%')) "
-            + "OR LOWER(e.enterpriseCode) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
+            + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
             + "AND (:status IS NULL OR e.status = :status)")
     Page<Enterprise> searchEnterprises(
             @Param("keyword") String keyword,

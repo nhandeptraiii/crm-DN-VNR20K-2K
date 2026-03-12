@@ -1,16 +1,18 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.service;
 
-import java.time.LocalDate;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Enterprise;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.EnterpriseContact;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqEnterpriseCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqEnterpriseUpdateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResEnterpriseDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseContactRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 
@@ -18,12 +20,16 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 public class EnterpriseService {
 
     private final EnterpriseRepository enterpriseRepository;
+    private final EnterpriseContactRepository enterpriseContactRepository;
 
-    public EnterpriseService(EnterpriseRepository enterpriseRepository) {
+    public EnterpriseService(EnterpriseRepository enterpriseRepository,
+            EnterpriseContactRepository enterpriseContactRepository) {
         this.enterpriseRepository = enterpriseRepository;
+        this.enterpriseContactRepository = enterpriseContactRepository;
     }
 
     // --- Tạo mới ---
+    @Transactional
     public ResEnterpriseDTO createEnterprise(ReqEnterpriseCreateDTO dto) throws IdInvalidException {
         // Kiểm tra MST đã tồn tại
         if (enterpriseRepository.existsByTaxCode(dto.getTaxCode())) {
@@ -41,10 +47,20 @@ public class EnterpriseService {
         enterprise.setPhone(dto.getPhone());
         enterprise.setNote(dto.getNote());
 
-        // Auto-gen mã doanh nghiệp: DN-yyyy-xxxx
-        enterprise.setEnterpriseCode(generateEnterpriseCode());
-
         Enterprise saved = enterpriseRepository.save(enterprise);
+
+        // Thêm người đại diện nếu có
+        if (dto.getContactFullName() != null && !dto.getContactFullName().isBlank()) {
+            EnterpriseContact contact = new EnterpriseContact();
+            contact.setEnterprise(saved);
+            contact.setFullName(dto.getContactFullName());
+            contact.setEmail(dto.getContactEmail());
+            contact.setPhone(dto.getContactPhone());
+            contact.setPosition(dto.getContactPosition());
+            contact.setIsPrimary(true);
+            enterpriseContactRepository.save(contact);
+        }
+
         return toDTO(saved);
     }
 
@@ -107,23 +123,11 @@ public class EnterpriseService {
         enterpriseRepository.deleteById(id);
     }
 
-    // --- Helper: Auto-gen mã DN ---
-    private String generateEnterpriseCode() {
-        int year = LocalDate.now().getYear();
-        long nextSeq = enterpriseRepository.findMaxId() + 1;
-        String code;
-        do {
-            code = String.format("DN-%d-%04d", year, nextSeq);
-            nextSeq++;
-        } while (enterpriseRepository.existsByEnterpriseCode(code));
-        return code;
-    }
 
     // --- Helper: Entity → DTO ---
     private ResEnterpriseDTO toDTO(Enterprise e) {
         ResEnterpriseDTO dto = new ResEnterpriseDTO();
         dto.setId(e.getId());
-        dto.setEnterpriseCode(e.getEnterpriseCode());
         dto.setName(e.getName());
         dto.setTaxCode(e.getTaxCode());
         dto.setIndustry(e.getIndustry());

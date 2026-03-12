@@ -28,9 +28,6 @@ public class Enterprise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "enterprise_code", unique = true, length = 30)
-    private String enterpriseCode;
-
     @Column(nullable = false, length = 255)
     private String name;
 

@@ -9,7 +9,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqServiceCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqServiceUpdateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResServiceDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.ViettelServiceRepository;
-import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ViettelServiceService {
@@ -20,51 +20,38 @@ public class ViettelServiceService {
         this.serviceRepository = serviceRepository;
     }
 
-    public ResServiceDTO createService(ReqServiceCreateDTO dto) throws IdInvalidException {
-        if (serviceRepository.existsByServiceCode(dto.getServiceCode())) {
-            throw new IdInvalidException("Mã dịch vụ '" + dto.getServiceCode() + "' đã tồn tại");
-        }
-
+    public ResServiceDTO createService(ReqServiceCreateDTO dto) {
         ViettelService service = new ViettelService();
         service.setServiceCode(dto.getServiceCode());
         service.setServiceName(dto.getServiceName());
-        service.setCategory(dto.getCategory());
         service.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
 
         ViettelService saved = serviceRepository.save(service);
         return toDTO(saved);
     }
 
-    public Page<ResServiceDTO> searchServices(String keyword, String category, Boolean isActive, Pageable pageable) {
+    public Page<ResServiceDTO> searchServices(String keyword, Boolean isActive, Pageable pageable) {
         Page<ViettelService> page = serviceRepository.searchServices(
                 keyword != null && !keyword.isBlank() ? keyword.trim() : null,
-                category != null && !category.isBlank() ? category.trim() : null,
                 isActive,
                 pageable);
         return page.map(this::toDTO);
     }
 
-    public ResServiceDTO getServiceById(Long id) throws IdInvalidException {
+    public ResServiceDTO getServiceById(Long id) {
         ViettelService service = serviceRepository.findById(id)
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy dịch vụ Viettel với ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy dịch vụ Viettel với ID: " + id));
         return toDTO(service);
     }
 
-    public ResServiceDTO updateService(Long id, ReqServiceUpdateDTO dto) throws IdInvalidException {
+    public ResServiceDTO updateService(Long id, ReqServiceUpdateDTO dto) {
         ViettelService service = serviceRepository.findById(id)
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy dịch vụ Viettel với ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy dịch vụ Viettel với ID: " + id));
 
-        if (dto.getServiceCode() != null && !dto.getServiceCode().equals(service.getServiceCode())) {
-            if (serviceRepository.existsByServiceCode(dto.getServiceCode())) {
-                throw new IdInvalidException("Mã dịch vụ '" + dto.getServiceCode() + "' đã tồn tại");
-            }
+        if (dto.getServiceCode() != null)
             service.setServiceCode(dto.getServiceCode());
-        }
-
         if (dto.getServiceName() != null)
             service.setServiceName(dto.getServiceName());
-        if (dto.getCategory() != null)
-            service.setCategory(dto.getCategory());
         if (dto.getIsActive() != null)
             service.setIsActive(dto.getIsActive());
 
@@ -72,9 +59,9 @@ public class ViettelServiceService {
         return toDTO(updated);
     }
 
-    public void deleteService(Long id) throws IdInvalidException {
+    public void deleteService(Long id) {
         if (!serviceRepository.existsById(id)) {
-            throw new IdInvalidException("Không tìm thấy dịch vụ Viettel với ID: " + id);
+            throw new EntityNotFoundException("Không tìm thấy dịch vụ Viettel với ID: " + id);
         }
         serviceRepository.deleteById(id);
     }
@@ -84,7 +71,6 @@ public class ViettelServiceService {
         dto.setId(s.getId());
         dto.setServiceCode(s.getServiceCode());
         dto.setServiceName(s.getServiceName());
-        dto.setCategory(s.getCategory());
         dto.setIsActive(s.getIsActive());
         dto.setCreatedAt(s.getCreatedAt());
         dto.setUpdatedAt(s.getUpdatedAt());

@@ -22,7 +22,6 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqServiceCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqServiceUpdateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResServiceDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.service.ViettelServiceService;
-import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 
 @RestController
 @RequestMapping("/viettel-services")
@@ -36,8 +35,7 @@ public class ViettelServiceController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ResServiceDTO> create(@Valid @RequestBody ReqServiceCreateDTO dto)
-            throws IdInvalidException {
+    public ResponseEntity<ResServiceDTO> create(@Valid @RequestBody ReqServiceCreateDTO dto) {
         ResServiceDTO created = serviceService.createService(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -46,32 +44,31 @@ public class ViettelServiceController {
     @GetMapping
     public ResponseEntity<Page<ResServiceDTO>> list(
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "isActive", required = false) Boolean isActive,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         int safeSize = Math.min(Math.max(size, 1), 50);
         Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(Sort.Order.asc("serviceName")));
-        Page<ResServiceDTO> result = serviceService.searchServices(keyword, category, isActive, pageable);
+        Page<ResServiceDTO> result = serviceService.searchServices(keyword, isActive, pageable);
         return ResponseEntity.ok(result);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<ResServiceDTO> getById(@PathVariable("id") Long id) throws IdInvalidException {
+    public ResponseEntity<ResServiceDTO> getById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(serviceService.getServiceById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ResServiceDTO> update(@PathVariable("id") Long id,
-            @Valid @RequestBody ReqServiceUpdateDTO dto) throws IdInvalidException {
+            @Valid @RequestBody ReqServiceUpdateDTO dto) {
         return ResponseEntity.ok(serviceService.updateService(id, dto));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) throws IdInvalidException {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         serviceService.deleteService(id);
         return ResponseEntity.noContent().build();
     }

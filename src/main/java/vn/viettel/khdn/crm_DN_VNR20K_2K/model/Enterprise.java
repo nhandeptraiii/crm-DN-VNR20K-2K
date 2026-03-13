@@ -71,7 +71,7 @@ public class Enterprise {
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         if (this.status == null) {
-            this.status = EnterpriseStatus.PROSPECT;
+            this.status = EnterpriseStatus.ACTIVE;
         }
     }
 

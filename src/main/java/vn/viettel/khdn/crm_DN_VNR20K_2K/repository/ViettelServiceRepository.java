@@ -14,14 +14,14 @@ public interface ViettelServiceRepository extends JpaRepository<ViettelService, 
 
     boolean existsByServiceCode(String serviceCode);
 
+    boolean existsByServiceCodeIgnoreCase(String serviceCode);
+
     @Query("SELECT s FROM ViettelService s WHERE " +
             "(:keyword IS NULL OR LOWER(s.serviceName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(s.serviceCode) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
             +
-            "AND (:category IS NULL OR LOWER(s.category) = LOWER(:category)) " +
             "AND (:isActive IS NULL OR s.isActive = :isActive)")
     Page<ViettelService> searchServices(
             @Param("keyword") String keyword,
-            @Param("category") String category,
             @Param("isActive") Boolean isActive,
             Pageable pageable);
 }

@@ -14,8 +14,5 @@ public class ReqServiceUpdateDTO {
     @Size(max = 255, message = "Tên dịch vụ tối đa 255 ký tự")
     private String serviceName;
 
-    @Size(max = 100, message = "Phân loại (category) tối đa 100 ký tự")
-    private String category;
-
     private Boolean isActive;
 }

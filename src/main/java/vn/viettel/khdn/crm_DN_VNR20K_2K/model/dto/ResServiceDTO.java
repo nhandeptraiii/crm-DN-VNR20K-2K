@@ -11,7 +11,6 @@ public class ResServiceDTO {
     private Long id;
     private String serviceCode;
     private String serviceName;
-    private String category;
     private Boolean isActive;
     private Instant createdAt;
     private Instant updatedAt;

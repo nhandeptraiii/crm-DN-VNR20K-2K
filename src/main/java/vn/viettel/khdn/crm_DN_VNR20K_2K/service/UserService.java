@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUserCreateDTO;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUserUpdateDTO;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResUserDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.UserRepository;
 
 @Service
@@ -26,72 +29,90 @@ public class UserService {
         return userRepository.findByEmail(username).orElse(null);
     }
 
-    public User createUser(User user) {
-        Optional<User> existing = userRepository.findByEmail(user.getEmail());
+    public ResUserDTO createUser(ReqUserCreateDTO dto) {
+        Optional<User> existing = userRepository.findByEmail(dto.getEmail());
         if (existing.isPresent()) {
-            throw new EntityExistsException("Email đã tồn tại: " + user.getEmail());
+            throw new EntityExistsException("Email đã tồn tại: " + dto.getEmail());
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getStatus() == null) {
-            user.setStatus("ACTIVE");
-        }
-        return userRepository.save(user);
+
+        User user = new User();
+        user.setFullName(dto.getFullName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setPhone(dto.getPhone());
+        user.setGender(dto.getGender());
+        user.setDateOfBirth(dto.getDateOfBirth());
+        user.setRole(dto.getRole() != null ? dto.getRole() : vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT);
+        user.setStatus("ACTIVE");
+
+        User saved = userRepository.save(user);
+        return convertToResUserDTO(saved);
     }
 
     @Transactional(readOnly = true)
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    public ResUserDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User không tồn tại: " + id));
+        return convertToResUserDTO(user);
     }
 
     @Transactional(readOnly = true)
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+    public ResUserDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User không tồn tại: " + email));
+        return convertToResUserDTO(user);
     }
 
     @Transactional(readOnly = true)
-    public java.util.List<User> findAll() {
-        return userRepository.findAll();
+    public java.util.List<ResUserDTO> findAll() {
+        return userRepository.findAll().stream()
+                .map(this::convertToResUserDTO)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<User> searchUsers(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, String keyword,
+    public org.springframework.data.domain.Page<ResUserDTO> searchUsers(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, String keyword,
             org.springframework.data.domain.Pageable pageable) {
-        return userRepository.searchUsers(role, keyword, pageable);
+        org.springframework.data.domain.Page<User> page = userRepository.searchUsers(role, keyword, pageable);
+        return page.map(this::convertToResUserDTO);
     }
 
-    public User updateUser(Long id, User updateData) {
-        User user = getUserById(id);
-        if (updateData.getFullName() != null) {
-            user.setFullName(updateData.getFullName());
+    public ResUserDTO updateUser(Long id, ReqUserUpdateDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại: " + id));
+
+        if (dto.getFullName() != null) {
+            user.setFullName(dto.getFullName());
         }
-        if (updateData.getPhone() != null) {
-            user.setPhone(updateData.getPhone());
+        if (dto.getPhone() != null) {
+            user.setPhone(dto.getPhone());
         }
-        if (updateData.getGender() != null) {
-            user.setGender(updateData.getGender());
+        if (dto.getGender() != null) {
+            user.setGender(dto.getGender());
         }
-        if (updateData.getDateOfBirth() != null) {
-            user.setDateOfBirth(updateData.getDateOfBirth());
+        if (dto.getDateOfBirth() != null) {
+            user.setDateOfBirth(dto.getDateOfBirth());
+        }
+        if (dto.getStatus() != null) {
+            user.setStatus(dto.getStatus());
+        }
+        if (dto.getRole() != null) {
+            user.setRole(dto.getRole());
         }
 
-        if (updateData.getStatus() != null) {
-            user.setStatus(updateData.getStatus());
-        }
-        if (updateData.getRole() != null) {
-            user.setRole(updateData.getRole());
-        }
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        return convertToResUserDTO(saved);
     }
 
     public void deleteUser(Long id) {
-        User user = getUserById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại: " + id));
         userRepository.delete(user);
     }
 
     public void changePassword(Long userId, String oldPassword, String newPassword) {
-        User user = getUserById(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại: " + userId));
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new IllegalArgumentException("Mật khẩu cũ không đúng");
         }
@@ -100,8 +121,24 @@ public class UserService {
     }
 
     public void resetPassword(Long userId, String newPassword) {
-        User user = getUserById(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại: " + userId));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    private ResUserDTO convertToResUserDTO(User user) {
+        ResUserDTO dto = new ResUserDTO();
+        dto.setId(user.getId());
+        dto.setFullName(user.getFullName());
+        dto.setEmail(user.getEmail());
+        dto.setPhone(user.getPhone());
+        dto.setGender(user.getGender());
+        dto.setDateOfBirth(user.getDateOfBirth());
+        dto.setStatus(user.getStatus());
+        dto.setRole(user.getRole());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setUpdatedAt(user.getUpdatedAt());
+        return dto;
     }
 }

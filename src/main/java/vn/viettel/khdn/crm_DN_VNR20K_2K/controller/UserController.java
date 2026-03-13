@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqChangePasswordDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqResetPasswordDTO;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUserCreateDTO;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUserUpdateDTO;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResUserDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.service.UserService;
 
 @RestController
@@ -36,60 +38,61 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser() {
-        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+    public ResponseEntity<ResUserDTO> getCurrentUser() {
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication()
+                .getName();
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        User created = userService.createUser(user);
+    public ResponseEntity<ResUserDTO> createUser(@Valid @RequestBody ReqUserCreateDTO dto) {
+        ResUserDTO created = userService.createUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<?> getUsers(
+    public ResponseEntity<Page<ResUserDTO>> getUsers(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "role", required = false) String role,
-            @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "size", required = false) Integer size) {
-        if (page != null || size != null || keyword != null || role != null) {
-            int safePage = page != null ? Math.max(page, 0) : 0;
-            int safeSize = size != null ? Math.min(Math.max(size, 1), 50) : 10;
-            Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Order.asc("fullName")));
-            vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum roleEnum = null;
-            if (role != null && !role.trim().isEmpty()) {
-                try {
-                    roleEnum = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.valueOf(role.trim().toUpperCase());
-                } catch (Exception ignored) {
-                }
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(Sort.Order.asc("fullName")));
+
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum roleEnum = null;
+        if (role != null && !role.trim().isEmpty()) {
+            try {
+                roleEnum = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.valueOf(role.trim().toUpperCase());
+            } catch (Exception ignored) {
             }
-            Page<User> result = userService.searchUsers(roleEnum, keyword, pageable);
-            return ResponseEntity.ok(result);
         }
-        return ResponseEntity.ok(userService.findAll());
+        Page<ResUserDTO> result = userService.searchUsers(roleEnum, keyword, pageable);
+        return ResponseEntity.ok(result);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+    public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User user) {
-        User updated = userService.updateUser(id, user);
+    public ResponseEntity<ResUserDTO> updateUser(@PathVariable("id") Long id,
+            @Valid @RequestBody ReqUserUpdateDTO dto) {
+        ResUserDTO updated = userService.updateUser(id, dto);
         return ResponseEntity.ok(updated);
     }
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/me/password")
     public ResponseEntity<Map<String, String>> changePassword(@Valid @RequestBody ReqChangePasswordDTO req) {
-        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userService.getUserByEmail(email);
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication()
+                .getName();
+        ResUserDTO currentUser = userService.getUserByEmail(email);
         userService.changePassword(currentUser.getId(), req.getOldPassword(), req.getNewPassword());
         return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công!"));
     }
@@ -103,8 +106,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok(Map.of("message", "Xóa người dùng thành công!"));
+        return ResponseEntity.noContent().build();
     }
 }

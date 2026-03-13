@@ -46,8 +46,7 @@ public class User {
     @Column(length = 20)
     private String gender;
 
-
-    @JsonAlias({"date_of_birth", "dateOfBirth"})
+    @JsonAlias({ "date_of_birth", "dateOfBirth" })
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dateOfBirth;
 

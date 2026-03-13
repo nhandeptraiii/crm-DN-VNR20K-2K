@@ -11,6 +11,9 @@ import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.validator.EmailUnique;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Getter
 @Setter
 public class ReqUserCreateDTO {
@@ -34,6 +37,8 @@ public class ReqUserCreateDTO {
 
     private String gender;
 
+    @JsonAlias({ "date_of_birth", "dateOfBirth" })
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dateOfBirth;
 
     private RoleEnum role;

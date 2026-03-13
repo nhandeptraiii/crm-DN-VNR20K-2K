@@ -22,7 +22,6 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUsageCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUsageUpdateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResUsageDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.service.EnterpriseServiceUsageService;
-import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 
 @RestController
 @RequestMapping("/enterprises/{enterpriseId}/services")
@@ -38,7 +37,7 @@ public class EnterpriseServiceUsageController {
     @PostMapping
     public ResponseEntity<ResUsageDTO> create(
             @PathVariable("enterpriseId") Long enterpriseId,
-            @Valid @RequestBody ReqUsageCreateDTO dto) throws IdInvalidException {
+            @Valid @RequestBody ReqUsageCreateDTO dto) {
         ResUsageDTO created = usageService.createUsage(enterpriseId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -49,7 +48,7 @@ public class EnterpriseServiceUsageController {
             @PathVariable("enterpriseId") Long enterpriseId,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) throws IdInvalidException {
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         int safeSize = Math.min(Math.max(size, 1), 50);
         Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(Sort.Order.desc("createdAt")));
         Page<ResUsageDTO> result = usageService.getUsagesByEnterprise(enterpriseId, status, pageable);
@@ -60,7 +59,7 @@ public class EnterpriseServiceUsageController {
     @GetMapping("/{usageId}")
     public ResponseEntity<ResUsageDTO> getById(
             @PathVariable("enterpriseId") Long enterpriseId,
-            @PathVariable("usageId") Long usageId) throws IdInvalidException {
+            @PathVariable("usageId") Long usageId) {
         return ResponseEntity.ok(usageService.getUsageById(enterpriseId, usageId));
     }
 
@@ -69,7 +68,7 @@ public class EnterpriseServiceUsageController {
     public ResponseEntity<ResUsageDTO> update(
             @PathVariable("enterpriseId") Long enterpriseId,
             @PathVariable("usageId") Long usageId,
-            @Valid @RequestBody ReqUsageUpdateDTO dto) throws IdInvalidException {
+            @Valid @RequestBody ReqUsageUpdateDTO dto) {
         return ResponseEntity.ok(usageService.updateUsage(enterpriseId, usageId, dto));
     }
 
@@ -77,7 +76,7 @@ public class EnterpriseServiceUsageController {
     @DeleteMapping("/{usageId}")
     public ResponseEntity<Void> delete(
             @PathVariable("enterpriseId") Long enterpriseId,
-            @PathVariable("usageId") Long usageId) throws IdInvalidException {
+            @PathVariable("usageId") Long usageId) {
         usageService.deleteUsage(enterpriseId, usageId);
         return ResponseEntity.noContent().build();
     }

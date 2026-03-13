@@ -14,7 +14,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.UsageStatus;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseServiceUsageRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.ViettelServiceRepository;
-import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class EnterpriseServiceUsageService {
@@ -31,12 +31,12 @@ public class EnterpriseServiceUsageService {
         this.viettelServiceRepository = viettelServiceRepository;
     }
 
-    public ResUsageDTO createUsage(Long enterpriseId, ReqUsageCreateDTO dto) throws IdInvalidException {
+    public ResUsageDTO createUsage(Long enterpriseId, ReqUsageCreateDTO dto) {
         Enterprise enterprise = enterpriseRepository.findById(enterpriseId)
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy doanh nghiệp với ID: " + enterpriseId));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy doanh nghiệp với ID: " + enterpriseId));
 
         ViettelService viettelService = viettelServiceRepository.findById(dto.getViettelServiceId())
-                .orElseThrow(() -> new IdInvalidException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Không tìm thấy dịch vụ Viettel với ID: " + dto.getViettelServiceId()));
 
         EnterpriseServiceUsage usage = new EnterpriseServiceUsage();
@@ -50,10 +50,9 @@ public class EnterpriseServiceUsageService {
         return toDTO(saved);
     }
 
-    public Page<ResUsageDTO> getUsagesByEnterprise(Long enterpriseId, String status, Pageable pageable)
-            throws IdInvalidException {
+    public Page<ResUsageDTO> getUsagesByEnterprise(Long enterpriseId, String status, Pageable pageable) {
         if (!enterpriseRepository.existsById(enterpriseId)) {
-            throw new IdInvalidException("Không tìm thấy doanh nghiệp với ID: " + enterpriseId);
+            throw new EntityNotFoundException("Không tìm thấy doanh nghiệp với ID: " + enterpriseId);
         }
 
         UsageStatus enumStatus = null;
@@ -70,12 +69,12 @@ public class EnterpriseServiceUsageService {
         return page.map(this::toDTO);
     }
 
-    public ResUsageDTO getUsageById(Long enterpriseId, Long usageId) throws IdInvalidException {
+    public ResUsageDTO getUsageById(Long enterpriseId, Long usageId) {
         EnterpriseServiceUsage usage = findAndValidate(enterpriseId, usageId);
         return toDTO(usage);
     }
 
-    public ResUsageDTO updateUsage(Long enterpriseId, Long usageId, ReqUsageUpdateDTO dto) throws IdInvalidException {
+    public ResUsageDTO updateUsage(Long enterpriseId, Long usageId, ReqUsageUpdateDTO dto) {
         EnterpriseServiceUsage usage = findAndValidate(enterpriseId, usageId);
 
         if (dto.getContractNumber() != null)
@@ -89,19 +88,19 @@ public class EnterpriseServiceUsageService {
         return toDTO(updated);
     }
 
-    public void deleteUsage(Long enterpriseId, Long usageId) throws IdInvalidException {
+    public void deleteUsage(Long enterpriseId, Long usageId) {
         EnterpriseServiceUsage usage = findAndValidate(enterpriseId, usageId);
         usageRepository.delete(usage);
     }
 
-    private EnterpriseServiceUsage findAndValidate(Long enterpriseId, Long usageId) throws IdInvalidException {
+    private EnterpriseServiceUsage findAndValidate(Long enterpriseId, Long usageId) {
         if (!enterpriseRepository.existsById(enterpriseId)) {
-            throw new IdInvalidException("Không tìm thấy doanh nghiệp với ID: " + enterpriseId);
+            throw new EntityNotFoundException("Không tìm thấy doanh nghiệp với ID: " + enterpriseId);
         }
         EnterpriseServiceUsage usage = usageRepository.findById(usageId)
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy gói dịch vụ với ID: " + usageId));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy gói dịch vụ với ID: " + usageId));
         if (!usage.getEnterprise().getId().equals(enterpriseId)) {
-            throw new IdInvalidException("Gói dịch vụ ID " + usageId + " không thuộc doanh nghiệp ID " + enterpriseId);
+            throw new IllegalArgumentException("Gói dịch vụ ID " + usageId + " không thuộc doanh nghiệp ID " + enterpriseId);
         }
         return usage;
     }

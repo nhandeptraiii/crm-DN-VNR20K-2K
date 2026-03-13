@@ -1,6 +1,5 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.controller;
 
-
 import org.springframework.data.domain.Page;
 import java.util.Map;
 import org.springframework.data.domain.PageRequest;
@@ -79,7 +78,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<ResUserDTO> updateUser(@PathVariable("id") Long id,
             @Valid @RequestBody ReqUserUpdateDTO dto) {
@@ -99,7 +98,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/reset-password")
-    public ResponseEntity<Map<String, String>> resetPassword(@PathVariable("id") Long id, @Valid @RequestBody ReqResetPasswordDTO req) {
+    public ResponseEntity<Map<String, String>> resetPassword(@PathVariable("id") Long id,
+            @Valid @RequestBody ReqResetPasswordDTO req) {
         userService.resetPassword(id, req.getNewPassword());
         return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công!"));
     }

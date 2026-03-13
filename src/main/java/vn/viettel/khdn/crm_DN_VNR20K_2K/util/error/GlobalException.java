@@ -52,8 +52,8 @@ public class GlobalException {
     public ResponseEntity<RestResponse<Object>> handleAuthException(Exception ex) {
         RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getMessage());
-        res.setMessage("Exception occurred");
+        res.setError("Bad Credentials");
+        res.setMessage("Email hoặc mật khẩu không chính xác");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
@@ -73,10 +73,18 @@ public class GlobalException {
 
         RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getBody().getDetail());
+        res.setError("VALIDATION_ERROR"); // Dùng chuỗi cố định để kiểm tra reload
 
-        List<String> errors = fieldErrors.stream().map(f -> f.getDefaultMessage()).collect(Collectors.toList());
-        res.setMessage(errors.size() > 1 ? errors : errors.get(0));
+        List<java.util.Map<String, String>> errors = fieldErrors.stream()
+                .map(f -> {
+                    java.util.Map<String, String> errorMap = new java.util.HashMap<>();
+                    errorMap.put("field", f.getField());
+                    errorMap.put("message", f.getDefaultMessage());
+                    return errorMap;
+                })
+                .collect(Collectors.toList());
+
+        res.setMessage(errors); // Trả về list object luôn cho đồng nhất
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }

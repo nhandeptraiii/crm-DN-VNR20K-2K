@@ -3,6 +3,7 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.controller;
 import java.time.Instant;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.RestResponse;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.LoginDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResLoginDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.service.RevokedTokenService;
@@ -37,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<RestResponse<ResLoginDTO>> login(@Valid @RequestBody LoginDTO loginDTO) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsername(), loginDTO.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
@@ -45,8 +47,13 @@ public class AuthController {
         String accessToken = this.securityUtil.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        ResLoginDTO res = new ResLoginDTO();
-        res.setAccessToken(accessToken);
+        ResLoginDTO data = new ResLoginDTO();
+        data.setAccessToken(accessToken);
+
+        RestResponse<ResLoginDTO> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.OK.value());
+        res.setMessage("Đăng nhập thành công");
+        res.setData(data);
 
         return ResponseEntity.ok().body(res);
     }

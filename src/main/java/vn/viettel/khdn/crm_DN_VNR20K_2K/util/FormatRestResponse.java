@@ -57,6 +57,13 @@ public class FormatRestResponse implements ResponseBodyAdvice {
         if (status >= 400) {
             return body;
         } else {
+            if (body instanceof RestResponse) {
+                RestResponse<?> restBody = (RestResponse<?>) body;
+                if (restBody.getMessage() == null) {
+                    restBody.setMessage("Call API successful");
+                }
+                return body;
+            }
             res.setMessage("Call API successful");
             res.setData(body);
         }

@@ -15,6 +15,10 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
+    boolean existsByEmailIgnoreCase(String email);
+
     @Query(value = """
             SELECT u FROM User u
             WHERE (:role IS NULL OR u.role = :role)

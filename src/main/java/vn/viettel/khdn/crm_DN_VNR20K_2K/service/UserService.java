@@ -1,12 +1,10 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.service;
 
-import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUserCreateDTO;
@@ -30,11 +28,6 @@ public class UserService {
     }
 
     public ResUserDTO createUser(ReqUserCreateDTO dto) {
-        Optional<User> existing = userRepository.findByEmail(dto.getEmail());
-        if (existing.isPresent()) {
-            throw new EntityExistsException("Email đã tồn tại: " + dto.getEmail());
-        }
-
         User user = new User();
         user.setFullName(dto.getFullName());
         user.setEmail(dto.getEmail());

@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.util.validator.EmailUnique;
 
 @Getter
 @Setter
@@ -18,6 +19,7 @@ public class ReqUserCreateDTO {
     @Size(max = 150, message = "Họ tên tối đa 150 ký tự")
     private String fullName;
 
+    @EmailUnique(message = "Email đã tồn tại trên hệ thống")
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
     @Size(max = 120, message = "Email tối đa 120 ký tự")

@@ -65,7 +65,7 @@ public class EnterpriseService {
     }
 
     // --- Lấy danh sách (phân trang + tìm kiếm) ---
-    public Page<ResEnterpriseDTO> searchEnterprises(String keyword, String status, Pageable pageable) {
+    public Page<ResEnterpriseDTO> searchEnterprises(String keyword, String status, String industryStr, Pageable pageable) {
         EnterpriseStatus enumStatus = null;
         if (status != null && !status.isBlank()) {
             try {
@@ -74,9 +74,18 @@ public class EnterpriseService {
                 // Nếu status không hợp lệ, bỏ qua filter
             }
         }
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
+        if (industryStr != null && !industryStr.isBlank()) {
+            try {
+                enumIndustry = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry.valueOf(industryStr.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Nếu industry không hợp lệ, bỏ qua filter
+            }
+        }
         Page<Enterprise> page = enterpriseRepository.searchEnterprises(
                 keyword != null && !keyword.isBlank() ? keyword.trim() : null,
                 enumStatus,
+                enumIndustry,
                 pageable);
         return page.map(this::toDTO);
     }

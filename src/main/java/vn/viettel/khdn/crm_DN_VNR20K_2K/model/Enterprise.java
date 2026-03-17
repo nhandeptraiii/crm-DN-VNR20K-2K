@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
 
 @Entity
 @Table(name = "enterprises")
@@ -34,8 +35,9 @@ public class Enterprise {
     @Column(name = "tax_code", unique = true, length = 20)
     private String taxCode;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 100)
-    private String industry;
+    private Industry industry;
 
     @Column(name = "employee_count")
     private Integer employeeCount;

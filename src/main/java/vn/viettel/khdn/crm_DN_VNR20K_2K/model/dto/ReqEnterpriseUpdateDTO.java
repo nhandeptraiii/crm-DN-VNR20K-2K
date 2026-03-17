@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
 
 @Getter
 @Setter
@@ -17,8 +18,7 @@ public class ReqEnterpriseUpdateDTO {
     @Size(max = 20, message = "Mã số thuế tối đa 20 ký tự")
     private String taxCode;
 
-    @Size(max = 100, message = "Ngành nghề tối đa 100 ký tự")
-    private String industry;
+    private Industry industry;
 
     private Integer employeeCount;
 

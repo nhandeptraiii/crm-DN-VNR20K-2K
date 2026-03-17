@@ -15,20 +15,22 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
 
-    Optional<Enterprise> findByTaxCode(String taxCode);
+        Optional<Enterprise> findByTaxCode(String taxCode);
 
-    boolean existsByTaxCode(String taxCode);
+        boolean existsByTaxCode(String taxCode);
 
-    @Query("SELECT e FROM Enterprise e WHERE "
-            + "(:keyword IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')) "
-            + "OR LOWER(e.taxCode) LIKE LOWER(CONCAT('%', :keyword, '%')) "
-            + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
-            + "AND (:status IS NULL OR e.status = :status)")
-    Page<Enterprise> searchEnterprises(
-            @Param("keyword") String keyword,
-            @Param("status") EnterpriseStatus status,
-            Pageable pageable);
+        @Query("SELECT e FROM Enterprise e WHERE "
+                        + "(:keyword IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')) "
+                        + "OR LOWER(e.taxCode) LIKE LOWER(CONCAT('%', :keyword, '%')) "
+                        + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
+                        + "AND (:status IS NULL OR e.status = :status) "
+                        + "AND (:industry IS NULL OR e.industry = :industry)")
+        Page<Enterprise> searchEnterprises(
+                        @Param("keyword") String keyword,
+                        @Param("status") EnterpriseStatus status,
+                        @Param("industry") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry industry,
+                        Pageable pageable);
 
-    @Query("SELECT COALESCE(MAX(e.id), 0) FROM Enterprise e")
-    long findMaxId();
+        @Query("SELECT COALESCE(MAX(e.id), 0) FROM Enterprise e")
+        long findMaxId();
 }

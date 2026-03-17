@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
 
 @Getter
 @Setter
@@ -19,8 +20,7 @@ public class ReqEnterpriseCreateDTO {
     @Size(max = 20, message = "Mã số thuế tối đa 20 ký tự")
     private String taxCode;
 
-    @Size(max = 100, message = "Ngành nghề tối đa 100 ký tự")
-    private String industry;
+    private Industry industry;
 
     private Integer employeeCount;
 
@@ -32,8 +32,9 @@ public class ReqEnterpriseCreateDTO {
 
     private LocalDate establishedDate;
 
-    @Size(max = 30, message = "SĐT tối đa 30 ký tự")
+    @Size(max = 10, message = "SĐT tối đa 30 ký tự")
     private String phone;
+
 
     @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
     private String note;

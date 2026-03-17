@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ public class ResEnterpriseDTO {
     private Long id;
     private String name;
     private String taxCode;
-    private String industry;
+    private Industry industry;
     private Integer employeeCount;
     private String address;
     private String website;

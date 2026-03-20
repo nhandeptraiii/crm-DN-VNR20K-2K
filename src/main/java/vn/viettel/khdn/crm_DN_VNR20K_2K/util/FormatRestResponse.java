@@ -49,6 +49,10 @@ public class FormatRestResponse implements ResponseBodyAdvice {
             return body;
         }
 
+        if (body instanceof org.springframework.core.io.Resource) {
+            return body;
+        }
+
         if (selectedContentType != null && selectedContentType.includes(MediaType.APPLICATION_OCTET_STREAM)
                 || selectedContentType != null && selectedContentType.includes(MediaType.APPLICATION_PDF)) {
             return body;

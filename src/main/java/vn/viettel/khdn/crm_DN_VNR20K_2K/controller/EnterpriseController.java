@@ -15,9 +15,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import jakarta.validation.Valid;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ImportResultDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqEnterpriseCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqEnterpriseUpdateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResEnterpriseDTO;
@@ -82,5 +92,46 @@ public class EnterpriseController {
                 .map(industry -> new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResIndustryDTO(industry.name(), industry.getDisplayName()))
                 .collect(java.util.stream.Collectors.toList());
         return ResponseEntity.ok(industries);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/export")
+    public ResponseEntity<Resource> exportEnterprises(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "industry", required = false) String industry) throws IOException {
+        
+        ByteArrayInputStream in = enterpriseService.exportToExcel(keyword, status, industry);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=doanh_nghiep_export.xlsx");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(in));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/import/template")
+    public ResponseEntity<Resource> downloadTemplate() throws IOException {
+        ByteArrayInputStream in = enterpriseService.getTemplateExcel();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=doanh_nghiep_template.xlsx");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(in));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/import")
+    public ResponseEntity<ImportResultDTO> importEnterprises(@RequestPart("file") MultipartFile file) {
+        ImportResultDTO result = enterpriseService.importFromExcel(file);
+        return ResponseEntity.ok(result);
     }
 }

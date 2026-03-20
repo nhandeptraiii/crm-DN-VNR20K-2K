@@ -29,6 +29,9 @@ public class ViettelService {
     @Column(name = "service_name", nullable = false, length = 255)
     private String serviceName;
 
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
     @Column(name = "is_active")
     private Boolean isActive = true;
 

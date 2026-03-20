@@ -24,6 +24,7 @@ public class ViettelServiceService {
         ViettelService service = new ViettelService();
         service.setServiceCode(dto.getServiceCode());
         service.setServiceName(dto.getServiceName());
+        service.setDescription(dto.getDescription());
         service.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
 
         ViettelService saved = serviceRepository.save(service);
@@ -52,6 +53,8 @@ public class ViettelServiceService {
             service.setServiceCode(dto.getServiceCode());
         if (dto.getServiceName() != null)
             service.setServiceName(dto.getServiceName());
+        if (dto.getDescription() != null)
+            service.setDescription(dto.getDescription());
         if (dto.getIsActive() != null)
             service.setIsActive(dto.getIsActive());
 
@@ -71,6 +74,7 @@ public class ViettelServiceService {
         dto.setId(s.getId());
         dto.setServiceCode(s.getServiceCode());
         dto.setServiceName(s.getServiceName());
+        dto.setDescription(s.getDescription());
         dto.setIsActive(s.getIsActive());
         dto.setCreatedAt(s.getCreatedAt());
         dto.setUpdatedAt(s.getUpdatedAt());

@@ -25,12 +25,14 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
                         + "AND (:status IS NULL OR e.status = :status) "
                         + "AND (:industry IS NULL OR e.industry = :industry)")
-        Page<Enterprise> searchEnterprises(
-                        @Param("keyword") String keyword,
+        Page<Enterprise> searchEnterprises(@Param("keyword") String keyword,
                         @Param("status") EnterpriseStatus status,
                         @Param("industry") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry industry,
                         Pageable pageable);
 
         @Query("SELECT COALESCE(MAX(e.id), 0) FROM Enterprise e")
         long findMaxId();
+
+        @Query("SELECT COUNT(DISTINCT i.enterprise.id) FROM Interaction i")
+        long countInteractedEnterprises();
 }

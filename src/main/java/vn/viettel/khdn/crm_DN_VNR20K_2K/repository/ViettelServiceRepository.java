@@ -12,16 +12,16 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.ViettelService;
 @Repository
 public interface ViettelServiceRepository extends JpaRepository<ViettelService, Long> {
 
-    boolean existsByServiceCode(String serviceCode);
+        boolean existsByServiceCode(String serviceCode);
 
-    boolean existsByServiceCodeIgnoreCase(String serviceCode);
+        boolean existsByServiceCodeIgnoreCase(String serviceCode);
 
-    @Query("SELECT s FROM ViettelService s WHERE " +
-            "(:keyword IS NULL OR LOWER(s.serviceName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(s.serviceCode) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
-            +
-            "AND (:isActive IS NULL OR s.isActive = :isActive)")
-    Page<ViettelService> searchServices(
-            @Param("keyword") String keyword,
-            @Param("isActive") Boolean isActive,
-            Pageable pageable);
+        @Query("SELECT s FROM ViettelService s WHERE "
+                        + "(:keyword IS NULL OR LOWER(s.serviceName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(s.serviceCode) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
+                        + "AND (:isActive IS NULL OR s.isActive = :isActive)")
+        Page<ViettelService> searchServices(@Param("keyword") String keyword,
+                        @Param("isActive") Boolean isActive, Pageable pageable);
+
+        @Query("SELECT COUNT(s) FROM ViettelService s WHERE s.isActive = true")
+        long countActiveServices();
 }

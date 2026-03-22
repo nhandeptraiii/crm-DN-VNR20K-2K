@@ -1,11 +1,15 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 
+import java.util.List;
+
 public class DashboardDTO {
     private long totalUsers;
     private long totalEnterprises;
     private long totalServices;
     private long activeServices;
     private long totalInteractedEnterprises;
+    private List<EmployeeInteractionDTO> employeeStats;
+    private long totalActiveEmployees;
 
     public long getTotalUsers() {
         return totalUsers;
@@ -45,5 +49,21 @@ public class DashboardDTO {
 
     public void setTotalInteractedEnterprises(long totalInteractedEnterprises) {
         this.totalInteractedEnterprises = totalInteractedEnterprises;
+    }
+
+    public List<EmployeeInteractionDTO> getEmployeeStats() {
+        return employeeStats;
+    }
+
+    public void setEmployeeStats(List<EmployeeInteractionDTO> employeeStats) {
+        this.employeeStats = employeeStats;
+    }
+
+    public long getTotalActiveEmployees() {
+        return totalActiveEmployees;
+    }
+
+    public void setTotalActiveEmployees(long totalActiveEmployees) {
+        this.totalActiveEmployees = totalActiveEmployees;
     }
 }

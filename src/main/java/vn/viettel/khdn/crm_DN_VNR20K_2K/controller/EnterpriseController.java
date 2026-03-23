@@ -132,6 +132,9 @@ public class EnterpriseController {
     @PostMapping("/import")
     public ResponseEntity<ImportResultDTO> importEnterprises(@RequestPart("file") MultipartFile file) {
         ImportResultDTO result = enterpriseService.importFromExcel(file);
+        if (result.getTotalRows() == 0 && !result.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(result);
+        }
         return ResponseEntity.ok(result);
     }
 }

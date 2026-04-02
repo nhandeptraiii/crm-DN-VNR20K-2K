@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 
 @Getter
 @Setter
@@ -49,4 +51,8 @@ public class ReqEnterpriseCreateDTO {
 
     @Size(max = 100, message = "Chức vụ người đại diện tối đa 100 ký tự")
     private String contactPosition;
+
+    private RegionEnum region;
+    private EnterpriseTypeEnum type;
+    private Long ownerId;
 }

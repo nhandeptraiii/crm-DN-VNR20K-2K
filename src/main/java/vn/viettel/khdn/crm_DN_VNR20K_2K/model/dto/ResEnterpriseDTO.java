@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 
 @Getter
 @Setter
@@ -24,4 +26,7 @@ public class ResEnterpriseDTO {
     private String note;
     private Instant createdAt;
     private Instant updatedAt;
+    private RegionEnum region;         
+    private EnterpriseTypeEnum type;   
+    private Long ownerId;
 }

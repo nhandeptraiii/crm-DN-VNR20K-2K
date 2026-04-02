@@ -35,7 +35,9 @@ public class UserService {
         user.setPhone(dto.getPhone());
         user.setGender(dto.getGender());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setRole(dto.getRole() != null ? dto.getRole() : vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT);
+        user.setRole(dto.getRole() != null ? dto.getRole()
+                : vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT);
+        user.setRegion(dto.getRegion());
         user.setStatus("ACTIVE");
 
         User saved = userRepository.save(user);
@@ -58,15 +60,16 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public java.util.List<ResUserDTO> findAll() {
-        return userRepository.findAll().stream()
-                .map(this::convertToResUserDTO)
+        return userRepository.findAll().stream().map(this::convertToResUserDTO)
                 .collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<ResUserDTO> searchUsers(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, String keyword,
+    public org.springframework.data.domain.Page<ResUserDTO> searchUsers(
+            vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, String keyword,
             org.springframework.data.domain.Pageable pageable) {
-        org.springframework.data.domain.Page<User> page = userRepository.searchUsers(role, keyword, pageable);
+        org.springframework.data.domain.Page<User> page =
+                userRepository.searchUsers(role, keyword, pageable);
         return page.map(this::convertToResUserDTO);
     }
 
@@ -91,6 +94,9 @@ public class UserService {
         }
         if (dto.getRole() != null) {
             user.setRole(dto.getRole());
+        }
+        if (dto.getRegion() != null) {
+            user.setRegion(dto.getRegion());
         }
 
         User saved = userRepository.save(user);

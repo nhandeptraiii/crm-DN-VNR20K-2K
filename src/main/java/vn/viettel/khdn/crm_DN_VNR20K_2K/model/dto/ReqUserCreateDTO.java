@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.validator.EmailUnique;
 
@@ -42,4 +43,5 @@ public class ReqUserCreateDTO {
     private LocalDate dateOfBirth;
 
     private RoleEnum role;
+    private RegionEnum region;
 }

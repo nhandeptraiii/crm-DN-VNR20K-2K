@@ -21,6 +21,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
 
 @Getter
@@ -46,7 +47,7 @@ public class User {
     @Column(length = 20)
     private String gender;
 
-    @JsonAlias({ "date_of_birth", "dateOfBirth" })
+    @JsonAlias({"date_of_birth", "dateOfBirth"})
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dateOfBirth;
 
@@ -63,6 +64,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private RoleEnum role = RoleEnum.CONSULTANT;
+
+    @Enumerated(EnumType.STRING)
+    private RegionEnum region;
 
     @PrePersist
     public void handleBeforeCreate() {

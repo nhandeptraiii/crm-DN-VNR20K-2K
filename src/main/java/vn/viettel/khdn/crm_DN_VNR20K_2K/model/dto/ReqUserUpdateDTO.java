@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -30,4 +31,5 @@ public class ReqUserUpdateDTO {
     private String status;
 
     private RoleEnum role;
+    private RegionEnum region;
 }

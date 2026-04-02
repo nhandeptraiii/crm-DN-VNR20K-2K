@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Enterprise;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
@@ -24,10 +26,13 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         + "OR LOWER(e.taxCode) LIKE LOWER(CONCAT('%', :keyword, '%')) "
                         + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
                         + "AND (:status IS NULL OR e.status = :status) "
-                        + "AND (:industry IS NULL OR e.industry = :industry)")
+                        + "AND (:industry IS NULL OR e.industry = :industry) "
+                        + "AND (:region IS NULL OR e.region = :region) " 
+                        + "AND (:ownerId IS NULL OR e.owner.id = :ownerId)")
         Page<Enterprise> searchEnterprises(@Param("keyword") String keyword,
                         @Param("status") EnterpriseStatus status,
                         @Param("industry") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry industry,
+                        @Param("region") RegionEnum region, @Param("ownerId") Long ownerId,
                         Pageable pageable);
 
         @Query("SELECT COALESCE(MAX(e.id), 0) FROM Enterprise e")
@@ -35,4 +40,11 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
 
         @Query("SELECT COUNT(DISTINCT i.enterprise.id) FROM Interaction i")
         long countInteractedEnterprises();
+
+        @Query("SELECT e FROM Enterprise e WHERE " + "(:region IS NULL OR e.region = :region) AND "
+                        + "(:status IS NULL OR e.status = :status) AND "
+                        + "(:industry IS NULL OR e.industry = :industry) AND "
+                        + "(:kw IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :kw, '%')) OR e.taxCode LIKE CONCAT('%', :kw, '%'))")
+        Page<Enterprise> searchEnterprisesWithRegion(String kw, EnterpriseStatus status,
+                        Industry industry, RegionEnum region, Pageable pageable);
 }

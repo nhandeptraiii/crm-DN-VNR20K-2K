@@ -8,16 +8,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 
 @Entity
 @Table(name = "enterprises")
@@ -58,6 +63,16 @@ public class Enterprise {
     @Enumerated(EnumType.STRING)
     @Column(length = 30)
     private EnterpriseStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private RegionEnum region;
+
+    @Enumerated(EnumType.STRING)
+    private EnterpriseTypeEnum type;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner; // Người phụ trách
 
     @Column(length = 1000)
     private String note;

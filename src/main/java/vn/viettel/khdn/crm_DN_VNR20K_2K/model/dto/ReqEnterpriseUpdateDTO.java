@@ -37,4 +37,8 @@ public class ReqEnterpriseUpdateDTO {
 
     @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
     private String note;
+
+    private vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum region;
+    private vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum type;
+    private Long ownerId;
 }

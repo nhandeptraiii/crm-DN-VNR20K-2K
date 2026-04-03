@@ -18,22 +18,29 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqEnterpriseCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqEnterpriseUpdateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResEnterpriseDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseContactRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseRepository;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.UserRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.ExcelExportHelper;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.ExcelUtils;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
 
 @Service
 public class EnterpriseService {
 
     private final EnterpriseRepository enterpriseRepository;
     private final EnterpriseContactRepository enterpriseContactRepository;
+    private final UserRepository userRepository;
 
     public EnterpriseService(EnterpriseRepository enterpriseRepository,
-            EnterpriseContactRepository enterpriseContactRepository) {
+            EnterpriseContactRepository enterpriseContactRepository,
+            UserRepository userRepository) {
         this.enterpriseRepository = enterpriseRepository;
         this.enterpriseContactRepository = enterpriseContactRepository;
+        this.userRepository = userRepository;
     }
 
     // --- Tạo mới ---
@@ -41,7 +48,8 @@ public class EnterpriseService {
     public ResEnterpriseDTO createEnterprise(ReqEnterpriseCreateDTO dto) throws IdInvalidException {
         // Kiểm tra MST đã tồn tại
         if (enterpriseRepository.existsByTaxCode(dto.getTaxCode())) {
-            throw new IdInvalidException("Mã số thuế '" + dto.getTaxCode() + "' đã tồn tại trong hệ thống");
+            throw new IdInvalidException(
+                    "Mã số thuế '" + dto.getTaxCode() + "' đã tồn tại trong hệ thống");
         }
 
         Enterprise enterprise = new Enterprise();
@@ -54,6 +62,14 @@ public class EnterpriseService {
         enterprise.setEstablishedDate(dto.getEstablishedDate());
         enterprise.setPhone(dto.getPhone());
         enterprise.setNote(dto.getNote());
+        enterprise.setRegion(dto.getRegion());
+        enterprise.setType(dto.getType());
+
+        if (dto.getOwnerId() != null) {
+            User owner = new User();
+            owner.setId(dto.getOwnerId());
+            enterprise.setOwner(owner);
+        }
 
         Enterprise saved = enterpriseRepository.save(enterprise);
 
@@ -73,8 +89,12 @@ public class EnterpriseService {
     }
 
     // --- Lấy danh sách (phân trang + tìm kiếm) ---
-    public Page<ResEnterpriseDTO> searchEnterprises(String keyword, String status, String industryStr, Pageable pageable) {
+    public Page<ResEnterpriseDTO> searchEnterprises(String keyword, String status,
+            String industryStr, Pageable pageable) {
         EnterpriseStatus enumStatus = null;
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
+        RegionEnum regionFilter = null;
+        Long ownerIdFilter = null;
         if (status != null && !status.isBlank()) {
             try {
                 enumStatus = EnterpriseStatus.valueOf(status.trim().toUpperCase());
@@ -82,51 +102,153 @@ public class EnterpriseService {
                 // Nếu status không hợp lệ, bỏ qua filter
             }
         }
-        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
         if (industryStr != null && !industryStr.isBlank()) {
             try {
-                enumIndustry = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry.valueOf(industryStr.trim().toUpperCase());
+                enumIndustry = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry
+                        .valueOf(industryStr.trim().toUpperCase());
             } catch (IllegalArgumentException e) {
                 // Nếu industry không hợp lệ, bỏ qua filter
             }
         }
+
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        // 2. Lấy thông tin User từ Database (để biết họ thuộc Region nào)
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 3. Phân quyền lọc
+        if (currentUser.getRole() == RoleEnum.ADMIN) {
+            regionFilter = null;
+            ownerIdFilter = null;
+        } else {
+            regionFilter = currentUser.getRegion();
+
+            // THAY ĐỔI Ở ĐÂY:
+            if (regionFilter == null) {
+                // Nếu không phải admin mà vùng lại null, có thể gán mặc định
+                // hoặc ném lỗi để Admin biết mà vào sửa User
+                throw new RuntimeException(
+                        "Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
+            }
+
+            if (currentUser.getRole() == RoleEnum.CONSULTANT) {
+                ownerIdFilter = currentUser.getId();
+            } else {
+                ownerIdFilter = null; // Manager thì xem theo Region
+            }
+        }
         Page<Enterprise> page = enterpriseRepository.searchEnterprises(
-                keyword != null && !keyword.isBlank() ? keyword.trim() : null,
-                enumStatus,
-                enumIndustry,
-                pageable);
+                keyword != null && !keyword.isBlank() ? keyword.trim() : null, enumStatus,
+                enumIndustry, regionFilter, ownerIdFilter, pageable);
         return page.map(this::toDTO);
     }
 
     // --- Lấy theo ID ---
     public ResEnterpriseDTO getEnterpriseById(Long id) throws IdInvalidException {
-        Enterprise enterprise = enterpriseRepository.findById(id)
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy doanh nghiệp với ID: " + id));
+        Enterprise enterprise = enterpriseRepository.findById(id).orElseThrow(
+                () -> new IdInvalidException("Không tìm thấy doanh nghiệp với ID: " + id));
+
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() == RoleEnum.ADMIN) {
+            return toDTO(enterprise);
+        }
+
+        if (currentUser.getRegion() == null) {
+            throw new RuntimeException(
+                    "Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
+        }
+
+        if (enterprise.getRegion() != currentUser.getRegion()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN,
+                    "Bạn không có quyền xem doanh nghiệp này.");
+        }
+
+        if (currentUser.getRole() == RoleEnum.CONSULTANT) {
+            if (enterprise.getOwner() == null
+                    || !currentUser.getId().equals(enterprise.getOwner().getId())) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.FORBIDDEN,
+                        "Bạn không có quyền xem doanh nghiệp này.");
+            }
+        }
+
         return toDTO(enterprise);
     }
 
     // --- Cập nhật ---
-    public ResEnterpriseDTO updateEnterprise(Long id, ReqEnterpriseUpdateDTO dto) throws IdInvalidException {
-        Enterprise enterprise = enterpriseRepository.findById(id)
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy doanh nghiệp với ID: " + id));
+    public ResEnterpriseDTO updateEnterprise(Long id, ReqEnterpriseUpdateDTO dto)
+            throws IdInvalidException {
+        Enterprise enterprise = enterpriseRepository.findById(id).orElseThrow(
+                () -> new IdInvalidException("Không tìm thấy doanh nghiệp với ID: " + id));
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() != RoleEnum.ADMIN) {
+            if (currentUser.getRegion() == null) {
+                throw new RuntimeException(
+                        "Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
+            }
+            if (enterprise.getRegion() != currentUser.getRegion()) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.FORBIDDEN,
+                        "Bạn không có quyền chỉnh sửa doanh nghiệp này.");
+            }
+            // CONSULTANT không được sửa enterprise của người khác
+            if (currentUser.getRole() == RoleEnum.CONSULTANT) {
+                if (enterprise.getOwner() == null
+                        || !currentUser.getId().equals(enterprise.getOwner().getId())) {
+                    throw new org.springframework.web.server.ResponseStatusException(
+                            org.springframework.http.HttpStatus.FORBIDDEN,
+                            "Bạn không có quyền chỉnh sửa doanh nghiệp này.");
+                }
+            }
+        }
 
         // Kiểm tra MST trùng (nếu có thay đổi)
         if (dto.getTaxCode() != null && !dto.getTaxCode().equals(enterprise.getTaxCode())) {
             if (enterpriseRepository.existsByTaxCode(dto.getTaxCode())) {
-                throw new IdInvalidException("Mã số thuế '" + dto.getTaxCode() + "' đã tồn tại trong hệ thống");
+                throw new IdInvalidException(
+                        "Mã số thuế '" + dto.getTaxCode() + "' đã tồn tại trong hệ thống");
             }
             enterprise.setTaxCode(dto.getTaxCode());
         }
 
-        if (dto.getName() != null) enterprise.setName(dto.getName());
-        if (dto.getIndustry() != null) enterprise.setIndustry(dto.getIndustry());
-        if (dto.getEmployeeCount() != null) enterprise.setEmployeeCount(dto.getEmployeeCount());
-        if (dto.getAddress() != null) enterprise.setAddress(dto.getAddress());
-        if (dto.getWebsite() != null) enterprise.setWebsite(dto.getWebsite());
-        if (dto.getEstablishedDate() != null) enterprise.setEstablishedDate(dto.getEstablishedDate());
-        if (dto.getPhone() != null) enterprise.setPhone(dto.getPhone());
-        if (dto.getStatus() != null) enterprise.setStatus(dto.getStatus());
-        if (dto.getNote() != null) enterprise.setNote(dto.getNote());
+        if (dto.getName() != null)
+            enterprise.setName(dto.getName());
+        if (dto.getIndustry() != null)
+            enterprise.setIndustry(dto.getIndustry());
+        if (dto.getEmployeeCount() != null)
+            enterprise.setEmployeeCount(dto.getEmployeeCount());
+        if (dto.getAddress() != null)
+            enterprise.setAddress(dto.getAddress());
+        if (dto.getWebsite() != null)
+            enterprise.setWebsite(dto.getWebsite());
+        if (dto.getEstablishedDate() != null)
+            enterprise.setEstablishedDate(dto.getEstablishedDate());
+        if (dto.getPhone() != null)
+            enterprise.setPhone(dto.getPhone());
+        if (dto.getStatus() != null)
+            enterprise.setStatus(dto.getStatus());
+        if (dto.getNote() != null)
+            enterprise.setNote(dto.getNote());
+        if (dto.getRegion() != null)
+            enterprise.setRegion(dto.getRegion());
+        if (dto.getType() != null)
+            enterprise.setType(dto.getType());
+        if (dto.getOwnerId() != null) {
+            User owner = new User();
+            owner.setId(dto.getOwnerId());
+            enterprise.setOwner(owner);
+        }
 
         Enterprise updated = enterpriseRepository.save(enterprise);
         return toDTO(updated);
@@ -147,8 +269,11 @@ public class EnterpriseService {
     }
 
     // --- Export Excel ---
-    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr) throws IOException {
+    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr)
+            throws IOException {
         EnterpriseStatus enumStatus = null;
+        RegionEnum regionFilter = null;
+        Long ownerIdFilter = null;
         if (status != null && !status.isBlank()) {
             try {
                 enumStatus = EnterpriseStatus.valueOf(status.trim().toUpperCase());
@@ -158,17 +283,45 @@ public class EnterpriseService {
         vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
         if (industryStr != null && !industryStr.isBlank()) {
             try {
-                enumIndustry = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry.valueOf(industryStr.trim().toUpperCase());
+                enumIndustry = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry
+                        .valueOf(industryStr.trim().toUpperCase());
             } catch (IllegalArgumentException e) {
             }
         }
 
+
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getRole() == RoleEnum.ADMIN) {
+            regionFilter = null;
+            ownerIdFilter = null;
+        } else {
+            regionFilter = currentUser.getRegion();
+
+            // THAY ĐỔI Ở ĐÂY:
+            if (regionFilter == null) {
+                // Nếu không phải admin mà vùng lại null, có thể gán mặc định
+                // hoặc ném lỗi để Admin biết mà vào sửa User
+                throw new RuntimeException(
+                        "Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
+            }
+
+            if (currentUser.getRole() == RoleEnum.CONSULTANT) {
+                ownerIdFilter = currentUser.getId();
+            } else {
+                ownerIdFilter = null; // Manager thì xem theo Region
+            }
+        }
         // Tạm thời lấy tất cả (không phân trang) để export report
         Page<Enterprise> page = enterpriseRepository.searchEnterprises(
-                keyword != null && !keyword.isBlank() ? keyword.trim() : null,
-                enumStatus,
-                enumIndustry,
-                Pageable.unpaged()); // Hoặc có thể cần viết 1 hàm findAll() riêng trong repository nếu không dùng Pageable
+                keyword != null && !keyword.isBlank() ? keyword.trim() : null, enumStatus,
+                enumIndustry, regionFilter, ownerIdFilter, Pageable.unpaged()); // Hoặc có thể cần
+                                                                                // viết 1 hàm
+        // findAll() riêng
+        // trong repository nếu không dùng Pageable
 
         List<ResEnterpriseDTO> dtos = page.getContent().stream().map(this::toDTO).toList();
         return ExcelExportHelper.enterprisesToExcel(dtos);
@@ -203,7 +356,8 @@ public class EnterpriseService {
                 } else if (dto.getTaxCode() == null || dto.getTaxCode().isBlank()) {
                     result.addError(rowNum, "Mã số thuế không được để trống");
                 } else {
-                    // Gọi hàm createEnterprise hiện có (Hàm này đã có @Transactional và kiểm tra MST)
+                    // Gọi hàm createEnterprise hiện có (Hàm này đã có @Transactional và kiểm tra
+                    // MST)
                     createEnterprise(dto);
                     result.incrementSuccess();
                 }
@@ -237,6 +391,11 @@ public class EnterpriseService {
         dto.setNote(e.getNote());
         dto.setCreatedAt(e.getCreatedAt());
         dto.setUpdatedAt(e.getUpdatedAt());
+        dto.setRegion(e.getRegion());
+        dto.setType(e.getType());
+        if (e.getOwner() != null) {
+            dto.setOwnerId(e.getOwner().getId());
+        }
         return dto;
     }
 }

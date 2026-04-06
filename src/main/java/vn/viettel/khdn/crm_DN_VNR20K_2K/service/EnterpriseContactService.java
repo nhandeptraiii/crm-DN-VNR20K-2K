@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Enterprise;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.EnterpriseContact;
@@ -15,6 +16,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 
 @Service
+@Transactional
 public class EnterpriseContactService {
 
     private final EnterpriseContactRepository contactRepository;
@@ -37,7 +39,12 @@ public class EnterpriseContactService {
         contact.setPosition(dto.getPosition());
         contact.setEmail(dto.getEmail());
         contact.setPhone(dto.getPhone());
-        contact.setIsPrimary(dto.getIsPrimary() != null ? dto.getIsPrimary() : false);
+
+        Boolean isPrimary = dto.getIsPrimary() != null ? dto.getIsPrimary() : false;
+        if (isPrimary) {
+            clearPrimaryContacts(enterpriseId);
+        }
+        contact.setIsPrimary(isPrimary);
 
         EnterpriseContact saved = contactRepository.save(contact);
         return toDTO(saved);
@@ -73,8 +80,12 @@ public class EnterpriseContactService {
             contact.setEmail(dto.getEmail());
         if (dto.getPhone() != null)
             contact.setPhone(dto.getPhone());
-        if (dto.getIsPrimary() != null)
+        if (dto.getIsPrimary() != null) {
+            if (dto.getIsPrimary() && !Boolean.TRUE.equals(contact.getIsPrimary())) {
+                clearPrimaryContacts(enterpriseId);
+            }
             contact.setIsPrimary(dto.getIsPrimary());
+        }
 
         EnterpriseContact updated = contactRepository.save(contact);
         return toDTO(updated);
@@ -113,5 +124,16 @@ public class EnterpriseContactService {
         dto.setCreatedAt(c.getCreatedAt());
         dto.setUpdatedAt(c.getUpdatedAt());
         return dto;
+    }
+
+    // --- Helper: Clear existing primary contacts ---
+    private void clearPrimaryContacts(Long enterpriseId) {
+        List<EnterpriseContact> oldPrimaries = contactRepository.findByEnterpriseIdAndIsPrimaryTrue(enterpriseId);
+        if (!oldPrimaries.isEmpty()) {
+            for (EnterpriseContact old : oldPrimaries) {
+                old.setIsPrimary(false);
+            }
+            contactRepository.saveAll(oldPrimaries);
+        }
     }
 }

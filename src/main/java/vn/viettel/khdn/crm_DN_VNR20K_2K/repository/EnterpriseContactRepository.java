@@ -13,4 +13,8 @@ public interface EnterpriseContactRepository extends JpaRepository<EnterpriseCon
     List<EnterpriseContact> findByEnterpriseIdOrderByIsPrimaryDescFullNameAsc(Long enterpriseId);
 
     void deleteAllByEnterpriseId(Long enterpriseId);
+
+    List<EnterpriseContact> findByEnterpriseIdAndIsPrimaryTrue(Long enterpriseId);
+
+    List<EnterpriseContact> findByEnterpriseIdInAndIsPrimaryTrue(List<Long> enterpriseIds);
 }

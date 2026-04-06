@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Enterprise;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 
@@ -27,12 +28,14 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
                         + "AND (:status IS NULL OR e.status = :status) "
                         + "AND (:industry IS NULL OR e.industry = :industry) "
-                        + "AND (:region IS NULL OR e.region = :region) " 
+                        + "AND (:region IS NULL OR e.region = :region) "
+                        + "AND (:type IS NULL OR e.type = :type) "
                         + "AND (:ownerId IS NULL OR e.owner.id = :ownerId)")
         Page<Enterprise> searchEnterprises(@Param("keyword") String keyword,
                         @Param("status") EnterpriseStatus status,
                         @Param("industry") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry industry,
-                        @Param("region") RegionEnum region, @Param("ownerId") Long ownerId,
+                        @Param("region") RegionEnum region, @Param("type") EnterpriseTypeEnum type,
+                        @Param("ownerId") Long ownerId,
                         Pageable pageable);
 
         @Query("SELECT COALESCE(MAX(e.id), 0) FROM Enterprise e")

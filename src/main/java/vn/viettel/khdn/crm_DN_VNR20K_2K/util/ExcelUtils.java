@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqEnterpriseCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 
 public class ExcelUtils {
     public static String EXCEL_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -33,7 +35,9 @@ public class ExcelUtils {
             "dd-MM-yyyy", "dd/MM/yyyy", "dd.MM.yyyy",
             "yyyy-MM-dd", "yyyy/MM/dd",
             "d/M/yyyy", "d-M-yyyy",
-            "dd-MM-yy"
+            "dd-MM-yy",
+            "MM-dd-yyyy", "MM/dd/yyyy", 
+            "M-d-yyyy", "M/d/yyyy"
         };
 
         for (String pattern : patterns) {
@@ -139,6 +143,24 @@ public class ExcelUtils {
                 
                 // Cột 13: Chức vụ NĐD
                 dto.setContactPosition(getCellValueAsString(row.getCell(13)));
+
+                // Cột 14: Vùng
+                String regionStr = getCellValueAsString(row.getCell(14));
+                if (regionStr != null && !regionStr.isBlank()) {
+                    try {
+                        dto.setRegion(RegionEnum.valueOf(regionStr.trim().toUpperCase()));
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
+
+                // Cột 15: Loại hình
+                String typeStr = getCellValueAsString(row.getCell(15));
+                if (typeStr != null && !typeStr.isBlank()) {
+                    try {
+                        dto.setType(EnterpriseTypeEnum.valueOf(typeStr.trim().toUpperCase()));
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
 
                 enterprises.add(dto);
             }

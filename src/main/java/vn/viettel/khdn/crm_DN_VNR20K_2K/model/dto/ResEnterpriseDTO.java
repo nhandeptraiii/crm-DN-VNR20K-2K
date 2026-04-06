@@ -29,4 +29,10 @@ public class ResEnterpriseDTO {
     private RegionEnum region;         
     private EnterpriseTypeEnum type;   
     private Long ownerId;
+    
+    // Thêm các trường cho xuất Excel (Người đại diện)
+    private String contactFullName;
+    private String contactEmail;
+    private String contactPhone;
+    private String contactPosition;
 }

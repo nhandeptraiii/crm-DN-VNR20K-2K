@@ -136,6 +136,7 @@ public class UserService {
         dto.setDateOfBirth(user.getDateOfBirth());
         dto.setStatus(user.getStatus());
         dto.setRole(user.getRole());
+        dto.setRegion(user.getRegion());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setUpdatedAt(user.getUpdatedAt());
         return dto;

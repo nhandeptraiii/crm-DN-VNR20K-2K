@@ -58,11 +58,13 @@ public class EnterpriseController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "industry", required = false) String industry,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "type", required = false) String type,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         int safeSize = Math.min(Math.max(size, 1), 50);
         Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(Sort.Order.desc("createdAt")));
-        Page<ResEnterpriseDTO> result = enterpriseService.searchEnterprises(keyword, status, industry, pageable);
+        Page<ResEnterpriseDTO> result = enterpriseService.searchEnterprises(keyword, status, industry, region, type, pageable);
         return ResponseEntity.ok(result);
     }
 
@@ -99,9 +101,11 @@ public class EnterpriseController {
     public ResponseEntity<Resource> exportEnterprises(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "industry", required = false) String industry) throws IOException {
+            @RequestParam(value = "industry", required = false) String industry,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "type", required = false) String type) throws IOException {
         
-        ByteArrayInputStream in = enterpriseService.exportToExcel(keyword, status, industry);
+        ByteArrayInputStream in = enterpriseService.exportToExcel(keyword, status, industry, region, type);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=doanh_nghiep_export.xlsx");

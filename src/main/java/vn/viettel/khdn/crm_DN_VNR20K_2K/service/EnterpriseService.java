@@ -92,11 +92,28 @@ public class EnterpriseService {
 
     // --- Lấy danh sách (phân trang + tìm kiếm) ---
     public Page<ResEnterpriseDTO> searchEnterprises(String keyword, String status,
-            String industryStr, Pageable pageable) {
+            String industryStr, String regionStr, String typeStr, Pageable pageable) {
         EnterpriseStatus enumStatus = null;
         vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum enumType = null;
+        RegionEnum requestedRegion = null;
         RegionEnum regionFilter = null;
         Long ownerIdFilter = null;
+        
+        if (typeStr != null && !typeStr.isBlank()) {
+            try {
+                enumType = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.valueOf(typeStr.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
+        if (regionStr != null && !regionStr.isBlank()) {
+            try {
+                requestedRegion = RegionEnum.valueOf(regionStr.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
         if (status != null && !status.isBlank()) {
             try {
                 enumStatus = EnterpriseStatus.valueOf(status.trim().toUpperCase());
@@ -122,7 +139,7 @@ public class EnterpriseService {
 
         // 3. Phân quyền lọc
         if (currentUser.getRole() == RoleEnum.ADMIN) {
-            regionFilter = null;
+            regionFilter = requestedRegion;
             ownerIdFilter = null;
         } else {
             regionFilter = currentUser.getRegion();
@@ -135,6 +152,10 @@ public class EnterpriseService {
                         "Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
             }
 
+            if (requestedRegion != null && requestedRegion != regionFilter) {
+                return Page.empty(pageable);
+            }
+
             if (currentUser.getRole() == RoleEnum.CONSULTANT) {
                 ownerIdFilter = currentUser.getId();
             } else {
@@ -143,7 +164,7 @@ public class EnterpriseService {
         }
         Page<Enterprise> page = enterpriseRepository.searchEnterprises(
                 keyword != null && !keyword.isBlank() ? keyword.trim() : null, enumStatus,
-                enumIndustry, regionFilter, null, ownerIdFilter, pageable);
+                enumIndustry, regionFilter, enumType, ownerIdFilter, pageable);
         return page.map(this::toDTO);
     }
 
@@ -271,11 +292,28 @@ public class EnterpriseService {
     }
 
     // --- Export Excel ---
-    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr)
+    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr, String regionStr, String typeStr)
             throws IOException {
         EnterpriseStatus enumStatus = null;
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum enumType = null;
+        RegionEnum requestedRegion = null;
         RegionEnum regionFilter = null;
         Long ownerIdFilter = null;
+        
+        if (typeStr != null && !typeStr.isBlank()) {
+            try {
+                enumType = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.valueOf(typeStr.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
+        if (regionStr != null && !regionStr.isBlank()) {
+            try {
+                requestedRegion = RegionEnum.valueOf(regionStr.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
         if (status != null && !status.isBlank()) {
             try {
                 enumStatus = EnterpriseStatus.valueOf(status.trim().toUpperCase());
@@ -298,7 +336,7 @@ public class EnterpriseService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (currentUser.getRole() == RoleEnum.ADMIN) {
-            regionFilter = null;
+            regionFilter = requestedRegion;
             ownerIdFilter = null;
         } else {
             regionFilter = currentUser.getRegion();
@@ -311,6 +349,10 @@ public class EnterpriseService {
                         "Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
             }
 
+            if (requestedRegion != null && requestedRegion != regionFilter) {
+                return ExcelExportHelper.enterprisesToExcel(java.util.Collections.emptyList());
+            }
+
             if (currentUser.getRole() == RoleEnum.CONSULTANT) {
                 ownerIdFilter = currentUser.getId();
             } else {
@@ -320,7 +362,7 @@ public class EnterpriseService {
         // Tạm thời lấy tất cả (không phân trang) để export report
         Page<Enterprise> page = enterpriseRepository.searchEnterprises(
                 keyword != null && !keyword.isBlank() ? keyword.trim() : null, enumStatus,
-                enumIndustry, regionFilter, null, ownerIdFilter, Pageable.unpaged()); // Hoặc có thể cần
+                enumIndustry, regionFilter, enumType, ownerIdFilter, Pageable.unpaged()); // Hoặc có thể cần
                                                                                 // viết 1 hàm
         // findAll() riêng
         // trong repository nếu không dùng Pageable

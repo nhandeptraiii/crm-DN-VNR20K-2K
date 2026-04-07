@@ -43,6 +43,7 @@ public class AppointmentService {
     private final EnterpriseContactRepository contactRepository;
     private final UserRepository userRepository;
     private final InteractionRepository interactionRepository;
+    private final EmailService emailService;
 
     @Value("${crm.upload.path:uploads}")
     private String uploadBasePath;
@@ -52,12 +53,14 @@ public class AppointmentService {
             EnterpriseRepository enterpriseRepository,
             EnterpriseContactRepository contactRepository,
             UserRepository userRepository,
-            InteractionRepository interactionRepository) {
+            InteractionRepository interactionRepository,
+            EmailService emailService) {
         this.appointmentRepository = appointmentRepository;
         this.enterpriseRepository = enterpriseRepository;
         this.contactRepository = contactRepository;
         this.userRepository = userRepository;
         this.interactionRepository = interactionRepository;
+        this.emailService = emailService;
     }
 
     // ===================== Lấy user hiện tại =====================
@@ -101,7 +104,14 @@ public class AppointmentService {
         appointment.setLocation(dto.getLocation());
         appointment.setPurpose(dto.getPurpose());
 
-        return toDTO(appointmentRepository.save(appointment));
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        // Gửi email xác nhận chạy ngầm (không đợi 5s SMTP timeout làm đơ API)
+        new Thread(() -> {
+            emailService.sendAppointmentConfirmation(consultant.getEmail(), savedAppointment);
+        }).start();
+
+        return toDTO(savedAppointment);
     }
 
     /**

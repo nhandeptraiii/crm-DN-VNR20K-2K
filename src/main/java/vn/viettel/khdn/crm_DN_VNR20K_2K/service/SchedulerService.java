@@ -40,7 +40,7 @@ public class SchedulerService {
     private void sendReminder24h() {
         Instant now = Instant.now();
         Instant from = now.plus(23, ChronoUnit.HOURS);
-        Instant to   = now.plus(25, ChronoUnit.HOURS);
+        Instant to = now.plus(25, ChronoUnit.HOURS);
 
         List<Appointment> appointments = appointmentRepository.findRemindable24h(from, to);
 
@@ -71,7 +71,7 @@ public class SchedulerService {
     private void sendReminder1h() {
         Instant now = Instant.now();
         Instant from = now.plus(55, ChronoUnit.MINUTES);
-        Instant to   = now.plus(65, ChronoUnit.MINUTES);
+        Instant to = now.plus(65, ChronoUnit.MINUTES);
 
         List<Appointment> appointments = appointmentRepository.findRemindable1h(from, to);
 

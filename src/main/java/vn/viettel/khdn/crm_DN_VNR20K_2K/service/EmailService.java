@@ -53,6 +53,49 @@ public class EmailService {
         }
     }
 
+    /**
+     * Gửi email xác nhận lên lịch thành công ngay khi vừa tạo hệ thống.
+     */
+    public void sendAppointmentConfirmation(String toEmail, Appointment appointment) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("✅ [CRM Viettel] Xác nhận lên lịch thành công — " + appointment.getEnterprise().getName());
+
+            ZonedDateTime scheduledVN = appointment.getScheduledTime().atZone(VIETNAM_ZONE);
+            String formattedTime = scheduledVN.format(DATETIME_FORMATTER);
+            String typeLabel = mapTypeLabel(appointment.getAppointmentType().name());
+
+            String htmlMsg = "<!DOCTYPE html>"
+                + "<html lang='vi'><head><meta charset='UTF-8'></head><body style='font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;'>"
+                + "<div style='max-width:600px; margin:0 auto; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1);'>"
+                + "<div style='background:#4CAF50; padding:24px 32px;'>"
+                + "<h2 style='color:#fff; margin:0; font-size:20px;'>✅ Đặt Lịch Thành Công</h2>"
+                + "<p style='color:#e8f5e9; margin:4px 0 0;'>Hệ thống ghi nhận bạn vừa lên lịch trên CRM!</p>"
+                + "</div>"
+                + "<div style='padding:28px 32px;'>"
+                + "<p style='font-size:15px; color:#333;'>Xin chào <strong>" + appointment.getConsultant().getFullName() + "</strong>,</p>"
+                + "<p style='color:#555;'>Lịch hẹn của bạn đã được ghi nhận. Chi tiết cuộc hẹn:</p>"
+                + "<table style='width:100%; border-collapse:collapse; margin-top:16px;'>"
+                + tableRow("🏢 Doanh nghiệp", "<strong>" + appointment.getEnterprise().getName() + "</strong>")
+                + tableRow("📋 Loại hình", typeLabel)
+                + tableRow("🕐 Thời gian", "<strong style='color:#4CAF50;'>" + formattedTime + "</strong>")
+                + tableRow("📍 Địa điểm", appointment.getLocation() != null ? appointment.getLocation() : "(Chưa xác định)")
+                + "</table>"
+                + "</div></div></body></html>";
+
+            helper.setText(htmlMsg, true);
+            mailSender.send(mimeMessage);
+            System.out.println("[EmailService] Đã gửi xác nhận TẠO MỚI lịch hẹn ID=" + appointment.getId() + " đến " + toEmail);
+        } catch (Exception e) {
+            System.err.println("[EmailService] Lỗi gửi xác nhận TẠO MỚI lịch hẹn ID=" 
+                    + appointment.getId() + " đến " + toEmail + ": " + e.getMessage());
+        }
+    }
+
     private String buildSubject(Appointment appointment, int hoursLeft) {
         String timeLabel = hoursLeft == 1 ? "1 giờ" : "24 giờ";
         return "⏰ [CRM Viettel] Nhắc lịch hẹn sau " + timeLabel

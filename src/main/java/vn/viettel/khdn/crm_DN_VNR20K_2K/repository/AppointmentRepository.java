@@ -23,8 +23,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
      *   - reminder_24h_sent = false
      *   - scheduledTime nằm trong khoảng (from, to) — tức là (now+23h, now+25h)
      */
-    @Query("SELECT a FROM Appointment a WHERE "
-            + "a.status NOT IN ('CONFIRMED', 'REJECTED') "
+    @Query("SELECT a FROM Appointment a "
+            + "JOIN FETCH a.consultant "
+            + "JOIN FETCH a.enterprise "
+            + "LEFT JOIN FETCH a.contact "
+            + "WHERE a.status NOT IN ('CONFIRMED', 'REJECTED') "
             + "AND a.reminder24hSent = false "
             + "AND a.scheduledTime > :from "
             + "AND a.scheduledTime <= :to")
@@ -33,8 +36,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     /**
      * Tìm lịch hẹn cần gửi email nhắc trước 1h.
      */
-    @Query("SELECT a FROM Appointment a WHERE "
-            + "a.status NOT IN ('CONFIRMED', 'REJECTED') "
+    @Query("SELECT a FROM Appointment a "
+            + "JOIN FETCH a.consultant "
+            + "JOIN FETCH a.enterprise "
+            + "LEFT JOIN FETCH a.contact "
+            + "WHERE a.status NOT IN ('CONFIRMED', 'REJECTED') "
             + "AND a.reminder1hSent = false "
             + "AND a.scheduledTime > :from "
             + "AND a.scheduledTime <= :to")

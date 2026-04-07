@@ -1,0 +1,151 @@
+package vn.viettel.khdn.crm_DN_VNR20K_2K.service;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
+import jakarta.mail.internet.MimeMessage;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Appointment;
+
+@Service
+public class EmailService {
+
+    private final JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+
+    private static final DateTimeFormatter DATETIME_FORMATTER =
+            DateTimeFormatter.ofPattern("HH:mm - dd/MM/yyyy");
+    private static final ZoneId VIETNAM_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
+
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    /**
+     * Gửi email nhắc lịch hẹn đến AM (Gmail).
+     *
+     * @param toEmail     Địa chỉ Gmail của AM
+     * @param appointment Lịch hẹn cần nhắc
+     * @param hoursLeft   Số giờ còn lại (24 hoặc 1)
+     */
+    public void sendAppointmentReminder(String toEmail, Appointment appointment, int hoursLeft) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(buildSubject(appointment, hoursLeft));
+            helper.setText(buildHtmlContent(appointment, hoursLeft), true); // true = HTML
+
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            // Log lỗi nhưng không throw để không làm crash scheduler
+            System.err.println("[EmailService] Lỗi gửi email nhắc lịch hẹn ID="
+                    + appointment.getId() + " đến " + toEmail + ": " + e.getMessage());
+        }
+    }
+
+    private String buildSubject(Appointment appointment, int hoursLeft) {
+        String timeLabel = hoursLeft == 1 ? "1 giờ" : "24 giờ";
+        return "⏰ [CRM Viettel] Nhắc lịch hẹn sau " + timeLabel
+                + " — " + appointment.getEnterprise().getName();
+    }
+
+    private String buildHtmlContent(Appointment appointment, int hoursLeft) {
+        String timeLabel = hoursLeft == 1 ? "1 giờ nữa" : "24 giờ nữa";
+
+        ZonedDateTime scheduledVN = appointment.getScheduledTime()
+                .atZone(VIETNAM_ZONE);
+        String formattedTime = scheduledVN.format(DATETIME_FORMATTER);
+
+        String contactInfo = appointment.getContact() != null
+                ? appointment.getContact().getFullName()
+                : "(Chưa xác định người liên hệ)";
+
+        String location = appointment.getLocation() != null
+                ? appointment.getLocation()
+                : "(Chưa có địa điểm)";
+
+        String purpose = appointment.getPurpose() != null
+                ? appointment.getPurpose()
+                : "(Không có ghi chú)";
+
+        String typeLabel = mapTypeLabel(appointment.getAppointmentType().name());
+
+        return "<!DOCTYPE html>"
+                + "<html lang='vi'><head><meta charset='UTF-8'></head><body "
+                + "style='font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;'>"
+                + "<div style='max-width:600px; margin:0 auto; background:#fff; "
+                + "border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1);'>"
+
+                // Header
+                + "<div style='background:#E3000E; padding:24px 32px;'>"
+                + "<h2 style='color:#fff; margin:0; font-size:20px;'>⏰ Nhắc Lịch Hẹn</h2>"
+                + "<p style='color:#ffd1d3; margin:4px 0 0;'>Còn " + timeLabel + " — Hãy chuẩn bị!</p>"
+                + "</div>"
+
+                // Body
+                + "<div style='padding:28px 32px;'>"
+                + "<p style='font-size:15px; color:#333;'>Xin chào <strong>"
+                + appointment.getConsultant().getFullName() + "</strong>,</p>"
+                + "<p style='color:#555;'>Bạn có lịch hẹn sắp diễn ra. Vui lòng kiểm tra thông tin bên dưới:</p>"
+
+                // Info table
+                + "<table style='width:100%; border-collapse:collapse; margin-top:16px;'>"
+                + tableRow("🏢 Doanh nghiệp", "<strong>" + appointment.getEnterprise().getName() + "</strong>")
+                + tableRow("👤 Người liên hệ", contactInfo)
+                + tableRow("📋 Loại hình", typeLabel)
+                + tableRow("🕐 Thời gian", "<strong style='color:#E3000E;'>" + formattedTime + "</strong>")
+                + tableRow("📍 Địa điểm", location)
+                + tableRow("📝 Mục đích", purpose)
+                + "</table>"
+
+                // Reminder note
+                + "<div style='margin-top:24px; padding:12px 16px; background:#fff8e1; "
+                + "border-left:4px solid #FFC107; border-radius:4px;'>"
+                + "<p style='margin:0; color:#795548; font-size:13px;'>"
+                + "💡 Sau khi hoàn thành cuộc hẹn, vui lòng vào hệ thống CRM để <strong>Xác nhận</strong> "
+                + "và ghi lại kết quả tiếp xúc."
+                + "</p>"
+                + "</div>"
+                + "</div>"
+
+                // Footer
+                + "<div style='background:#f4f4f4; padding:16px 32px; text-align:center;'>"
+                + "<p style='color:#999; font-size:12px; margin:0;'>"
+                + "Email này được gửi tự động từ hệ thống CRM KHDN Viettel. Vui lòng không trả lời email này."
+                + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</body></html>";
+    }
+
+    private String tableRow(String label, String value) {
+        return "<tr>"
+                + "<td style='padding:8px 0; color:#888; font-size:13px; width:140px; "
+                + "vertical-align:top;'>" + label + "</td>"
+                + "<td style='padding:8px 0; color:#333; font-size:14px;'>" + value + "</td>"
+                + "</tr>";
+    }
+
+    private String mapTypeLabel(String type) {
+        return switch (type) {
+            case "PHONE_CALL" -> "📞 Gọi điện";
+            case "EMAIL_QUOTE" -> "📧 Gửi email / Báo giá";
+            case "ONLINE_MEETING" -> "💻 Họp online";
+            case "OFFLINE_MEETING" -> "🤝 Gặp mặt trực tiếp";
+            case "DEMO" -> "🖥️ Demo sản phẩm";
+            case "CONTRACT_SIGNING" -> "📑 Ký hợp đồng";
+            case "CUSTOMER_SUPPORT" -> "🛠️ Hỗ trợ khách hàng";
+            default -> type;
+        };
+    }
+}

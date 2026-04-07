@@ -172,6 +172,14 @@ public class InteractionService {
         dto.setInteractionTime(i.getInteractionTime());
         dto.setLocation(i.getLocation());
         dto.setDescription(i.getDescription());
+
+        // Chuyển chuỗi đường dẫn ảnh thành danh sách
+        if (i.getPhotoPaths() != null && !i.getPhotoPaths().isBlank()) {
+            dto.setPhotoPaths(java.util.Arrays.asList(i.getPhotoPaths().split(",")));
+        } else {
+            dto.setPhotoPaths(new java.util.ArrayList<>());
+        }
+
         dto.setCreatedAt(i.getCreatedAt());
         dto.setUpdatedAt(i.getUpdatedAt());
         return dto;

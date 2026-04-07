@@ -1,6 +1,7 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 
 import java.time.Instant;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,10 @@ public class ResInteractionDTO {
     private Instant interactionTime;
     private String location;
     private String description;
+
+    // Ảnh gặp mặt — được upload khi AM xác nhận lịch hẹn
+    // Mỗi phần tử là đường dẫn public: "appointments/{id}/filename.jpg"
+    private List<String> photoPaths;
 
     private Instant createdAt;
     private Instant updatedAt;

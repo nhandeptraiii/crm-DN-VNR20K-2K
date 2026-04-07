@@ -3,6 +3,8 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 import java.time.Instant;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.InteractionResult;
@@ -24,7 +26,10 @@ public class ResInteractionDTO {
 
     private InteractionType interactionType;
     private InteractionResult result;
+
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant interactionTime;
+
     private String location;
     private String description;
 
@@ -32,6 +37,9 @@ public class ResInteractionDTO {
     // Mỗi phần tử là đường dẫn public: "appointments/{id}/filename.jpg"
     private List<String> photoPaths;
 
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant createdAt;
+
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant updatedAt;
 }

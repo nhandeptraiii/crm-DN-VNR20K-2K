@@ -2,6 +2,8 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,6 +25,7 @@ public class ReqAppointmentCreateDTO {
 
     @NotNull(message = "Thời gian hẹn không được để trống")
     @Future(message = "Thời gian hẹn phải ở trong tương lai")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant scheduledTime;
 
     @Size(max = 255, message = "Địa điểm tối đa 255 ký tự")

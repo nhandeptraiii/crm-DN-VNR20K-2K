@@ -27,7 +27,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"enterpriseId\": 1,\n  \"contactId\": 1,\n  \"appointmentType\": \"OFFLINE_MEETING\",\n  \"scheduledTime\": \"2026-05-15T09:00:00Z\",\n  \"location\": \"Trụ sở Viettel\",\n  \"purpose\": \"Tư vấn triển khai CRM\"\n}"
+          "raw": "{\n  \"enterpriseId\": 1,\n  \"contactId\": 1,\n  \"appointmentType\": \"OFFLINE_MEETING\",\n  \"scheduledTime\": \"15/05/2026 09:00\",\n  \"location\": \"Trụ sở Viettel\",\n  \"purpose\": \"Tư vấn triển khai CRM\"\n}"
         },
         "url": {
           "raw": "http://localhost:8080/appointments",
@@ -145,7 +145,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"appointmentType\": \"ONLINE_MEETING\",\n  \"scheduledTime\": \"2026-05-16T14:30:00Z\",\n  \"location\": \"Google Meet\",\n  \"purpose\": \"Dời lịch tư vấn sang online\"\n}"
+          "raw": "{\n  \"appointmentType\": \"ONLINE_MEETING\",\n  \"scheduledTime\": \"16/05/2026 14:30\",\n  \"location\": \"Google Meet\",\n  \"purpose\": \"Dời lịch tư vấn sang online\"\n}"
         },
         "url": {
           "raw": "http://localhost:8080/appointments/1",

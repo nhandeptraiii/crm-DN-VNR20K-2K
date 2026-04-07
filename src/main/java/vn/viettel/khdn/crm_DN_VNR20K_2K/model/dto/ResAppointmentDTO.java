@@ -2,6 +2,8 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.AppointmentStatus;
@@ -28,7 +30,10 @@ public class ResAppointmentDTO {
 
     // Thông tin lịch hẹn
     private InteractionType appointmentType;
+
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant scheduledTime;
+
     private String location;
     private String purpose;
 
@@ -42,6 +47,9 @@ public class ResAppointmentDTO {
     private Long interactionId;
 
     // Timestamps
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant createdAt;
+
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant updatedAt;
 }

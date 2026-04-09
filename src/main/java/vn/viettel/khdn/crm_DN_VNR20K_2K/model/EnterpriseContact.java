@@ -36,10 +36,10 @@ public class EnterpriseContact {
     @Column(length = 100)
     private String position;
 
-    @Column(length = 120)
+    @Column(length = 100)
     private String email;
 
-    @Column(length = 30)
+    @Column(length = 11)
     private String phone;
 
     @Column(name = "is_primary")

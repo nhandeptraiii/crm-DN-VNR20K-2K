@@ -30,7 +30,7 @@ public class ReqEnterpriseUpdateDTO {
 
     private LocalDate establishedDate;
 
-    @Size(max = 30, message = "SĐT tối đa 30 ký tự")
+    @Size(max = 11, message = "SĐT tối đa 11 ký tự")
     private String phone;
 
     private EnterpriseStatus status;

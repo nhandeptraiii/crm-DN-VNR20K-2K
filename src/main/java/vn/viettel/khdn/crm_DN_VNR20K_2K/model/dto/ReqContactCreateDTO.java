@@ -16,11 +16,11 @@ public class ReqContactCreateDTO {
     @Size(max = 100, message = "Chức vụ tối đa 100 ký tự")
     private String position;
 
-    @Size(max = 120, message = "Email tối đa 120 ký tự")
+    @Size(max = 100, message = "Email tối đa 100 ký tự")
     private String email;
 
     @NotBlank(message = "Số điện thoại không được để trống")
-    @Size(max = 30, message = "SĐT tối đa 30 ký tự")
+    @Size(max = 11, message = "SĐT tối đa 11 ký tự")
     private String phone;
 
     private Boolean isPrimary;

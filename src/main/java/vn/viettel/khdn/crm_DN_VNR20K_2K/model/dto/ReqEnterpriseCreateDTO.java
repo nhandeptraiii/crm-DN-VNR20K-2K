@@ -34,7 +34,7 @@ public class ReqEnterpriseCreateDTO {
 
     private LocalDate establishedDate;
 
-    @Size(max = 10, message = "SĐT tối đa 10 ký tự")
+    @Size(max = 11, message = "SĐT tối đa 11 ký tự")
     private String phone;
 
     @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")

@@ -48,11 +48,6 @@ public class EnterpriseService {
     // --- Tạo mới ---
     @Transactional
     public ResEnterpriseDTO createEnterprise(ReqEnterpriseCreateDTO dto) throws IdInvalidException {
-        // Kiểm tra MST đã tồn tại
-        if (enterpriseRepository.existsByTaxCode(dto.getTaxCode())) {
-            throw new IdInvalidException(
-                    "Mã số thuế '" + dto.getTaxCode() + "' đã tồn tại trong hệ thống");
-        }
 
         Enterprise enterprise = new Enterprise();
         enterprise.setName(dto.getName());
@@ -236,12 +231,8 @@ public class EnterpriseService {
             }
         }
 
-        // Kiểm tra MST trùng (nếu có thay đổi)
+        // Cập nhật MST (không kiểm tra trùng nữa)
         if (dto.getTaxCode() != null && !dto.getTaxCode().equals(enterprise.getTaxCode())) {
-            if (enterpriseRepository.existsByTaxCode(dto.getTaxCode())) {
-                throw new IdInvalidException(
-                        "Mã số thuế '" + dto.getTaxCode() + "' đã tồn tại trong hệ thống");
-            }
             enterprise.setTaxCode(dto.getTaxCode());
         }
 
@@ -425,7 +416,7 @@ public class EnterpriseService {
                     result.incrementSuccess();
                 }
             } catch (IdInvalidException idEx) {
-                // Lỗi trùng mã số thuế từ createEnterprise()
+                // Lỗi ID không hợp lệ từ createEnterprise()
                 result.addError(rowNum, idEx.getMessage());
             } catch (Exception e) {
                 // Các lỗi khác (ví dụ lưu database thất bại)

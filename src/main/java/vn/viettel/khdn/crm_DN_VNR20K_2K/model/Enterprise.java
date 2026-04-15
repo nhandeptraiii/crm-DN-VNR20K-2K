@@ -37,7 +37,7 @@ public class Enterprise {
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(name = "tax_code", unique = true, length = 20)
+    @Column(name = "tax_code", nullable = false, length = 20)
     private String taxCode;
 
     @Enumerated(EnumType.STRING)

@@ -18,9 +18,6 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
 
-        Optional<Enterprise> findByTaxCode(String taxCode);
-
-        boolean existsByTaxCode(String taxCode);
 
         @Query("SELECT e FROM Enterprise e WHERE "
                         + "(:keyword IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')) "

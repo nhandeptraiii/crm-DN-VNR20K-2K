@@ -1,9 +1,11 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -259,8 +261,19 @@ public class AppointmentService {
             return paths;
         }
 
-        // Thư mục: uploads/appointments/{appointmentId}/
-        Path dir = Paths.get(uploadBasePath, "appointments", String.valueOf(appointmentId));
+        // Resolve đường dẫn tuyệt đối để tránh bị resolve vào thư mục temp Tomcat
+        // Khi uploadBasePath là đường dẫn tương đối (vd: "uploads"),
+        // dùng System.getProperty("user.dir") để lấy working directory thực của JVM
+        Path baseDir;
+        Path configuredPath = Paths.get(uploadBasePath);
+        if (configuredPath.isAbsolute()) {
+            baseDir = configuredPath;
+        } else {
+            baseDir = Paths.get(System.getProperty("user.dir")).resolve(uploadBasePath);
+        }
+
+        // Thư mục: {uploadBasePath}/appointments/{appointmentId}/
+        Path dir = baseDir.resolve("appointments").resolve(String.valueOf(appointmentId));
         Files.createDirectories(dir);
 
         for (MultipartFile photo : photos) {
@@ -274,7 +287,12 @@ public class AppointmentService {
 
             String fileName = UUID.randomUUID().toString() + ext;
             Path filePath = dir.resolve(fileName);
-            photo.transferTo(filePath.toFile());
+
+            // Dùng Files.copy(InputStream) thay vì transferTo(File) để tránh lỗi
+            // FileNotFoundException khi file temp Tomcat bị xoá trước khi transfer
+            try (InputStream inputStream = photo.getInputStream()) {
+                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            }
 
             // Đường dẫn public (phục vụ qua /uploads/**)
             paths.add("appointments/" + appointmentId + "/" + fileName);

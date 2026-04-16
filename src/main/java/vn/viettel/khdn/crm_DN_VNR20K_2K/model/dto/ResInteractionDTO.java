@@ -27,7 +27,8 @@ public class ResInteractionDTO {
     private InteractionType interactionType;
     private InteractionResult result;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
+    // Trả về ISO 8601 (vd: "2026-04-16T02:00:00Z") để JavaScript có thể
+    // parse bằng new Date() ở mọi nơi trong frontend
     private Instant interactionTime;
 
     private String location;

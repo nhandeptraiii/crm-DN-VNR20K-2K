@@ -66,7 +66,15 @@ public class User {
     private RoleEnum role = RoleEnum.CONSULTANT;
 
     @Enumerated(EnumType.STRING)
-    private RegionEnum region;
+    private RegionEnum managedRegion;
+
+    @jakarta.persistence.ManyToMany(fetch = jakarta.persistence.FetchType.LAZY)
+    @jakarta.persistence.JoinTable(
+        name = "users_communes",
+        joinColumns = @jakarta.persistence.JoinColumn(name = "user_id"),
+        inverseJoinColumns = @jakarta.persistence.JoinColumn(name = "commune_id")
+    )
+    private java.util.Set<Commune> managedCommunes = new java.util.HashSet<>();
 
     @PrePersist
     public void handleBeforeCreate() {
@@ -78,5 +86,15 @@ public class User {
     @PreUpdate
     public void handleBeforeUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    @jakarta.persistence.Transient
+    public RegionEnum getRegion() {
+        return this.managedRegion;
+    }
+
+    @jakarta.persistence.Transient
+    public void setRegion(RegionEnum region) {
+        this.managedRegion = region;
     }
 }

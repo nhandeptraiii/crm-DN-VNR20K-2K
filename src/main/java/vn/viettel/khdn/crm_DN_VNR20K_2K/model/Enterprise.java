@@ -64,9 +64,9 @@ public class Enterprise {
     @Column(length = 30)
     private EnterpriseStatus status;
 
-    @Enumerated(EnumType.STRING)
-    private RegionEnum region;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "commune_id")
+    private Commune commune;
     @Enumerated(EnumType.STRING)
     private EnterpriseTypeEnum type;
 
@@ -95,5 +95,19 @@ public class Enterprise {
     @PreUpdate
     public void handleBeforeUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    @jakarta.persistence.Transient
+    public RegionEnum getRegion() {
+        if (this.commune != null && this.commune.getCluster() != null) {
+            return this.commune.getCluster().getRegion();
+        }
+        return null;
+    }
+
+    @jakarta.persistence.Transient
+    public void setRegion(RegionEnum region) {
+        // Obsolete, left for backwards compatibility with DTO mapping.
+        // Needs Commune parameter to be properly assigned in the Service layer.
     }
 }

@@ -39,6 +39,12 @@ public class ReqEnterpriseUpdateDTO {
     private String note;
 
     private vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum region;
+    
+    @jakarta.validation.constraints.NotNull(message = "Loại hình doanh nghiệp không được để trống")
     private vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum type;
+    
     private Long ownerId;
+    
+    // Thêm trường communeId để hỗ trợ Frontend truyền bằng dạng số thay vì gõ text
+    private Long communeId;
 }

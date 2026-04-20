@@ -32,4 +32,5 @@ public class ReqUserUpdateDTO {
 
     private RoleEnum role;
     private RegionEnum region;
+    private java.util.List<Long> communeIds;
 }

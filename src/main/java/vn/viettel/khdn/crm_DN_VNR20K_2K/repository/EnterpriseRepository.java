@@ -16,13 +16,15 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
 
-    @Query("SELECT e FROM Enterprise e WHERE "
-            + "(:keyword IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')) "
+    @Query("SELECT e FROM Enterprise e "
+            + "LEFT JOIN e.commune c "
+            + "LEFT JOIN c.cluster cl "
+            + "WHERE (:keyword IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')) "
             + "OR LOWER(e.taxCode) LIKE LOWER(CONCAT('%', :keyword, '%')) "
             + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
             + "AND (:status IS NULL OR e.status = :status) "
             + "AND (:industry IS NULL OR e.industry = :industry) "
-            + "AND (:region IS NULL OR e.commune.cluster.region = :region) "
+            + "AND (:region IS NULL OR cl.region = :region) "
             + "AND (:type IS NULL OR e.type = :type) "
             + "AND (:ownerId IS NULL OR e.owner.id = :ownerId)")
     Page<Enterprise> searchEnterprises(@Param("keyword") String keyword,
@@ -38,7 +40,10 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
     @Query("SELECT COUNT(DISTINCT i.enterprise.id) FROM Interaction i")
     long countInteractedEnterprises();
 
-    @Query("SELECT e FROM Enterprise e WHERE " + "(:region IS NULL OR e.commune.cluster.region = :region) AND "
+    @Query("SELECT e FROM Enterprise e "
+            + "LEFT JOIN e.commune c "
+            + "LEFT JOIN c.cluster cl "
+            + "WHERE (:region IS NULL OR cl.region = :region) AND "
             + "(:status IS NULL OR e.status = :status) AND "
             + "(:industry IS NULL OR e.industry = :industry) AND "
             + "(:kw IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :kw, '%')) OR e.taxCode LIKE CONCAT('%', :kw, '%'))")

@@ -11,16 +11,25 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUserCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUserUpdateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResUserDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.UserRepository;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.CommuneRepository;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Commune;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CommuneRepository communeRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CommuneRepository communeRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.communeRepository = communeRepository;
     }
 
     public User handleGetUserByUsername(String username) {
@@ -35,9 +44,29 @@ public class UserService {
         user.setPhone(dto.getPhone());
         user.setGender(dto.getGender());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setRole(dto.getRole() != null ? dto.getRole()
-                : vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT);
-        user.setRegion(dto.getRegion());
+        RoleEnum assignedRole = dto.getRole() != null ? dto.getRole() : RoleEnum.CONSULTANT;
+        user.setRole(assignedRole);
+        
+        if (assignedRole == RoleEnum.MANAGER) {
+            if (dto.getRegion() == null) {
+                throw new IllegalArgumentException("Vui lòng chọn Tỉnh/Vùng quản lý cho tài khoản Quản lý (MANAGER)");
+            }
+            user.setRegion(dto.getRegion());
+        } else if (assignedRole == RoleEnum.CONSULTANT) {
+            // Consultant có thể gán Region (Tỉnh làm việc) nhưng phần quan trọng nhất là Xã
+            user.setRegion(dto.getRegion());
+            if (dto.getCommuneIds() == null || dto.getCommuneIds().isEmpty()) {
+                throw new IllegalArgumentException("Vui lòng chọn danh sách Xã quản lý cho tài khoản Tư vấn viên (CONSULTANT)");
+            }
+            Set<Commune> communes = new HashSet<>(communeRepository.findAllById(dto.getCommuneIds()));
+            if (communes.size() != dto.getCommuneIds().size()) {
+                throw new IllegalArgumentException("Một vài ID Xã không hợp lệ hoặc không tồn tại.");
+            }
+            user.setManagedCommunes(communes);
+        } else {
+            user.setRegion(dto.getRegion());
+        }
+
         user.setStatus("ACTIVE");
 
         User saved = userRepository.save(user);
@@ -95,8 +124,35 @@ public class UserService {
         if (dto.getRole() != null) {
             user.setRole(dto.getRole());
         }
-        if (dto.getRegion() != null) {
-            user.setRegion(dto.getRegion());
+        
+        RoleEnum tempRole = user.getRole();
+        
+        if (tempRole == RoleEnum.MANAGER) {
+            if (dto.getRegion() != null) {
+                user.setRegion(dto.getRegion());
+            } else if (user.getRegion() == null) {
+                throw new IllegalArgumentException("Vui lòng bổ sung Tỉnh/Vùng quản lý vì tài khoản được cấu hình là Quản lý (MANAGER)");
+            }
+        } else if (tempRole == RoleEnum.CONSULTANT) {
+            if (dto.getRegion() != null) {
+                user.setRegion(dto.getRegion());
+            }
+            if (dto.getCommuneIds() != null) {
+                if (dto.getCommuneIds().isEmpty()) {
+                    throw new IllegalArgumentException("Phải có ít nhất 1 Xã quản lý cho Tư vấn viên (CONSULTANT)");
+                }
+                Set<Commune> communes = new HashSet<>(communeRepository.findAllById(dto.getCommuneIds()));
+                if (communes.size() != dto.getCommuneIds().size()) {
+                    throw new IllegalArgumentException("Một vài ID Xã không hợp lệ hoặc không tồn tại.");
+                }
+                user.setManagedCommunes(communes);
+            } else if (user.getManagedCommunes() == null || user.getManagedCommunes().isEmpty()) {
+                // Ignore missing update array unless it's null inside the database already
+            }
+        } else {
+            if (dto.getRegion() != null) {
+                user.setRegion(dto.getRegion());
+            }
         }
 
         User saved = userRepository.save(user);
@@ -137,6 +193,9 @@ public class UserService {
         dto.setStatus(user.getStatus());
         dto.setRole(user.getRole());
         dto.setRegion(user.getRegion());
+        if (user.getManagedCommunes() != null && !user.getManagedCommunes().isEmpty()) {
+            dto.setCommuneIds(user.getManagedCommunes().stream().map(Commune::getId).collect(Collectors.toList()));
+        }
         dto.setCreatedAt(user.getCreatedAt());
         dto.setUpdatedAt(user.getUpdatedAt());
         return dto;

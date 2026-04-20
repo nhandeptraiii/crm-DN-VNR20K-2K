@@ -68,6 +68,7 @@ public class Enterprise {
     @JoinColumn(name = "commune_id")
     private Commune commune;
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private EnterpriseTypeEnum type;
 
     @ManyToOne(fetch = FetchType.LAZY)

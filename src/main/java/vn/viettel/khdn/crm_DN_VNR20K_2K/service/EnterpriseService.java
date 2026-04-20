@@ -67,7 +67,11 @@ public class EnterpriseService {
         enterprise.setRegion(dto.getRegion()); // Backwards compatible transient method
         enterprise.setType(dto.getType());
         
-        if (dto.getCommuneCode() != null && !dto.getCommuneCode().isBlank()) {
+        if (dto.getCommuneId() != null) {
+            Commune commune = communeRepository.findById(dto.getCommuneId())
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có ID: " + dto.getCommuneId()));
+            enterprise.setCommune(commune);
+        } else if (dto.getCommuneCode() != null && !dto.getCommuneCode().isBlank()) {
             Commune commune = communeRepository.findByCode(dto.getCommuneCode())
                     .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có mã: " + dto.getCommuneCode()));
             enterprise.setCommune(commune);
@@ -273,6 +277,12 @@ public class EnterpriseService {
             User owner = new User();
             owner.setId(dto.getOwnerId());
             enterprise.setOwner(owner);
+        }
+        
+        if (dto.getCommuneId() != null) {
+            Commune commune = communeRepository.findById(dto.getCommuneId())
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có ID: " + dto.getCommuneId()));
+            enterprise.setCommune(commune);
         }
 
         Enterprise updated = enterpriseRepository.save(enterprise);

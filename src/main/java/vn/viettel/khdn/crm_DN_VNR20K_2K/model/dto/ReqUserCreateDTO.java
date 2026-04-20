@@ -44,4 +44,5 @@ public class ReqUserCreateDTO {
 
     private RoleEnum role;
     private RegionEnum region;
+    private java.util.List<Long> communeIds;
 }

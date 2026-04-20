@@ -53,9 +53,15 @@ public class ReqEnterpriseCreateDTO {
     private String contactPosition;
 
     private RegionEnum region;
+    
+    @jakarta.validation.constraints.NotNull(message = "Loại hình doanh nghiệp không được để trống")
     private EnterpriseTypeEnum type;
+    
     private Long ownerId;
     
     @Size(max = 50, message = "Mã xã tối đa 50 ký tự")
     private String communeCode;
+    
+    // Thêm trường communeId để hỗ trợ Frontend truyền bằng dạng số thay vì gõ text
+    private Long communeId;
 }

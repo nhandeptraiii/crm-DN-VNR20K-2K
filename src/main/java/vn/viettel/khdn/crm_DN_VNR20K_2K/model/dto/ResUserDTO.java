@@ -27,6 +27,7 @@ public class ResUserDTO {
     private String status;
     private RoleEnum role;
     private RegionEnum region;
+    private java.util.List<Long> communeIds;
     private Instant createdAt;
     private Instant updatedAt;
 }

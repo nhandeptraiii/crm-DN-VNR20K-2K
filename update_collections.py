@@ -7,23 +7,21 @@ if os.path.exists(file1):
     with open(file1, "r", encoding="utf-8") as f:
         data1 = json.load(f)
     
-    # 2.2 Create User
+    # 2.1 Create User
     for item in data1["item"][1]["item"]:
-        if item["name"] == "2.2. Create User":
+        if "Create User" in item["name"]:
             body = json.loads(item["request"]["body"]["raw"])
             body["region"] = "CTO"
             body["communeIds"] = [1]
             item["request"]["body"]["raw"] = json.dumps(body, indent=2, ensure_ascii=False)
-            break
             
     # 2.4 Update User
     for item in data1["item"][1]["item"]:
-        if item["name"] == "2.4. Update User":
+        if "Update User" in item["name"] and "ADMIN" in item["name"]:
             body = json.loads(item["request"]["body"]["raw"])
             body["region"] = "CTO"
             body["communeIds"] = [1]
             item["request"]["body"]["raw"] = json.dumps(body, indent=2, ensure_ascii=False)
-            break
 
     with open(file1, "w", encoding="utf-8") as f:
         json.dump(data1, f, indent=2, ensure_ascii=False)
@@ -36,19 +34,19 @@ if os.path.exists(file2):
         data2 = json.load(f)
         
     for item in data2["item"]:
-        if item["name"] == "2.1. Create Enterprise":
+        if "Create Enterprise" in item["name"]:
             body = json.loads(item["request"]["body"]["raw"])
             body["type"] = "SME"
             body["communeId"] = 1
             item["request"]["body"]["raw"] = json.dumps(body, indent=2, ensure_ascii=False)
             
-        elif item["name"] == "2.3. Update Enterprise":
+        elif "Update Enterprise" in item["name"]:
             body = json.loads(item["request"]["body"]["raw"])
             body["type"] = "SME"
             body["communeId"] = 1
             item["request"]["body"]["raw"] = json.dumps(body, indent=2, ensure_ascii=False)
             
-        elif item["name"] == "2.2. Search Enterprises":
+        elif "Get All Enterprises" in item["name"]:
             # Add parameters type and region
             url = item["request"]["url"]
             if "query" not in url:

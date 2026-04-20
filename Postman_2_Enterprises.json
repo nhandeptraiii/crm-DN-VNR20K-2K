@@ -27,7 +27,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel\",\n  \"taxCode\": \"0101234567\",\n  \"industry\": \"IT_SOFTWARE\",\n  \"employeeCount\": 500,\n  \"address\": \"D29 Phạm Văn Bạch, Cầu Giấy, HN\",\n  \"phone\": \"0988123456\",\n  \"website\": \"viettelsoftware.com\",\n  \"establishedDate\": \"2010-05-15\"\n}"
+          "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel\",\n  \"taxCode\": \"0101234567\",\n  \"industry\": \"IT_SOFTWARE\",\n  \"employeeCount\": 500,\n  \"address\": \"D29 Phạm Văn Bạch, Cầu Giấy, HN\",\n  \"phone\": \"0988123456\",\n  \"website\": \"viettelsoftware.com\",\n  \"establishedDate\": \"2010-05-15\",\n  \"type\": \"SME\",\n  \"communeId\": 1\n}"
         },
         "url": {
           "raw": "http://localhost:8080/enterprises",
@@ -87,7 +87,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/enterprises?page=0&size=10&keyword=&status=&industry=",
+          "raw": "http://localhost:8080/enterprises?page=0&size=10&keyword=&status=&industry=&typeStr=SME&regionStr=CTO",
           "protocol": "http",
           "host": [
             "localhost"
@@ -118,6 +118,14 @@
               "key": "industry",
               "value": "",
               "description": "IT_SOFTWARE, HEALTHCARE, EDUCATION..."
+            },
+            {
+              "key": "typeStr",
+              "value": "SME"
+            },
+            {
+              "key": "regionStr",
+              "value": "CTO"
             }
           ]
         }
@@ -174,7 +182,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel (Updated)\",\n  \"status\": \"ACTIVE_CUSTOMER\",\n  \"employeeCount\": 600\n}"
+          "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel (Updated)\",\n  \"status\": \"ACTIVE_CUSTOMER\",\n  \"employeeCount\": 600,\n  \"type\": \"SME\",\n  \"communeId\": 1\n}"
         },
         "url": {
           "raw": "http://localhost:8080/enterprises/1",

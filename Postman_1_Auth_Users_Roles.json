@@ -133,7 +133,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Nhân viên Sale mới\",\n  \"email\": \"sale1@viettel.com.vn\",\n  \"phone\": \"0988123123\",\n  \"password\": \"sale123\",\n  \"role\": \"CONSULTANT\",\n  \"dateOfBirth\": \"21-08-2003\"\n}"
+              "raw": "{\n  \"fullName\": \"Nhân viên Sale mới\",\n  \"email\": \"sale1@viettel.com.vn\",\n  \"phone\": \"0988123123\",\n  \"password\": \"sale123\",\n  \"role\": \"CONSULTANT\",\n  \"dateOfBirth\": \"21-08-2003\",\n  \"region\": \"CTO\",\n  \"communeIds\": [\n    1\n  ]\n}"
             },
             "url": {
               "raw": "http://localhost:8080/users",
@@ -245,7 +245,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Nhân viên Sale 1 Edit\",\n  \"phone\": \"0988999999\"\n}"
+              "raw": "{\n  \"fullName\": \"Nhân viên Sale 1 Edit\",\n  \"phone\": \"0988999999\",\n  \"region\": \"CTO\",\n  \"communeIds\": [\n    1\n  ]\n}"
             },
             "url": {
               "raw": "http://localhost:8080/users/2",

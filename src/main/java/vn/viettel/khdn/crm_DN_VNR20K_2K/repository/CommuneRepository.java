@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface CommuneRepository extends JpaRepository<Commune, Long> {
     Optional<Commune> findByCode(String code);
+    java.util.List<Commune> findByClusterId(Long clusterId);
 }

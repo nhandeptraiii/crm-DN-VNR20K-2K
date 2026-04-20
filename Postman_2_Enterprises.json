@@ -8,9 +8,23 @@
     {
       "name": "1. Create Enterprise",
       "request": {
-        "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "POST",
-        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel\",\n  \"taxCode\": \"0101234567\",\n  \"industry\": \"IT_SOFTWARE\",\n  \"employeeCount\": 500,\n  \"address\": \"D29 Phạm Văn Bạch, Cầu Giấy, HN\",\n  \"phone\": \"0988123456\",\n  \"website\": \"viettelsoftware.com\",\n  \"establishedDate\": \"2010-05-15\"\n}"
@@ -18,45 +32,93 @@
         "url": {
           "raw": "http://localhost:8080/enterprises",
           "protocol": "http",
-          "host": [ "localhost" ],
+          "host": [
+            "localhost"
+          ],
           "port": "8080",
-          "path": [ "enterprises" ]
+          "path": [
+            "enterprises"
+          ]
         }
       }
     },
     {
       "name": "1.1. Get All Industries",
       "request": {
-        "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "url": {
           "raw": "http://localhost:8080/enterprises/industries",
           "protocol": "http",
-          "host": [ "localhost" ],
+          "host": [
+            "localhost"
+          ],
           "port": "8080",
-          "path": [ "enterprises", "industries" ]
+          "path": [
+            "enterprises",
+            "industries"
+          ]
         }
       }
     },
     {
       "name": "2. Get All Enterprises (Pagination & Filter)",
       "request": {
-        "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "url": {
           "raw": "http://localhost:8080/enterprises?page=0&size=10&keyword=&status=&industry=",
           "protocol": "http",
-          "host": [ "localhost" ],
+          "host": [
+            "localhost"
+          ],
           "port": "8080",
-          "path": [ "enterprises" ],
+          "path": [
+            "enterprises"
+          ],
           "query": [
-            { "key": "page", "value": "0" },
-            { "key": "size", "value": "10" },
-            { "key": "keyword", "value": "" },
-            { "key": "status", "value": "", "description": "PROSPECT, ACTIVE_CUSTOMER, CHURNED" },
-            { "key": "industry", "value": "", "description": "IT_SOFTWARE, HEALTHCARE, EDUCATION..." }
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "10"
+            },
+            {
+              "key": "keyword",
+              "value": ""
+            },
+            {
+              "key": "status",
+              "value": "",
+              "description": "PROSPECT, ACTIVE_CUSTOMER, CHURNED"
+            },
+            {
+              "key": "industry",
+              "value": "",
+              "description": "IT_SOFTWARE, HEALTHCARE, EDUCATION..."
+            }
           ]
         }
       }
@@ -64,24 +126,52 @@
     {
       "name": "3. Get Enterprise Detail by ID",
       "request": {
-        "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "url": {
           "raw": "http://localhost:8080/enterprises/1",
           "protocol": "http",
-          "host": [ "localhost" ],
+          "host": [
+            "localhost"
+          ],
           "port": "8080",
-          "path": [ "enterprises", "1" ]
+          "path": [
+            "enterprises",
+            "1"
+          ]
         }
       }
     },
     {
       "name": "4. Update Enterprise",
       "request": {
-        "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "PUT",
-        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel (Updated)\",\n  \"status\": \"ACTIVE_CUSTOMER\",\n  \"employeeCount\": 600\n}"
@@ -89,24 +179,43 @@
         "url": {
           "raw": "http://localhost:8080/enterprises/1",
           "protocol": "http",
-          "host": [ "localhost" ],
+          "host": [
+            "localhost"
+          ],
           "port": "8080",
-          "path": [ "enterprises", "1" ]
+          "path": [
+            "enterprises",
+            "1"
+          ]
         }
       }
     },
     {
       "name": "5. Delete Enterprise (ADMIN ONLY)",
       "request": {
-        "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{access_token}}", "type": "string" } ] },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "DELETE",
         "header": [],
         "url": {
           "raw": "http://localhost:8080/enterprises/1",
           "protocol": "http",
-          "host": [ "localhost" ],
+          "host": [
+            "localhost"
+          ],
           "port": "8080",
-          "path": [ "enterprises", "1" ]
+          "path": [
+            "enterprises",
+            "1"
+          ]
         }
       }
     }

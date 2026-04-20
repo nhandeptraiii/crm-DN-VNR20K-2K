@@ -24,7 +24,7 @@ public class ExcelExportHelper {
             "STT", "Tên doanh nghiệp (*)", "Mã số thuế (*)", "Cơ quan thuế", "Lĩnh vực", "Số nhân viên",
             "Địa chỉ", "Website", "Ngày thành lập", "Điện thoại", "Loại hình", 
             "DT < 500tr (X)", "DT 500tr - 1 tỷ (X)", "DT > 1 tỷ (X)", 
-            "Vùng", "Mã xã", "Ghi chú",
+            "Vùng", "Tên xã", "Ghi chú",
             "Họ tên NĐD", "Email NĐD", "SĐT NĐD", "Chức vụ NĐD"
     };
 
@@ -85,7 +85,7 @@ public class ExcelExportHelper {
                 row.createCell(13).setCellValue(enterprise.getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.OVER_1B ? "X" : "");
 
                 row.createCell(14).setCellValue(enterprise.getRegion() != null ? enterprise.getRegion().name() : "");
-                row.createCell(15).setCellValue(enterprise.getCommuneCode() != null ? enterprise.getCommuneCode() : "");
+                row.createCell(15).setCellValue(enterprise.getCommuneName() != null ? enterprise.getCommuneName() : "");
                 row.createCell(16).setCellValue(enterprise.getNote() != null ? enterprise.getNote() : "");
                 row.createCell(17).setCellValue(enterprise.getContactFullName() != null ? enterprise.getContactFullName() : "");
                 row.createCell(18).setCellValue(enterprise.getContactEmail() != null ? enterprise.getContactEmail() : "");
@@ -146,7 +146,7 @@ public class ExcelExportHelper {
             exampleRow.createCell(13).setCellValue(""); // DT > 1 tỷ
 
             exampleRow.createCell(14).setCellValue("CTO"); // Region
-            exampleRow.createCell(15).setCellValue("XA_MAU_123"); // Commune Code
+            exampleRow.createCell(15).setCellValue("Phường An Thới Đông"); // Tên xã
             exampleRow.createCell(16).setCellValue("Đây là dữ liệu mẫu, vui lòng xóa dòng này trước khi import");
             exampleRow.createCell(17).setCellValue("Nguyễn Văn Mẫu");
             exampleRow.createCell(18).setCellValue("mau@example.com");

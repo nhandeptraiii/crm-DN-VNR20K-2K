@@ -67,6 +67,8 @@ public class ReqEnterpriseCreateDTO {
     
     @Size(max = 50, message = "Mã xã tối đa 50 ký tự")
     private String communeCode;
+
+    private String communeName;
     
     // Thêm trường communeId để hỗ trợ Frontend truyền bằng dạng số thay vì gõ text
     private Long communeId;

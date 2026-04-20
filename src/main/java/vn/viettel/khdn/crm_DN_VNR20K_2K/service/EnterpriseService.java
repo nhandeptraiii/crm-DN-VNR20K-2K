@@ -81,6 +81,10 @@ public class EnterpriseService {
             Commune commune = communeRepository.findByCode(dto.getCommuneCode())
                     .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có mã: " + dto.getCommuneCode()));
             enterprise.setCommune(commune);
+        } else if (dto.getCommuneName() != null && !dto.getCommuneName().isBlank()) {
+            Commune commune = communeRepository.findFirstByName(dto.getCommuneName())
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có tên: " + dto.getCommuneName()));
+            enterprise.setCommune(commune);
         }
 
         if (dto.getOwnerId() != null) {
@@ -526,10 +530,9 @@ public class EnterpriseService {
         dto.setUpdatedAt(e.getUpdatedAt());
         dto.setRegion(e.getRegion());
         dto.setType(e.getType());
-        dto.setCommuneCode(e.getCommuneCode());
-        if (e.getOwner() != null) {
-            dto.setOwnerId(e.getOwner().getId());
-        }
+        dto.setOwnerId(e.getOwner() != null ? e.getOwner().getId() : null);
+        dto.setCommuneCode(e.getCommune() != null ? e.getCommune().getCode() : null);
+        dto.setCommuneName(e.getCommune() != null ? e.getCommune().getName() : null);
         return dto;
     }
 }

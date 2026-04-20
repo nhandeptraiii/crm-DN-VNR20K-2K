@@ -164,7 +164,7 @@ public class ExcelUtils {
                 }
 
                 // Cột 15: Xã
-                dto.setCommuneCode(getCellValueAsString(row.getCell(15)));
+                dto.setCommuneName(getCellValueAsString(row.getCell(15)));
 
                 // Cột 16: Ghi chú
                 dto.setNote(getCellValueAsString(row.getCell(16)));

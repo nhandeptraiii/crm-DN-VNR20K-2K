@@ -40,4 +40,5 @@ public class ResEnterpriseDTO {
     private String contactPosition;
     
     private String communeCode;
+    private String communeName;
 }

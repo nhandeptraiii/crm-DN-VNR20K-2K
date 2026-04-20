@@ -52,11 +52,10 @@ public class UserService {
                 throw new IllegalArgumentException("Vui lòng chọn Tỉnh/Vùng quản lý cho tài khoản Quản lý (MANAGER)");
             }
             user.setRegion(dto.getRegion());
-        } else if (assignedRole == RoleEnum.CONSULTANT) {
-            // Consultant có thể gán Region (Tỉnh làm việc) nhưng phần quan trọng nhất là Xã
+        } else if (assignedRole == RoleEnum.ACCOUNT_MANAGER) {
             user.setRegion(dto.getRegion());
             if (dto.getCommuneIds() == null || dto.getCommuneIds().isEmpty()) {
-                throw new IllegalArgumentException("Vui lòng chọn danh sách Xã quản lý cho tài khoản Tư vấn viên (CONSULTANT)");
+                throw new IllegalArgumentException("Vui lòng chọn danh sách Xã quản lý cho tài khoản (ACCOUNT_MANAGER)");
             }
             Set<Commune> communes = new HashSet<>(communeRepository.findAllById(dto.getCommuneIds()));
             if (communes.size() != dto.getCommuneIds().size()) {
@@ -133,13 +132,13 @@ public class UserService {
             } else if (user.getRegion() == null) {
                 throw new IllegalArgumentException("Vui lòng bổ sung Tỉnh/Vùng quản lý vì tài khoản được cấu hình là Quản lý (MANAGER)");
             }
-        } else if (tempRole == RoleEnum.CONSULTANT) {
+        } else if (tempRole == RoleEnum.ACCOUNT_MANAGER) {
             if (dto.getRegion() != null) {
                 user.setRegion(dto.getRegion());
             }
             if (dto.getCommuneIds() != null) {
                 if (dto.getCommuneIds().isEmpty()) {
-                    throw new IllegalArgumentException("Phải có ít nhất 1 Xã quản lý cho Tư vấn viên (CONSULTANT)");
+                    throw new IllegalArgumentException("Phải có ít nhất 1 Xã quản lý cho (ACCOUNT_MANAGER)");
                 }
                 Set<Commune> communes = new HashSet<>(communeRepository.findAllById(dto.getCommuneIds()));
                 if (communes.size() != dto.getCommuneIds().size()) {

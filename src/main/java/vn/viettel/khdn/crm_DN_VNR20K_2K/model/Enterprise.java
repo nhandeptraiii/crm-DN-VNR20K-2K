@@ -23,6 +23,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange;
 
 @Entity
 @Table(name = "enterprises")
@@ -77,6 +78,13 @@ public class Enterprise {
 
     @Column(length = 1000)
     private String note;
+
+    @Column(name = "tax_authority", length = 255)
+    private String taxAuthority;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "revenue_range", length = 50)
+    private RevenueRange revenueRange;
 
     @Column(name = "created_at")
     private Instant createdAt;

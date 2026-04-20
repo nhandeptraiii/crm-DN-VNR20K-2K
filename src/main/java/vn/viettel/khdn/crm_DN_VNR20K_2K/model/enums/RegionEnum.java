@@ -1,5 +1,5 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums;
 
 public enum RegionEnum {
-    CTO, HUG, STG, DA, ALL, NONE
+    CTO, HUG, STG, ALL, NONE
 }

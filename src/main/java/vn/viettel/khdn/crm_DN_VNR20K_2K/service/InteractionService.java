@@ -99,7 +99,8 @@ public class InteractionService {
         User currentUser = getCurrentUser();
         Long filterConsultantId = consultantId;
 
-        boolean isConsultant = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT;
+        boolean isConsultant = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT 
+                            || currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ACCOUNT_MANAGER;
         if (isConsultant) {
             filterConsultantId = currentUser.getId();
         }

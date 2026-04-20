@@ -27,7 +27,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel\",\n  \"taxCode\": \"0101234567\",\n  \"industry\": \"IT_SOFTWARE\",\n  \"employeeCount\": 500,\n  \"address\": \"D29 Phạm Văn Bạch, Cầu Giấy, HN\",\n  \"phone\": \"0988123456\",\n  \"website\": \"viettelsoftware.com\",\n  \"establishedDate\": \"2010-05-15\",\n  \"type\": \"SME\",\n  \"communeId\": 1\n}"
+          "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel\",\n  \"taxCode\": \"0101234567\",\n  \"taxAuthority\": \"Chi cục thuế Quận Cầu Giấy\",\n  \"industry\": \"IT_SOFTWARE\",\n  \"employeeCount\": 500,\n  \"address\": \"D29 Phạm Văn Bạch, Cầu Giấy, HN\",\n  \"phone\": \"0988123456\",\n  \"website\": \"viettelsoftware.com\",\n  \"establishedDate\": \"2010-05-15\",\n  \"type\": \"HKD\",\n  \"revenueRange\": \"FROM_500M_TO_1B\",\n  \"communeId\": 1\n}"
         },
         "url": {
           "raw": "http://localhost:8080/enterprises",
@@ -182,7 +182,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel (Updated)\",\n  \"status\": \"ACTIVE_CUSTOMER\",\n  \"employeeCount\": 600,\n  \"type\": \"SME\",\n  \"communeId\": 1\n}"
+          "raw": "{\n  \"name\": \"Công ty TNHH Phần mềm Viettel (Updated)\",\n  \"status\": \"ACTIVE_CUSTOMER\",\n  \"taxAuthority\": \"Cục thuế Thành phố Hà Nội\",\n  \"employeeCount\": 600,\n  \"type\": \"HKD\",\n  \"revenueRange\": \"OVER_1B\",\n  \"communeId\": 1\n}"
         },
         "url": {
           "raw": "http://localhost:8080/enterprises/1",

@@ -4,5 +4,6 @@ public enum RoleEnum {
     ADMIN,
     OPERATOR,
     MANAGER,
+    ACCOUNT_MANAGER,
     CONSULTANT
 }

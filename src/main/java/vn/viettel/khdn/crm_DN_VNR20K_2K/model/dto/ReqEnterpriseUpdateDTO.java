@@ -38,6 +38,11 @@ public class ReqEnterpriseUpdateDTO {
     @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
     private String note;
 
+    @Size(max = 255, message = "Cơ quan thuế tối đa 255 ký tự")
+    private String taxAuthority;
+
+    private vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange revenueRange;
+
     private vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum region;
     
     @jakarta.validation.constraints.NotNull(message = "Loại hình doanh nghiệp không được để trống")

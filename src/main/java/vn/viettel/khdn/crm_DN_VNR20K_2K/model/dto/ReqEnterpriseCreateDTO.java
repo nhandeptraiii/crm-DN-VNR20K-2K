@@ -9,6 +9,7 @@ import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange;
 
 @Getter
 @Setter
@@ -39,6 +40,11 @@ public class ReqEnterpriseCreateDTO {
 
     @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
     private String note;
+
+    @Size(max = 255, message = "Cơ quan thuế tối đa 255 ký tự")
+    private String taxAuthority;
+
+    private RevenueRange revenueRange;
 
     @Size(max = 150, message = "Họ tên người đại diện tối đa 150 ký tự")
     private String contactFullName;

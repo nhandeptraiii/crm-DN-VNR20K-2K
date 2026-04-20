@@ -134,8 +134,8 @@ public class AppointmentService {
         User currentUser = getCurrentUser();
         Long filterConsultantId = consultantId;
 
-        // CONSULTANT chỉ thấy lịch hẹn của mình
-        if (currentUser.getRole() == RoleEnum.CONSULTANT) {
+        // ACCOUNT_MANAGER VÀ CONSULTANT chỉ thấy lịch hẹn của mình
+        if (currentUser.getRole() == RoleEnum.CONSULTANT || currentUser.getRole() == RoleEnum.ACCOUNT_MANAGER) {
             filterConsultantId = currentUser.getId();
         }
 

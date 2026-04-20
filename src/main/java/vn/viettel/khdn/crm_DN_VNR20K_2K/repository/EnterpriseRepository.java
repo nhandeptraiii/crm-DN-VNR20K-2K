@@ -26,12 +26,18 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
             + "AND (:industry IS NULL OR e.industry = :industry) "
             + "AND (:region IS NULL OR cl.region = :region) "
             + "AND (:type IS NULL OR e.type = :type) "
-            + "AND (:ownerId IS NULL OR e.owner.id = :ownerId)")
+            + "AND (:ownerId IS NULL OR e.owner.id = :ownerId) "
+            + "AND (:hasCommunes = false OR c.id IN :communeIds) "
+            + "AND (:hasRestrictTypes = false OR e.type IN :restrictTypes)")
     Page<Enterprise> searchEnterprises(@Param("keyword") String keyword,
             @Param("status") EnterpriseStatus status,
             @Param("industry") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry industry,
             @Param("region") RegionEnum region, @Param("type") EnterpriseTypeEnum type,
             @Param("ownerId") Long ownerId,
+            @Param("hasCommunes") boolean hasCommunes,
+            @Param("communeIds") java.util.List<Long> communeIds,
+            @Param("hasRestrictTypes") boolean hasRestrictTypes,
+            @Param("restrictTypes") java.util.List<EnterpriseTypeEnum> restrictTypes,
             Pageable pageable);
 
     @Query("SELECT COALESCE(MAX(e.id), 0) FROM Enterprise e")

@@ -9,6 +9,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseStatus;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange;
 
 @Getter
 @Setter
@@ -24,6 +25,8 @@ public class ResEnterpriseDTO {
     private String phone;
     private EnterpriseStatus status;
     private String note;
+    private String taxAuthority;
+    private RevenueRange revenueRange;
     private Instant createdAt;
     private Instant updatedAt;
     private RegionEnum region;         

@@ -29,6 +29,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.util.ExcelExportHelper;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.ExcelUtils;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.CommuneRepository;
 
 @Service
 public class EnterpriseService {
@@ -36,13 +37,15 @@ public class EnterpriseService {
     private final EnterpriseRepository enterpriseRepository;
     private final EnterpriseContactRepository enterpriseContactRepository;
     private final UserRepository userRepository;
+    private final CommuneRepository communeRepository;
 
     public EnterpriseService(EnterpriseRepository enterpriseRepository,
-            EnterpriseContactRepository enterpriseContactRepository,
-            UserRepository userRepository) {
+            EnterpriseContactRepository enterpriseContactRepository, UserRepository userRepository,
+            CommuneRepository communeRepository) {
         this.enterpriseRepository = enterpriseRepository;
         this.enterpriseContactRepository = enterpriseContactRepository;
         this.userRepository = userRepository;
+        this.communeRepository = communeRepository;
     }
 
     // --- Tạo mới ---
@@ -59,8 +62,12 @@ public class EnterpriseService {
         enterprise.setEstablishedDate(dto.getEstablishedDate());
         enterprise.setPhone(dto.getPhone());
         enterprise.setNote(dto.getNote());
-        enterprise.setRegion(dto.getRegion());
+        // enterprise.setRegion(dto.getRegion());
         enterprise.setType(dto.getType());
+
+        if (dto.getCommuneId() != null) {
+            enterprise.setCommune(communeRepository.findById(dto.getCommuneId()).orElse(null));
+        }
 
         if (dto.getOwnerId() != null) {
             User owner = new User();
@@ -94,10 +101,11 @@ public class EnterpriseService {
         RegionEnum requestedRegion = null;
         RegionEnum regionFilter = null;
         Long ownerIdFilter = null;
-        
+
         if (typeStr != null && !typeStr.isBlank()) {
             try {
-                enumType = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.valueOf(typeStr.trim().toUpperCase());
+                enumType = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum
+                        .valueOf(typeStr.trim().toUpperCase());
             } catch (IllegalArgumentException e) {
             }
         }
@@ -254,8 +262,13 @@ public class EnterpriseService {
             enterprise.setStatus(dto.getStatus());
         if (dto.getNote() != null)
             enterprise.setNote(dto.getNote());
-        if (dto.getRegion() != null)
-            enterprise.setRegion(dto.getRegion());
+        // if (dto.getRegion() != null)
+        // enterprise.setRegion(dto.getRegion());
+        if (dto.getCommuneId() != null) {
+            enterprise.setCommune(communeRepository.findById(dto.getCommuneId())
+                    .orElseThrow(() -> new IdInvalidException(
+                            "Xã/Phường với ID " + dto.getCommuneId() + " không tồn tại")));
+        }
         if (dto.getType() != null)
             enterprise.setType(dto.getType());
         if (dto.getOwnerId() != null) {
@@ -283,17 +296,18 @@ public class EnterpriseService {
     }
 
     // --- Export Excel ---
-    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr, String regionStr, String typeStr)
-            throws IOException {
+    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr,
+            String regionStr, String typeStr) throws IOException {
         EnterpriseStatus enumStatus = null;
         vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum enumType = null;
         RegionEnum requestedRegion = null;
         RegionEnum regionFilter = null;
         Long ownerIdFilter = null;
-        
+
         if (typeStr != null && !typeStr.isBlank()) {
             try {
-                enumType = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.valueOf(typeStr.trim().toUpperCase());
+                enumType = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum
+                        .valueOf(typeStr.trim().toUpperCase());
             } catch (IllegalArgumentException e) {
             }
         }
@@ -353,19 +367,29 @@ public class EnterpriseService {
         // Tạm thời lấy tất cả (không phân trang) để export report
         Page<Enterprise> page = enterpriseRepository.searchEnterprises(
                 keyword != null && !keyword.isBlank() ? keyword.trim() : null, enumStatus,
-                enumIndustry, regionFilter, enumType, ownerIdFilter, Pageable.unpaged()); // Hoặc có thể cần
-                                                                                // viết 1 hàm
+                enumIndustry, regionFilter, enumType, ownerIdFilter, Pageable.unpaged()); // Hoặc có
+                                                                                          // thể cần
+        // viết 1 hàm
         // findAll() riêng
         // trong repository nếu không dùng Pageable
 
-        List<ResEnterpriseDTO> dtos = page.getContent().stream().map(this::toDTO).collect(Collectors.toList());
-        
+        List<ResEnterpriseDTO> dtos =
+                page.getContent().stream().map(this::toDTO).collect(Collectors.toList());
+
         // Load danh sách người đại diện chính
-        List<Long> enterpriseIds = dtos.stream().map(ResEnterpriseDTO::getId).collect(Collectors.toList());
+        List<Long> enterpriseIds =
+                dtos.stream().map(ResEnterpriseDTO::getId).collect(Collectors.toList());
         if (!enterpriseIds.isEmpty()) {
-            List<EnterpriseContact> primaryContacts = enterpriseContactRepository.findByEnterpriseIdInAndIsPrimaryTrue(enterpriseIds);
-            Map<Long, EnterpriseContact> contactMap = primaryContacts.stream()
-                .collect(Collectors.toMap(c -> c.getEnterprise().getId(), c -> c, (c1, c2) -> c1)); // Tránh duplicate key nếu có lỗi data
+            List<EnterpriseContact> primaryContacts =
+                    enterpriseContactRepository.findByEnterpriseIdInAndIsPrimaryTrue(enterpriseIds);
+            Map<Long, EnterpriseContact> contactMap = primaryContacts.stream().collect(
+                    Collectors.toMap(c -> c.getEnterprise().getId(), c -> c, (c1, c2) -> c1)); // Tránh
+                                                                                               // duplicate
+                                                                                               // key
+                                                                                               // nếu
+                                                                                               // có
+                                                                                               // lỗi
+                                                                                               // data
 
             for (ResEnterpriseDTO dto : dtos) {
                 EnterpriseContact contact = contactMap.get(dto.getId());
@@ -447,6 +471,15 @@ public class EnterpriseService {
         dto.setUpdatedAt(e.getUpdatedAt());
         dto.setRegion(e.getRegion());
         dto.setType(e.getType());
+        if (e.getCommune() != null) {
+            dto.setCommuneId(e.getCommune().getId());
+            if (e.getCommune().getCluster() != null) {
+                dto.setRegion(e.getCommune().getCluster().getRegion());
+            }
+        } else {
+            dto.setRegion(e.getRegion());
+        }
+
         if (e.getOwner() != null) {
             dto.setOwnerId(e.getOwner().getId());
         }

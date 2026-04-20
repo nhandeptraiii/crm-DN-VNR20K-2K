@@ -1,7 +1,7 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 
 import java.time.LocalDate;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -32,6 +32,7 @@ public class ReqEnterpriseCreateDTO {
     @Size(max = 255, message = "Website tối đa 255 ký tự")
     private String website;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate establishedDate;
 
     @Size(max = 11, message = "SĐT tối đa 11 ký tự")
@@ -55,4 +56,5 @@ public class ReqEnterpriseCreateDTO {
     private RegionEnum region;
     private EnterpriseTypeEnum type;
     private Long ownerId;
+    private Long communeId;
 }

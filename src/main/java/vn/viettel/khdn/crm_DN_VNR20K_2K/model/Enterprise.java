@@ -110,4 +110,9 @@ public class Enterprise {
         // Obsolete, left for backwards compatibility with DTO mapping.
         // Needs Commune parameter to be properly assigned in the Service layer.
     }
+
+    @jakarta.persistence.Transient
+    public String getCommuneCode() {
+        return this.commune != null ? this.commune.getCode() : null;
+    }
 }

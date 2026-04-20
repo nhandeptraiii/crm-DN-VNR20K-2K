@@ -17,6 +17,9 @@ public class Commune {
     @Column(nullable = false, length = 255)
     private String name;
 
+    @Column(nullable = false, length = 50, unique = true)
+    private String code;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cluster_id", nullable = false)
     private Cluster cluster;

@@ -35,4 +35,6 @@ public class ResEnterpriseDTO {
     private String contactEmail;
     private String contactPhone;
     private String contactPosition;
+    
+    private String communeCode;
 }

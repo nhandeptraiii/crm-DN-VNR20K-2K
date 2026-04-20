@@ -103,9 +103,11 @@ public class EnterpriseController {
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "industry", required = false) String industry,
             @RequestParam(value = "region", required = false) String region,
-            @RequestParam(value = "type", required = false) String type) throws IOException {
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "group", required = false, defaultValue = "VNR") String group) throws IOException {
         
-        ByteArrayInputStream in = enterpriseService.exportToExcel(keyword, status, industry, region, type);
+        boolean isSme = "SME".equalsIgnoreCase(group);
+        ByteArrayInputStream in = enterpriseService.exportToExcel(keyword, status, industry, region, type, isSme);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=doanh_nghiep_export.xlsx");
@@ -119,11 +121,13 @@ public class EnterpriseController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/import/template")
-    public ResponseEntity<Resource> downloadTemplate() throws IOException {
-        ByteArrayInputStream in = enterpriseService.getTemplateExcel();
+    public ResponseEntity<Resource> downloadTemplate(
+            @RequestParam(value = "group", required = false, defaultValue = "VNR") String group) throws IOException {
+        boolean isSme = "SME".equalsIgnoreCase(group);
+        ByteArrayInputStream in = enterpriseService.getTemplateExcel(isSme);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=doanh_nghiep_template.xlsx");
+        headers.add("Content-Disposition", "attachment; filename=doanh_nghiep_template_" + group + ".xlsx");
 
         return ResponseEntity
                 .ok()
@@ -134,8 +138,11 @@ public class EnterpriseController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/import")
-    public ResponseEntity<ImportResultDTO> importEnterprises(@RequestPart("file") MultipartFile file) {
-        ImportResultDTO result = enterpriseService.importFromExcel(file);
+    public ResponseEntity<ImportResultDTO> importEnterprises(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "group", required = false, defaultValue = "VNR") String group) {
+        boolean isSme = "SME".equalsIgnoreCase(group);
+        ImportResultDTO result = enterpriseService.importFromExcel(file, isSme);
         if (result.getTotalRows() == 0 && !result.getErrors().isEmpty()) {
             return ResponseEntity.badRequest().body(result);
         }

@@ -55,4 +55,7 @@ public class ReqEnterpriseCreateDTO {
     private RegionEnum region;
     private EnterpriseTypeEnum type;
     private Long ownerId;
+    
+    @Size(max = 50, message = "Mã xã tối đa 50 ký tự")
+    private String communeCode;
 }

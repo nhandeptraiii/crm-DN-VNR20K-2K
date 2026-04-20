@@ -88,7 +88,7 @@ public class ExcelUtils {
     }
 
     // Trả về danh sách DTO, KHÔNG bao gồm báo lỗi (Xử lý lỗi ở Service)
-    public static List<ReqEnterpriseCreateDTO> excelToEnterprises(InputStream is) {
+    public static List<ReqEnterpriseCreateDTO> excelToEnterprises(InputStream is, boolean isSme) {
         List<ReqEnterpriseCreateDTO> enterprises = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -138,29 +138,49 @@ public class ExcelUtils {
                     }
                 }
 
-                // Cột 10: Vùng
-                String regionStr = getCellValueAsString(row.getCell(10));
-                if (regionStr != null && !regionStr.isBlank()) {
-                    try {
-                        dto.setRegion(RegionEnum.valueOf(regionStr.trim().toUpperCase()));
-                    } catch (IllegalArgumentException e) {
+                if (isSme) {
+                    // Cột 10: Vùng
+                    String regionStr = getCellValueAsString(row.getCell(10));
+                    if (regionStr != null && !regionStr.isBlank()) {
+                        try {
+                            dto.setRegion(RegionEnum.valueOf(regionStr.trim().toUpperCase()));
+                        } catch (IllegalArgumentException e) {
+                        }
                     }
+
+                    // Cột 11: Xã
+                    dto.setCommuneCode(getCellValueAsString(row.getCell(11)));
+
+                    // Cột 12: Ghi chú
+                    dto.setNote(getCellValueAsString(row.getCell(12)));
+                    
+                    // Cột 13: Họ tên NĐD
+                    dto.setContactFullName(getCellValueAsString(row.getCell(13)));
+                    
+                    // Cột 14: Email NĐD
+                    dto.setContactEmail(getCellValueAsString(row.getCell(14)));
+                    
+                    // Cột 15: SĐT NĐD
+                    dto.setContactPhone(getCellValueAsString(row.getCell(15)));
+                    
+                    // Cột 16: Chức vụ NĐD
+                    dto.setContactPosition(getCellValueAsString(row.getCell(16)));
+                } else {
+                    // Cột 10: Ghi chú
+                    dto.setNote(getCellValueAsString(row.getCell(10)));
+
+                    // Cột 11: Họ tên NĐD
+                    dto.setContactFullName(getCellValueAsString(row.getCell(11)));
+                    
+                    // Cột 12: Email NĐD
+                    dto.setContactEmail(getCellValueAsString(row.getCell(12)));
+                    
+                    // Cột 13: SĐT NĐD
+                    dto.setContactPhone(getCellValueAsString(row.getCell(13)));
+                    
+                    // Cột 14: Chức vụ NĐD
+                    dto.setContactPosition(getCellValueAsString(row.getCell(14)));
                 }
-
-                // Cột 11: Ghi chú
-                dto.setNote(getCellValueAsString(row.getCell(11)));
-
-                // Cột 12: Họ tên NĐD
-                dto.setContactFullName(getCellValueAsString(row.getCell(12)));
-                
-                // Cột 13: Email NĐD
-                dto.setContactEmail(getCellValueAsString(row.getCell(13)));
-                
-                // Cột 14: SĐT NĐD
-                dto.setContactPhone(getCellValueAsString(row.getCell(14)));
-                
-                // Cột 15: Chức vụ NĐD
-                dto.setContactPosition(getCellValueAsString(row.getCell(15)));
 
                 enterprises.add(dto);
             }

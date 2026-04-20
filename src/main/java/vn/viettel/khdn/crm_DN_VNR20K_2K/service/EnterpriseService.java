@@ -29,6 +29,8 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.util.ExcelExportHelper;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.ExcelUtils;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Commune;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.CommuneRepository;
 
 @Service
 public class EnterpriseService {
@@ -36,13 +38,16 @@ public class EnterpriseService {
     private final EnterpriseRepository enterpriseRepository;
     private final EnterpriseContactRepository enterpriseContactRepository;
     private final UserRepository userRepository;
+    private final CommuneRepository communeRepository;
 
     public EnterpriseService(EnterpriseRepository enterpriseRepository,
             EnterpriseContactRepository enterpriseContactRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            CommuneRepository communeRepository) {
         this.enterpriseRepository = enterpriseRepository;
         this.enterpriseContactRepository = enterpriseContactRepository;
         this.userRepository = userRepository;
+        this.communeRepository = communeRepository;
     }
 
     // --- Tạo mới ---
@@ -59,8 +64,14 @@ public class EnterpriseService {
         enterprise.setEstablishedDate(dto.getEstablishedDate());
         enterprise.setPhone(dto.getPhone());
         enterprise.setNote(dto.getNote());
-        enterprise.setRegion(dto.getRegion());
+        enterprise.setRegion(dto.getRegion()); // Backwards compatible transient method
         enterprise.setType(dto.getType());
+        
+        if (dto.getCommuneCode() != null && !dto.getCommuneCode().isBlank()) {
+            Commune commune = communeRepository.findByCode(dto.getCommuneCode())
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có mã: " + dto.getCommuneCode()));
+            enterprise.setCommune(commune);
+        }
 
         if (dto.getOwnerId() != null) {
             User owner = new User();
@@ -278,12 +289,12 @@ public class EnterpriseService {
 
 
     // --- Tải file mẫu Export ---
-    public ByteArrayInputStream getTemplateExcel() throws IOException {
-        return ExcelExportHelper.createTemplateExcel();
+    public ByteArrayInputStream getTemplateExcel(boolean isSme) throws IOException {
+        return ExcelExportHelper.createTemplateExcel(isSme);
     }
 
     // --- Export Excel ---
-    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr, String regionStr, String typeStr)
+    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr, String regionStr, String typeStr, boolean isSme)
             throws IOException {
         EnterpriseStatus enumStatus = null;
         vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum enumType = null;
@@ -341,7 +352,7 @@ public class EnterpriseService {
             }
 
             if (requestedRegion != null && requestedRegion != regionFilter) {
-                return ExcelExportHelper.enterprisesToExcel(java.util.Collections.emptyList());
+                return ExcelExportHelper.enterprisesToExcel(java.util.Collections.emptyList(), isSme);
             }
 
             if (currentUser.getRole() == RoleEnum.CONSULTANT) {
@@ -378,11 +389,11 @@ public class EnterpriseService {
             }
         }
 
-        return ExcelExportHelper.enterprisesToExcel(dtos);
+        return ExcelExportHelper.enterprisesToExcel(dtos, isSme);
     }
 
     // --- Import Excel ---
-    public ImportResultDTO importFromExcel(MultipartFile file) {
+    public ImportResultDTO importFromExcel(MultipartFile file, boolean isSme) {
         ImportResultDTO result = new ImportResultDTO();
 
         // Validate format
@@ -393,7 +404,7 @@ public class EnterpriseService {
 
         List<ReqEnterpriseCreateDTO> enterprises;
         try {
-            enterprises = ExcelUtils.excelToEnterprises(file.getInputStream());
+            enterprises = ExcelUtils.excelToEnterprises(file.getInputStream(), isSme);
         } catch (Exception e) {
             result.addError(0, "Lỗi khi đọc nội dung file: " + e.getMessage());
             return result;
@@ -447,6 +458,7 @@ public class EnterpriseService {
         dto.setUpdatedAt(e.getUpdatedAt());
         dto.setRegion(e.getRegion());
         dto.setType(e.getType());
+        dto.setCommuneCode(e.getCommuneCode());
         if (e.getOwner() != null) {
             dto.setOwnerId(e.getOwner().getId());
         }

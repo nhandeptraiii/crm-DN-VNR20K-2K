@@ -33,23 +33,26 @@ public class EmailService {
      *
      * @param toEmail     Địa chỉ Gmail của AM
      * @param appointment Lịch hẹn cần nhắc
-     * @param hoursLeft   Số giờ còn lại (24 hoặc 1)
+     * @param leadMinutes Số phút còn lại (ví dụ: 1440, 60, 15)
+     * @return true nếu gửi thành công, false nếu thất bại
      */
-    public void sendAppointmentReminder(String toEmail, Appointment appointment, int hoursLeft) {
+    public boolean sendAppointmentReminder(String toEmail, Appointment appointment, int leadMinutes) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject(buildSubject(appointment, hoursLeft));
-            helper.setText(buildHtmlContent(appointment, hoursLeft), true); // true = HTML
+            helper.setSubject(buildSubject(appointment, leadMinutes));
+            helper.setText(buildHtmlContent(appointment, leadMinutes), true); // true = HTML
 
             mailSender.send(mimeMessage);
+            return true;
         } catch (Exception e) {
             // Log lỗi nhưng không throw để không làm crash scheduler
             System.err.println("[EmailService] Lỗi gửi email nhắc lịch hẹn ID="
                     + appointment.getId() + " đến " + toEmail + ": " + e.getMessage());
+            return false;
         }
     }
 
@@ -96,14 +99,14 @@ public class EmailService {
         }
     }
 
-    private String buildSubject(Appointment appointment, int hoursLeft) {
-        String timeLabel = hoursLeft == 1 ? "1 giờ" : "24 giờ";
+    private String buildSubject(Appointment appointment, int leadMinutes) {
+        String timeLabel = formatLeadTime(leadMinutes);
         return "⏰ [CRM Viettel] Nhắc lịch hẹn sau " + timeLabel
                 + " — " + appointment.getEnterprise().getName();
     }
 
-    private String buildHtmlContent(Appointment appointment, int hoursLeft) {
-        String timeLabel = hoursLeft == 1 ? "1 giờ nữa" : "24 giờ nữa";
+    private String buildHtmlContent(Appointment appointment, int leadMinutes) {
+        String timeLabel = formatLeadTime(leadMinutes) + " nữa";
 
         ZonedDateTime scheduledVN = appointment.getScheduledTime()
                 .atZone(VIETNAM_ZONE);
@@ -169,6 +172,14 @@ public class EmailService {
                 + "</div>"
                 + "</div>"
                 + "</body></html>";
+    }
+
+    private String formatLeadTime(int leadMinutes) {
+        if (leadMinutes % 60 == 0) {
+            int hours = leadMinutes / 60;
+            return hours + " giờ";
+        }
+        return leadMinutes + " phút";
     }
 
     private String tableRow(String label, String value) {

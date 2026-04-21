@@ -39,7 +39,7 @@ public class EnterpriseContact {
     @Column(length = 100)
     private String email;
 
-    @Column(length = 11)
+    @Column(length = 100)
     private String phone;
 
     @Column(name = "is_primary")

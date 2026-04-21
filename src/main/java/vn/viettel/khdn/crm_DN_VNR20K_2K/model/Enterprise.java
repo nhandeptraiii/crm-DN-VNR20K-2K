@@ -58,7 +58,7 @@ public class Enterprise {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate establishedDate;
 
-    @Column(length = 30)
+    @Column(length = 100)
     private String phone;
 
     @Enumerated(EnumType.STRING)

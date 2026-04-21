@@ -17,7 +17,7 @@ public class ReqContactUpdateDTO {
     @Size(max = 100, message = "Email tối đa 100 ký tự")
     private String email;
 
-    @Size(max = 11, message = "SĐT tối đa 11 ký tự")
+    @Size(max = 100, message = "SĐT tối đa 100 ký tự")
     private String phone;
 
     private Boolean isPrimary;

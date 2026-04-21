@@ -47,24 +47,7 @@ public class UserService {
         RoleEnum assignedRole = dto.getRole() != null ? dto.getRole() : RoleEnum.CONSULTANT;
         user.setRole(assignedRole);
         
-        if (assignedRole == RoleEnum.MANAGER) {
-            if (dto.getRegion() == null) {
-                throw new IllegalArgumentException("Vui lòng chọn Tỉnh/Vùng quản lý cho tài khoản Quản lý (MANAGER)");
-            }
-            user.setRegion(dto.getRegion());
-        } else if (assignedRole == RoleEnum.ACCOUNT_MANAGER) {
-            user.setRegion(dto.getRegion());
-            if (dto.getCommuneIds() == null || dto.getCommuneIds().isEmpty()) {
-                throw new IllegalArgumentException("Vui lòng chọn danh sách Xã quản lý cho tài khoản (ACCOUNT_MANAGER)");
-            }
-            Set<Commune> communes = new HashSet<>(communeRepository.findAllById(dto.getCommuneIds()));
-            if (communes.size() != dto.getCommuneIds().size()) {
-                throw new IllegalArgumentException("Một vài ID Xã không hợp lệ hoặc không tồn tại.");
-            }
-            user.setManagedCommunes(communes);
-        } else {
-            user.setRegion(dto.getRegion());
-        }
+        applyRoleConstraints(user, assignedRole, dto.getRegion(), dto.getCommuneIds());
 
         user.setStatus("ACTIVE");
 
@@ -125,34 +108,7 @@ public class UserService {
         }
         
         RoleEnum tempRole = user.getRole();
-        
-        if (tempRole == RoleEnum.MANAGER) {
-            if (dto.getRegion() != null) {
-                user.setRegion(dto.getRegion());
-            } else if (user.getRegion() == null) {
-                throw new IllegalArgumentException("Vui lòng bổ sung Tỉnh/Vùng quản lý vì tài khoản được cấu hình là Quản lý (MANAGER)");
-            }
-        } else if (tempRole == RoleEnum.ACCOUNT_MANAGER) {
-            if (dto.getRegion() != null) {
-                user.setRegion(dto.getRegion());
-            }
-            if (dto.getCommuneIds() != null) {
-                if (dto.getCommuneIds().isEmpty()) {
-                    throw new IllegalArgumentException("Phải có ít nhất 1 Xã quản lý cho (ACCOUNT_MANAGER)");
-                }
-                Set<Commune> communes = new HashSet<>(communeRepository.findAllById(dto.getCommuneIds()));
-                if (communes.size() != dto.getCommuneIds().size()) {
-                    throw new IllegalArgumentException("Một vài ID Xã không hợp lệ hoặc không tồn tại.");
-                }
-                user.setManagedCommunes(communes);
-            } else if (user.getManagedCommunes() == null || user.getManagedCommunes().isEmpty()) {
-                // Ignore missing update array unless it's null inside the database already
-            }
-        } else {
-            if (dto.getRegion() != null) {
-                user.setRegion(dto.getRegion());
-            }
-        }
+        applyRoleConstraints(user, tempRole, dto.getRegion(), dto.getCommuneIds());
 
         User saved = userRepository.save(user);
         return convertToResUserDTO(saved);
@@ -198,5 +154,64 @@ public class UserService {
         dto.setCreatedAt(user.getCreatedAt());
         dto.setUpdatedAt(user.getUpdatedAt());
         return dto;
+    }
+
+    /**
+     * Áp dụng ràng buộc dữ liệu theo Role:
+     * - MANAGER   : Bắt buộc region, KHÔNG có communes (tự động xóa nếu có).
+     * - ACCOUNT_MANAGER: Bắt buộc region VÀ communes.
+     * - ADMIN / OPERATOR / CONSULTANT: KHÔNG cho phép region và communes (tự động xóa).
+     */
+    private void applyRoleConstraints(User user, RoleEnum role,
+            vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum region,
+            java.util.List<Long> communeIds) {
+
+        switch (role) {
+            case MANAGER -> {
+                if (region == null && user.getRegion() == null) {
+                    throw new IllegalArgumentException(
+                            "[MANAGER] Bắt buộc phải chọn Tỉnh/Vùng (region) cho tài khoản Quản lý.");
+                }
+                if (region != null) {
+                    user.setRegion(region);
+                }
+                user.setManagedCommunes(new HashSet<>());
+            }
+            case ACCOUNT_MANAGER -> {
+                if (region == null && user.getRegion() == null) {
+                    throw new IllegalArgumentException(
+                            "[ACCOUNT_MANAGER] Bắt buộc phải chọn Tỉnh/Vùng (region).");
+                }
+                if (region != null) {
+                    user.setRegion(region);
+                }
+                if (communeIds != null) {
+                    if (communeIds.isEmpty()) {
+                        throw new IllegalArgumentException(
+                                "[ACCOUNT_MANAGER] Bắt buộc phải chọn ít nhất 1 Xã quản lý.");
+                    }
+                    Set<Commune> communes = new HashSet<>(communeRepository.findAllById(communeIds));
+                    if (communes.size() != communeIds.size()) {
+                        throw new IllegalArgumentException("Một vài ID Xã không hợp lệ hoặc không tồn tại.");
+                    }
+                    user.setManagedCommunes(communes);
+                } else if (user.getManagedCommunes() == null || user.getManagedCommunes().isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "[ACCOUNT_MANAGER] Bắt buộc phải chọn ít nhất 1 Xã quản lý.");
+                }
+            }
+            case ADMIN, OPERATOR, CONSULTANT -> {
+                if (region != null) {
+                    throw new IllegalArgumentException(
+                            "[" + role + "] Role này không được phép chọn Tỉnh/Vùng (region).");
+                }
+                if (communeIds != null && !communeIds.isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "[" + role + "] Role này không được phép chọn danh sách Xã (communeIds).");
+                }
+                user.setRegion(null);
+                user.setManagedCommunes(new HashSet<>());
+            }
+        }
     }
 }

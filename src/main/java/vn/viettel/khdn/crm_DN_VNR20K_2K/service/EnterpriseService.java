@@ -112,27 +112,33 @@ public class EnterpriseService {
 
     // --- Lấy danh sách (phân trang + tìm kiếm) ---
     public Page<ResEnterpriseDTO> searchEnterprises(String keyword, String status,
-            String industryStr, String regionStr, String typeStr, Pageable pageable) {
+            String industryStr, List<String> regionStrs, List<String> typeStrs, Pageable pageable) {
         EnterpriseStatus enumStatus = null;
         vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
-        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum enumType = null;
-        RegionEnum requestedRegion = null;
-        RegionEnum regionFilter = null;
-        Long ownerIdFilter = null;
         
-        if (typeStr != null && !typeStr.isBlank()) {
-            try {
-                enumType = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.valueOf(typeStr.trim().toUpperCase());
-            } catch (IllegalArgumentException e) {
+        List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> requestedTypes = new java.util.ArrayList<>();
+        if (typeStrs != null) {
+            for (String ts : typeStrs) {
+                if (ts != null && !ts.isBlank()) {
+                    try {
+                        requestedTypes.add(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.valueOf(ts.trim().toUpperCase()));
+                    } catch (IllegalArgumentException e) {}
+                }
             }
         }
 
-        if (regionStr != null && !regionStr.isBlank()) {
-            try {
-                requestedRegion = RegionEnum.valueOf(regionStr.trim().toUpperCase());
-            } catch (IllegalArgumentException e) {
+        List<RegionEnum> requestedRegions = new java.util.ArrayList<>();
+        if (regionStrs != null) {
+            for (String rs : regionStrs) {
+                if (rs != null && !rs.isBlank()) {
+                    try {
+                        requestedRegions.add(RegionEnum.valueOf(rs.trim().toUpperCase()));
+                    } catch (IllegalArgumentException e) {}
+                }
             }
         }
+        
+        Long ownerIdFilter = null;
 
         if (status != null && !status.isBlank()) {
             try {
@@ -157,35 +163,36 @@ public class EnterpriseService {
         User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 3. Phân quyền lọc
+        List<RegionEnum> allowedRegions = new java.util.ArrayList<>(requestedRegions);
         boolean hasCommunes = false;
         java.util.List<Long> communeIds = java.util.Collections.emptyList();
         boolean hasRestrictTypes = false;
         java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes = java.util.Collections.emptyList();
 
-        if (currentUser.getRole() == RoleEnum.ADMIN || currentUser.getRole() == RoleEnum.OPERATOR) {
-            regionFilter = requestedRegion;
-        } else if (currentUser.getRole() == RoleEnum.CONSULTANT) {
-            regionFilter = requestedRegion; // Global visibility
+        if (currentUser.getRole() == RoleEnum.CONSULTANT) {
             hasRestrictTypes = true;
             restrictTypes = java.util.List.of(
                 vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K,
                 vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000,
                 vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME
             );
-            if (enumType != null && !restrictTypes.contains(enumType)) {
-                return Page.empty(pageable); // Trả rỗng nếu cố tình query sai loại quyền
+            if (!requestedTypes.isEmpty()) {
+                for (vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum t : requestedTypes) {
+                    if (!restrictTypes.contains(t)) {
+                        return Page.empty(pageable); // Trả rỗng nếu cố tình query sai loại quyền
+                    }
+                }
             }
         } else if (currentUser.getRole() == RoleEnum.MANAGER) {
-            regionFilter = currentUser.getRegion();
-            if (regionFilter == null) {
+            RegionEnum managerRegion = currentUser.getRegion();
+            if (managerRegion == null) {
                 throw new RuntimeException("Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
             }
-            if (requestedRegion != null && requestedRegion != regionFilter) {
+            if (!requestedRegions.isEmpty() && !requestedRegions.contains(managerRegion)) {
                 return Page.empty(pageable);
             }
+            allowedRegions = java.util.List.of(managerRegion);
         } else if (currentUser.getRole() == RoleEnum.ACCOUNT_MANAGER) {
-            regionFilter = requestedRegion;
             hasCommunes = true;
             if (currentUser.getManagedCommunes() == null || currentUser.getManagedCommunes().isEmpty()) {
                 communeIds = java.util.List.of(-1L);
@@ -196,9 +203,12 @@ public class EnterpriseService {
             }
         }
 
+        boolean hasRegions = allowedRegions != null && !allowedRegions.isEmpty();
+        boolean hasTypes = requestedTypes != null && !requestedTypes.isEmpty();
+
         Page<Enterprise> page = enterpriseRepository.searchEnterprises(
                 keyword != null && !keyword.isBlank() ? keyword.trim() : null, enumStatus,
-                enumIndustry, regionFilter, enumType, ownerIdFilter, 
+                enumIndustry, hasRegions, allowedRegions, hasTypes, requestedTypes, ownerIdFilter, 
                 hasCommunes, communeIds, hasRestrictTypes, restrictTypes, pageable);
         return page.map(this::toDTO);
     }
@@ -354,27 +364,34 @@ public class EnterpriseService {
     }
 
     // --- Export Excel ---
-    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr, String regionStr, String typeStr)
+    public ByteArrayInputStream exportToExcel(String keyword, String status, String industryStr, List<String> regionStrs, List<String> typeStrs)
             throws IOException {
         EnterpriseStatus enumStatus = null;
-        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum enumType = null;
-        RegionEnum requestedRegion = null;
-        RegionEnum regionFilter = null;
-        Long ownerIdFilter = null;
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
         
-        if (typeStr != null && !typeStr.isBlank()) {
-            try {
-                enumType = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.valueOf(typeStr.trim().toUpperCase());
-            } catch (IllegalArgumentException e) {
+        List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> requestedTypes = new java.util.ArrayList<>();
+        if (typeStrs != null) {
+            for (String ts : typeStrs) {
+                if (ts != null && !ts.isBlank()) {
+                    try {
+                        requestedTypes.add(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.valueOf(ts.trim().toUpperCase()));
+                    } catch (IllegalArgumentException e) {}
+                }
             }
         }
 
-        if (regionStr != null && !regionStr.isBlank()) {
-            try {
-                requestedRegion = RegionEnum.valueOf(regionStr.trim().toUpperCase());
-            } catch (IllegalArgumentException e) {
+        List<RegionEnum> requestedRegions = new java.util.ArrayList<>();
+        if (regionStrs != null) {
+            for (String rs : regionStrs) {
+                if (rs != null && !rs.isBlank()) {
+                    try {
+                        requestedRegions.add(RegionEnum.valueOf(rs.trim().toUpperCase()));
+                    } catch (IllegalArgumentException e) {}
+                }
             }
         }
+        
+        Long ownerIdFilter = null;
 
         if (status != null && !status.isBlank()) {
             try {
@@ -382,7 +399,7 @@ public class EnterpriseService {
             } catch (IllegalArgumentException e) {
             }
         }
-        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
+
         if (industryStr != null && !industryStr.isBlank()) {
             try {
                 enumIndustry = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry
@@ -397,36 +414,38 @@ public class EnterpriseService {
         User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 6. Phân quyền lọc (Code lặp lại từ search)
+        // 6. Phân quyền lọc
+        List<RegionEnum> allowedRegions = new java.util.ArrayList<>(requestedRegions);
         boolean hasCommunes = false;
         java.util.List<Long> communeIds = java.util.Collections.emptyList();
         boolean hasRestrictTypes = false;
         java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes = java.util.Collections.emptyList();
 
-        if (currentUser.getRole() == RoleEnum.ADMIN || currentUser.getRole() == RoleEnum.OPERATOR) {
-            regionFilter = requestedRegion;
-        } else if (currentUser.getRole() == RoleEnum.CONSULTANT) {
-            regionFilter = requestedRegion;
+        if (currentUser.getRole() == RoleEnum.CONSULTANT) {
             hasRestrictTypes = true;
             restrictTypes = java.util.List.of(
                 vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K,
                 vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000,
                 vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME
             );
-            if (enumType != null && !restrictTypes.contains(enumType)) {
-                return ExcelExportHelper.enterprisesToExcel(java.util.Collections.emptyList());
+            if (!requestedTypes.isEmpty()) {
+                for (vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum t : requestedTypes) {
+                    if (!restrictTypes.contains(t)) {
+                        return ExcelExportHelper.enterprisesToExcel(java.util.Collections.emptyList());
+                    }
+                }
             }
             ownerIdFilter = currentUser.getId();
         } else if (currentUser.getRole() == RoleEnum.MANAGER) {
-            regionFilter = currentUser.getRegion();
-            if (regionFilter == null) {
+            RegionEnum managerRegion = currentUser.getRegion();
+            if (managerRegion == null) {
                 throw new RuntimeException("Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
             }
-            if (requestedRegion != null && requestedRegion != regionFilter) {
+            if (!requestedRegions.isEmpty() && !requestedRegions.contains(managerRegion)) {
                 return ExcelExportHelper.enterprisesToExcel(java.util.Collections.emptyList());
             }
+            allowedRegions = java.util.List.of(managerRegion);
         } else if (currentUser.getRole() == RoleEnum.ACCOUNT_MANAGER) {
-            regionFilter = requestedRegion;
             hasCommunes = true;
             if (currentUser.getManagedCommunes() == null || currentUser.getManagedCommunes().isEmpty()) {
                 communeIds = java.util.List.of(-1L);
@@ -437,33 +456,46 @@ public class EnterpriseService {
             }
         }
 
-        // Tạm thời lấy tất cả (không phân trang) để export report
-        Page<Enterprise> page = enterpriseRepository.searchEnterprises(
-                keyword != null && !keyword.isBlank() ? keyword.trim() : null, enumStatus,
-                enumIndustry, regionFilter, enumType, ownerIdFilter, 
-                hasCommunes, communeIds, hasRestrictTypes, restrictTypes, Pageable.unpaged());
+        boolean hasRegions = allowedRegions != null && !allowedRegions.isEmpty();
+        boolean hasTypes = requestedTypes != null && !requestedTypes.isEmpty();
 
-        List<ResEnterpriseDTO> dtos = page.getContent().stream().map(this::toDTO).collect(Collectors.toList());
-        
-        // Load danh sách người đại diện chính
-        List<Long> enterpriseIds = dtos.stream().map(ResEnterpriseDTO::getId).collect(Collectors.toList());
-        if (!enterpriseIds.isEmpty()) {
-            List<EnterpriseContact> primaryContacts = enterpriseContactRepository.findByEnterpriseIdInAndIsPrimaryTrue(enterpriseIds);
-            Map<Long, EnterpriseContact> contactMap = primaryContacts.stream()
-                .collect(Collectors.toMap(c -> c.getEnterprise().getId(), c -> c, (c1, c2) -> c1)); // Tránh duplicate key nếu có lỗi data
+        try (ExcelExportHelper.EnterpriseExportStreamer streamer = new ExcelExportHelper.EnterpriseExportStreamer()) {
+            int pageNumber = 0;
+            int pageSize = 2000;
+            Page<Enterprise> page;
+            
+            do {
+                page = enterpriseRepository.searchEnterprises(
+                        keyword != null && !keyword.isBlank() ? keyword.trim() : null, enumStatus,
+                        enumIndustry, hasRegions, allowedRegions, hasTypes, requestedTypes, ownerIdFilter, 
+                        hasCommunes, communeIds, hasRestrictTypes, restrictTypes, 
+                        org.springframework.data.domain.PageRequest.of(pageNumber, pageSize));
 
-            for (ResEnterpriseDTO dto : dtos) {
-                EnterpriseContact contact = contactMap.get(dto.getId());
-                if (contact != null) {
-                    dto.setContactFullName(contact.getFullName());
-                    dto.setContactEmail(contact.getEmail());
-                    dto.setContactPhone(contact.getPhone());
-                    dto.setContactPosition(contact.getPosition());
+                List<ResEnterpriseDTO> dtos = page.getContent().stream().map(this::toDTO).collect(Collectors.toList());
+                
+                List<Long> enterpriseIds = dtos.stream().map(ResEnterpriseDTO::getId).collect(Collectors.toList());
+                if (!enterpriseIds.isEmpty()) {
+                    List<EnterpriseContact> primaryContacts = enterpriseContactRepository.findByEnterpriseIdInAndIsPrimaryTrue(enterpriseIds);
+                    java.util.Map<Long, EnterpriseContact> contactMap = primaryContacts.stream()
+                        .collect(Collectors.toMap(c -> c.getEnterprise().getId(), c -> c, (c1, c2) -> c1));
+
+                    for (ResEnterpriseDTO dto : dtos) {
+                        EnterpriseContact contact = contactMap.get(dto.getId());
+                        if (contact != null) {
+                            dto.setContactFullName(contact.getFullName());
+                            dto.setContactEmail(contact.getEmail());
+                            dto.setContactPhone(contact.getPhone());
+                            dto.setContactPosition(contact.getPosition());
+                        }
+                    }
                 }
-            }
-        }
 
-        return ExcelExportHelper.enterprisesToExcel(dtos);
+                streamer.writeChunk(dtos);
+                pageNumber++;
+            } while (page.hasNext());
+
+            return streamer.getInputStream();
+        }
     }
 
     // --- Import Excel ---

@@ -58,8 +58,8 @@ public class EnterpriseController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "industry", required = false) String industry,
-            @RequestParam(value = "region", required = false) String region,
-            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "region", required = false) java.util.List<String> region,
+            @RequestParam(value = "type", required = false) java.util.List<String> type,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         int safeSize = Math.min(Math.max(size, 1), 50);
@@ -102,8 +102,8 @@ public class EnterpriseController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "industry", required = false) String industry,
-            @RequestParam(value = "region", required = false) String region,
-            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "region", required = false) java.util.List<String> region,
+            @RequestParam(value = "type", required = false) java.util.List<String> type,
             @RequestParam(value = "group", required = false, defaultValue = "VNR") String group) throws IOException {
         
         ByteArrayInputStream in = enterpriseService.exportToExcel(keyword, status, industry, region, type);

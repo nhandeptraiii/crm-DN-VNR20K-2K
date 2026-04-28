@@ -16,30 +16,6 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.AppointmentStatus;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-        // ─── CŨ (giữ nguyên) ──────────────────────────────────────────────────────
-
-        @Query("SELECT a FROM Appointment a " + "JOIN FETCH a.consultant "
-                        + "JOIN FETCH a.enterprise " + "LEFT JOIN FETCH a.contact "
-                        + "WHERE a.status NOT IN ('CONFIRMED', 'REJECTED') "
-                        + "AND a.reminder24hSent = false " + "AND a.scheduledTime > :from "
-                        + "AND a.scheduledTime <= :to")
-        List<Appointment> findRemindable24h(@Param("from") Instant from, @Param("to") Instant to);
-
-        @Query("SELECT a FROM Appointment a " + "JOIN FETCH a.consultant "
-                        + "JOIN FETCH a.enterprise " + "LEFT JOIN FETCH a.contact "
-                        + "WHERE a.status NOT IN ('CONFIRMED', 'REJECTED') "
-                        + "AND a.reminder1hSent = false " + "AND a.scheduledTime > :from "
-                        + "AND a.scheduledTime <= :to")
-        List<Appointment> findRemindable1h(@Param("from") Instant from, @Param("to") Instant to);
-
-        @Query("SELECT a FROM Appointment a WHERE "
-                        + "(:enterpriseId IS NULL OR a.enterprise.id = :enterpriseId) "
-                        + "AND (:consultantId IS NULL OR a.consultant.id = :consultantId) "
-                        + "AND (:status IS NULL OR a.status = :status)")
-        Page<Appointment> searchAppointments(@Param("enterpriseId") Long enterpriseId,
-                        @Param("consultantId") Long consultantId,
-                        @Param("status") AppointmentStatus status, Pageable pageable);
-
         // ─── MỚI: Dashboard queries ────────────────────────────────────────────────
 
         // Đếm lịch hẹn trong khoảng thời gian (dùng cho lịch tuần)

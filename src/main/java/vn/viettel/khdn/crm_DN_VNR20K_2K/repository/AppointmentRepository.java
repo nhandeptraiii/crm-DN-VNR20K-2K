@@ -52,10 +52,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("SELECT a FROM Appointment a WHERE "
             + "(:enterpriseId IS NULL OR a.enterprise.id = :enterpriseId) "
             + "AND (:consultantId IS NULL OR a.consultant.id = :consultantId) "
-            + "AND (:status IS NULL OR a.status = :status)")
+            + "AND (:status IS NULL OR a.status = :status) "
+            + "AND (:regionFilter IS NULL OR a.enterprise.region = :regionFilter) "
+            + "AND (:hasRestrictTypes = false OR a.enterprise.type IN :restrictTypes)")
     Page<Appointment> searchAppointments(
             @Param("enterpriseId") Long enterpriseId,
             @Param("consultantId") Long consultantId,
             @Param("status") AppointmentStatus status,
+            @Param("regionFilter") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter,
+            @Param("hasRestrictTypes") boolean hasRestrictTypes,
+            @Param("restrictTypes") java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes,
             Pageable pageable);
 }

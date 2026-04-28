@@ -33,7 +33,7 @@ public class ViettelServiceController {
         this.serviceService = serviceService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR', 'MANAGER')")
     @PostMapping
     public ResponseEntity<ResServiceDTO> create(@Valid @RequestBody ReqServiceCreateDTO dto) {
         ResServiceDTO created = serviceService.createService(dto);
@@ -59,7 +59,7 @@ public class ViettelServiceController {
         return ResponseEntity.ok(serviceService.getServiceById(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR', 'MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<ResServiceDTO> update(@PathVariable("id") Long id,
             @Valid @RequestBody ReqServiceUpdateDTO dto) {

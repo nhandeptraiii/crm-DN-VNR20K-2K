@@ -43,14 +43,14 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     @PostMapping
     public ResponseEntity<ResUserDTO> createUser(@Valid @RequestBody ReqUserCreateDTO dto) {
         ResUserDTO created = userService.createUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR', 'MANAGER', 'CONSULTANT')")
     @GetMapping
     public ResponseEntity<Page<ResUserDTO>> getUsers(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -78,7 +78,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     @PutMapping("/{id}")
     public ResponseEntity<ResUserDTO> updateUser(@PathVariable("id") Long id,
             @Valid @RequestBody ReqUserUpdateDTO dto) {
@@ -104,7 +104,7 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công!"));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);

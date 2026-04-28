@@ -96,7 +96,7 @@ public class EnterpriseController {
         return ResponseEntity.ok(industries);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR', 'MANAGER', 'CONSULTANT')")
     @GetMapping("/export")
     public ResponseEntity<Resource> exportEnterprises(
             @RequestParam(value = "keyword", required = false) String keyword,

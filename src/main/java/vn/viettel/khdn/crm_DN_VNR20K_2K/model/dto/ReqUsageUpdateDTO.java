@@ -17,4 +17,6 @@ public class ReqUsageUpdateDTO {
     private LocalDate startDate;
 
     private UsageStatus status;
+
+    private Integer quantity;
 }

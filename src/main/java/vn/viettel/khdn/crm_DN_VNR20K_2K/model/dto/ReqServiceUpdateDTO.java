@@ -16,5 +16,7 @@ public class ReqServiceUpdateDTO {
 
     private String description;
 
+    private vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.ServiceCategory category;
+
     private Boolean isActive;
 }

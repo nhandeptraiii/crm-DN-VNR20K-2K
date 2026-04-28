@@ -99,14 +99,21 @@ public class InteractionService {
         User currentUser = getCurrentUser();
         Long filterConsultantId = consultantId;
 
-        boolean isConsultant = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT 
-                            || currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ACCOUNT_MANAGER;
-        if (isConsultant) {
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter = null;
+        boolean hasRestrictTypes = false;
+        java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes = null;
+
+        if (currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.MANAGER) {
+            regionFilter = currentUser.getRegion();
+        } else if (currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ACCOUNT_MANAGER) {
             filterConsultantId = currentUser.getId();
+        } else if (currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT) {
+            hasRestrictTypes = true;
+            restrictTypes = java.util.Arrays.asList(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME);
         }
 
         Page<Interaction> page = interactionRepository.searchInteractions(enterpriseId, filterConsultantId, type,
-                result, pageable);
+                result, regionFilter, hasRestrictTypes, restrictTypes, pageable);
         return page.map(this::toDTO);
     }
 
@@ -147,10 +154,16 @@ public class InteractionService {
 
     private void checkPermission(Interaction interaction) throws Exception {
         User currentUser = getCurrentUser();
-        boolean isAdminOrManager = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ADMIN;
+        boolean isAdminOrOperator = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ADMIN || currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.OPERATOR;
+        boolean isManagerAllowed = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.MANAGER && interaction.getEnterprise().getRegion() == currentUser.getRegion();
+        boolean isConsultantAllowed = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT && 
+                                      (interaction.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K || 
+                                       interaction.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 ||
+                                       interaction.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME);
+        boolean isOwner = interaction.getConsultant().getId().equals(currentUser.getId());
 
-        if (!isAdminOrManager && !interaction.getConsultant().getId().equals(currentUser.getId())) {
-            throw new Exception("Bạn không có quyền truy cập nhật ký tương tác của người khác!");
+        if (!isAdminOrOperator && !isManagerAllowed && !isConsultantAllowed && !isOwner) {
+            throw new Exception("Bạn không có quyền truy cập nhật ký tương tác này!");
         }
     }
 

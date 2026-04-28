@@ -134,13 +134,21 @@ public class AppointmentService {
         User currentUser = getCurrentUser();
         Long filterConsultantId = consultantId;
 
-        // ACCOUNT_MANAGER VÀ CONSULTANT chỉ thấy lịch hẹn của mình
-        if (currentUser.getRole() == RoleEnum.CONSULTANT || currentUser.getRole() == RoleEnum.ACCOUNT_MANAGER) {
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter = null;
+        boolean hasRestrictTypes = false;
+        java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes = null;
+
+        if (currentUser.getRole() == RoleEnum.MANAGER) {
+            regionFilter = currentUser.getRegion();
+        } else if (currentUser.getRole() == RoleEnum.ACCOUNT_MANAGER) {
             filterConsultantId = currentUser.getId();
+        } else if (currentUser.getRole() == RoleEnum.CONSULTANT) {
+            hasRestrictTypes = true;
+            restrictTypes = java.util.Arrays.asList(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME);
         }
 
         return appointmentRepository
-                .searchAppointments(enterpriseId, filterConsultantId, status, pageable)
+                .searchAppointments(enterpriseId, filterConsultantId, status, regionFilter, hasRestrictTypes, restrictTypes, pageable)
                 .map(this::toDTO);
     }
 
@@ -308,10 +316,16 @@ public class AppointmentService {
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy lịch hẹn với ID: " + id));
 
         User currentUser = getCurrentUser();
-        boolean isAdmin = currentUser.getRole() == RoleEnum.ADMIN;
+        boolean isAdminOrOperator = currentUser.getRole() == RoleEnum.ADMIN || currentUser.getRole() == RoleEnum.OPERATOR;
+        boolean isManagerAllowed = currentUser.getRole() == RoleEnum.MANAGER && appointment.getEnterprise().getRegion() == currentUser.getRegion();
+        boolean isConsultantAllowed = currentUser.getRole() == RoleEnum.CONSULTANT && 
+                                      (appointment.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K || 
+                                       appointment.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 ||
+                                       appointment.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME);
+        boolean isOwner = appointment.getConsultant().getId().equals(currentUser.getId());
 
-        if (!isAdmin && !appointment.getConsultant().getId().equals(currentUser.getId())) {
-            throw new Exception("Bạn không có quyền truy cập lịch hẹn của người khác!");
+        if (!isAdminOrOperator && !isManagerAllowed && !isConsultantAllowed && !isOwner) {
+            throw new Exception("Bạn không có quyền truy cập lịch hẹn này!");
         }
 
         return appointment;

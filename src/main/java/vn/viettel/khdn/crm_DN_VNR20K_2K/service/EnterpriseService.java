@@ -170,7 +170,8 @@ public class EnterpriseService {
             hasRestrictTypes = true;
             restrictTypes = java.util.List.of(
                 vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K,
-                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000
+                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000,
+                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME
             );
             if (enumType != null && !restrictTypes.contains(enumType)) {
                 return Page.empty(pageable); // Trả rỗng nếu cố tình query sai loại quyền
@@ -233,10 +234,11 @@ public class EnterpriseService {
                 }
             } else if (currentUser.getRole() == RoleEnum.CONSULTANT) {
                 if (enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 &&
-                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K) {
+                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K &&
+                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME) {
                     throw new org.springframework.web.server.ResponseStatusException(
                             org.springframework.http.HttpStatus.FORBIDDEN,
-                            "Tư vấn viên chỉ được phép xem các doanh nghiệp thuộc mảng VNR2000 hoặc VNR20K.");
+                            "Tư vấn viên chỉ được phép xem các doanh nghiệp thuộc mảng VNR2000, VNR20K hoặc SME.");
                 }
             }
         }
@@ -272,10 +274,11 @@ public class EnterpriseService {
                 }
             } else if (currentUser.getRole() == RoleEnum.CONSULTANT) {
                 if (enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 &&
-                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K) {
+                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K &&
+                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME) {
                     throw new org.springframework.web.server.ResponseStatusException(
                             org.springframework.http.HttpStatus.FORBIDDEN,
-                            "Tư vấn viên chỉ được phép sửa các doanh nghiệp thuộc mảng VNR2000 hoặc VNR20K.");
+                            "Tư vấn viên chỉ được phép sửa các doanh nghiệp thuộc mảng VNR2000, VNR20K hoặc SME.");
                 }
             }
         }
@@ -407,7 +410,8 @@ public class EnterpriseService {
             hasRestrictTypes = true;
             restrictTypes = java.util.List.of(
                 vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K,
-                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000
+                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000,
+                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME
             );
             if (enumType != null && !restrictTypes.contains(enumType)) {
                 return ExcelExportHelper.enterprisesToExcel(java.util.Collections.emptyList());

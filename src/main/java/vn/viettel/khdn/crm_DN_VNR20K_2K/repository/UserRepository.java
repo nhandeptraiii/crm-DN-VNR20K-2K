@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = """
             SELECT u FROM User u
             WHERE (:role IS NULL OR u.role = :role)
-              AND (:regionFilter IS NULL OR u.region = :regionFilter)
+              AND (:regionFilter IS NULL OR u.managedRegion = :regionFilter)
               AND (
                 :keyword IS NULL
                 OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))

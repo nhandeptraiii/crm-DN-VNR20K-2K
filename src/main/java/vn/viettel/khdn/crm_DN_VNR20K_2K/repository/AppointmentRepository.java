@@ -96,7 +96,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             + "(:enterpriseId IS NULL OR a.enterprise.id = :enterpriseId) "
             + "AND (:consultantId IS NULL OR a.consultant.id = :consultantId) "
             + "AND (:status IS NULL OR a.status = :status) "
-            + "AND (:regionFilter IS NULL OR a.enterprise.region = :regionFilter) "
+            + "AND (:regionFilter IS NULL OR a.enterprise.commune.cluster.region = :regionFilter) "
             + "AND (:hasRestrictTypes = false OR a.enterprise.type IN :restrictTypes)")
     Page<Appointment> searchAppointments(
             @Param("enterpriseId") Long enterpriseId,

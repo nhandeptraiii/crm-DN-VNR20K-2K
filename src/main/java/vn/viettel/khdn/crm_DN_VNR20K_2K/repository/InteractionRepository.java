@@ -21,7 +21,7 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
                         + "AND (:consultantId IS NULL OR i.consultant.id = :consultantId) "
                         + "AND (:type IS NULL OR i.interactionType = :type) "
                         + "AND (:result IS NULL OR i.result = :result) "
-                        + "AND (:regionFilter IS NULL OR i.enterprise.region = :regionFilter) "
+                        + "AND (:regionFilter IS NULL OR i.enterprise.commune.cluster.region = :regionFilter) "
                         + "AND (:hasRestrictTypes = false OR i.enterprise.type IN :restrictTypes)")
         Page<Interaction> searchInteractions(@Param("enterpriseId") Long enterpriseId,
                         @Param("consultantId") Long consultantId,

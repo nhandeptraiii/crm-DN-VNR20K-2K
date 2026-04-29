@@ -16,7 +16,6 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.AppointmentStatus;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-        // ─── CŨ (giữ nguyên) ──────────────────────────────────────────────────────
 
         @Query("SELECT a FROM Appointment a " + "JOIN FETCH a.consultant "
                         + "JOIN FETCH a.enterprise " + "LEFT JOIN FETCH a.contact "
@@ -83,4 +82,14 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                         + "GROUP BY e.commune.cluster.region")
         List<Object[]> countContactedByRegionInMonth(@Param("month") int month,
                         @Param("year") int year);
+
+        // Đếm DN CONFIRMED group by DAY trong tháng — dùng Instant range thay vì MONTH()/DAY()
+        @Query(value = "SELECT DAY(CONVERT_TZ(scheduled_time, '+00:00', '+07:00')), "
+                        + "COUNT(DISTINCT enterprise_id) " + "FROM appointments "
+                        + "WHERE status = 'CONFIRMED' " + "AND scheduled_time >= :startOfMonth "
+                        + "AND scheduled_time < :startOfNextMonth "
+                        + "GROUP BY DAY(CONVERT_TZ(scheduled_time, '+00:00', '+07:00'))",
+                        nativeQuery = true)
+        List<Object[]> countContactedByDayInMonth(@Param("startOfMonth") Instant startOfMonth,
+                        @Param("startOfNextMonth") Instant startOfNextMonth);
 }

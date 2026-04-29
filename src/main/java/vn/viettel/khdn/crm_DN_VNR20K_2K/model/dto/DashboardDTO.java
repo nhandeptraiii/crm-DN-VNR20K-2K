@@ -5,7 +5,6 @@ import java.util.List;
 
 public class DashboardDTO {
 
-    // ─── CŨ (giữ nguyên) ──────────────────────────────
     private long totalUsers;
     private long totalEnterprises;
     private long totalServices;
@@ -14,43 +13,75 @@ public class DashboardDTO {
     private List<EmployeeInteractionDTO> employeeStats;
     private long totalActiveEmployees;
 
-    // ─── MỚI: KPI Cards ───────────────────────────────
-    // Phân loại DN theo type
+    // ─── KPI Cards ────────────────────────────────────
     private long totalSme;
     private long totalHkd;
     private long total2000;
     private long total20k;
-
-    // DN mới trong 30 ngày
     private long newEnterprisesLast30Days;
-
-    // Số DN tiếp xúc trong tháng (có appointment CONFIRMED)
     private long contactedEnterprisesThisMonth;
-
-    // Số lịch hẹn trong tuần (T2 → CN)
     private long appointmentsThisWeek;
-
-    // Tỷ lệ chuyển đổi lịch hẹn → tiếp xúc (%)
     private double conversionRate;
 
-    // ─── MỚI: Phân bổ theo khu vực ────────────────────
+    // ─── Phân bổ theo khu vực ─────────────────────────
     private List<RegionDistributionDTO> regionDistribution;
 
-    // ─── MỚI: Lịch hẹn sắp tới ────────────────────────
+    // ─── Lịch hẹn sắp tới ─────────────────────────────
     private List<AppointmentItemDTO> todayAppointments;
     private List<AppointmentItemDTO> tomorrowAppointments;
 
-    // ─── MỚI: Lịch tuần (7 ngày T2→CN) ───────────────
+    // ─── Lịch tuần (7 ngày T2→CN) ─────────────────────
     private List<DayAppointmentsDTO> weeklyCalendar;
 
-    // ─── MỚI: Cảnh báo DN chưa tiếp xúc ──────────────
+    // ─── Cảnh báo DN chưa tiếp xúc ────────────────────
     private long uncontacted2000Count;
     private long uncontacted20kCount;
     private List<UncontactedEnterpriseDTO> uncontactedEnterprises;
 
+    // ─── MỚI: Lũy kế tiếp xúc so tháng trước ─────────
+    private List<MonthlyTrendDTO> monthlyTrend;
+
     // ══════════════════════════════════════════════════
     // Inner DTOs
     // ══════════════════════════════════════════════════
+
+    public static class MonthlyTrendDTO {
+        private int day; // ngày 1..31
+        private long cumContacted; // lũy kế DN tiếp xúc tính đến ngày đó (tháng hiện tại)
+        private long cumPrev; // lũy kế tháng trước (cùng ngày)
+
+        public MonthlyTrendDTO() {}
+
+        public MonthlyTrendDTO(int day, long cumContacted, long cumPrev) {
+            this.day = day;
+            this.cumContacted = cumContacted;
+            this.cumPrev = cumPrev;
+        }
+
+        public int getDay() {
+            return day;
+        }
+
+        public void setDay(int day) {
+            this.day = day;
+        }
+
+        public long getCumContacted() {
+            return cumContacted;
+        }
+
+        public void setCumContacted(long cumContacted) {
+            this.cumContacted = cumContacted;
+        }
+
+        public long getCumPrev() {
+            return cumPrev;
+        }
+
+        public void setCumPrev(long cumPrev) {
+            this.cumPrev = cumPrev;
+        }
+    }
 
     public static class RegionDistributionDTO {
         private String region;
@@ -289,7 +320,7 @@ public class DashboardDTO {
     }
 
     // ══════════════════════════════════════════════════
-    // Getters / Setters (CŨ)
+    // Getters / Setters
     // ══════════════════════════════════════════════════
 
     public long getTotalUsers() {
@@ -347,10 +378,6 @@ public class DashboardDTO {
     public void setTotalActiveEmployees(long totalActiveEmployees) {
         this.totalActiveEmployees = totalActiveEmployees;
     }
-
-    // ══════════════════════════════════════════════════
-    // Getters / Setters (MỚI)
-    // ══════════════════════════════════════════════════
 
     public long getTotalSme() {
         return totalSme;
@@ -470,5 +497,13 @@ public class DashboardDTO {
 
     public void setUncontactedEnterprises(List<UncontactedEnterpriseDTO> uncontactedEnterprises) {
         this.uncontactedEnterprises = uncontactedEnterprises;
+    }
+
+    public List<MonthlyTrendDTO> getMonthlyTrend() {
+        return monthlyTrend;
+    }
+
+    public void setMonthlyTrend(List<MonthlyTrendDTO> monthlyTrend) {
+        this.monthlyTrend = monthlyTrend;
     }
 }

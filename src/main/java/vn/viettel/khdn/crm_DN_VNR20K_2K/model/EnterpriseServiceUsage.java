@@ -50,6 +50,9 @@ public class EnterpriseServiceUsage {
     @Column(length = 30)
     private UsageStatus status;
 
+    @Column(name = "quantity")
+    private Integer quantity;
+
     @Column(name = "created_at")
     private Instant createdAt;
 

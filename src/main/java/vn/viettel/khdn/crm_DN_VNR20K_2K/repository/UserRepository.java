@@ -22,6 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = """
             SELECT u FROM User u
             WHERE (:role IS NULL OR u.role = :role)
+              AND (:regionFilter IS NULL OR u.region = :regionFilter)
               AND (
                 :keyword IS NULL
                 OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
@@ -29,5 +30,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 OR u.phone LIKE CONCAT('%', :keyword, '%')
               )
             """)
-    Page<User> searchUsers(@Param("role") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, @Param("keyword") String keyword, Pageable pageable);
+    Page<User> searchUsers(
+            @Param("role") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, 
+            @Param("keyword") String keyword, 
+            @Param("regionFilter") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter,
+            Pageable pageable);
 }

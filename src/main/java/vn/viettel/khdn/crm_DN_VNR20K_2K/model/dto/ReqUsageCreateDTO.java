@@ -24,4 +24,6 @@ public class ReqUsageCreateDTO {
     private LocalDate startDate;
 
     private UsageStatus status;
+
+    private Integer quantity;
 }

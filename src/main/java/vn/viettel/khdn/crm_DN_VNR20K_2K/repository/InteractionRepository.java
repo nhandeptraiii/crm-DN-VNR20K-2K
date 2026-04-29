@@ -20,11 +20,17 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
                         + "(:enterpriseId IS NULL OR i.enterprise.id = :enterpriseId) "
                         + "AND (:consultantId IS NULL OR i.consultant.id = :consultantId) "
                         + "AND (:type IS NULL OR i.interactionType = :type) "
-                        + "AND (:result IS NULL OR i.result = :result)")
+                        + "AND (:result IS NULL OR i.result = :result) "
+                        + "AND (:regionFilter IS NULL OR i.enterprise.region = :regionFilter) "
+                        + "AND (:hasRestrictTypes = false OR i.enterprise.type IN :restrictTypes)")
         Page<Interaction> searchInteractions(@Param("enterpriseId") Long enterpriseId,
                         @Param("consultantId") Long consultantId,
                         @Param("type") InteractionType type,
-                        @Param("result") InteractionResult result, Pageable pageable);
+                        @Param("result") InteractionResult result,
+                        @Param("regionFilter") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter,
+                        @Param("hasRestrictTypes") boolean hasRestrictTypes,
+                        @Param("restrictTypes") java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes,
+                        Pageable pageable);
 
         @Query("SELECT new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.EmployeeInteractionDTO(c.fullName, COUNT(i)) "
                         + "FROM Interaction i JOIN i.consultant c "

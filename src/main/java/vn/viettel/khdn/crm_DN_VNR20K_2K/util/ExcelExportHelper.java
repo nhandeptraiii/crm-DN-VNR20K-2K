@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResEnterpriseDTO;
@@ -30,11 +31,16 @@ public class ExcelExportHelper {
 
     public static String SHEET_NAME = "Doanh Nghiep";
 
-    public static ByteArrayInputStream enterprisesToExcel(List<ResEnterpriseDTO> enterprises) throws IOException {
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
-            Sheet sheet = workbook.createSheet(SHEET_NAME);
+    public static class EnterpriseExportStreamer implements AutoCloseable {
+        private SXSSFWorkbook workbook;
+        private Sheet sheet;
+        private int rowIdx = 1;
+        private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-            String[] headersArr = HEADERS;
+        public EnterpriseExportStreamer() {
+            // Keep maximum 500 rows in memory, exceeding rows will be flushed to disk
+            workbook = new SXSSFWorkbook(500); 
+            sheet = workbook.createSheet(SHEET_NAME);
 
             // Style for Header
             CellStyle headerStyle = workbook.createCellStyle();
@@ -47,16 +53,14 @@ public class ExcelExportHelper {
 
             // Row for Header
             Row headerRow = sheet.createRow(0);
-            for (int col = 0; col < headersArr.length; col++) {
+            for (int col = 0; col < HEADERS.length; col++) {
                 Cell cell = headerRow.createCell(col);
-                cell.setCellValue(headersArr[col]);
+                cell.setCellValue(HEADERS[col]);
                 cell.setCellStyle(headerStyle);
             }
+        }
 
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-            // Row for Data
-            int rowIdx = 1;
+        public void writeChunk(List<ResEnterpriseDTO> enterprises) {
             for (ResEnterpriseDTO enterprise : enterprises) {
                 Row row = sheet.createRow(rowIdx);
 
@@ -79,7 +83,6 @@ public class ExcelExportHelper {
                 row.createCell(9).setCellValue(enterprise.getPhone() != null ? enterprise.getPhone() : "");
                 row.createCell(10).setCellValue(enterprise.getType() != null ? enterprise.getType().name() : "");
                 
-                // Thuế HKD: Điền dấu "x" (hoặc "X") nếu khớp class Enum
                 row.createCell(11).setCellValue(enterprise.getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.UNDER_500M ? "X" : "");
                 row.createCell(12).setCellValue(enterprise.getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.FROM_500M_TO_1B ? "X" : "");
                 row.createCell(13).setCellValue(enterprise.getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.OVER_1B ? "X" : "");
@@ -94,14 +97,25 @@ public class ExcelExportHelper {
 
                 rowIdx++;
             }
+        }
 
-            // Auto size columns
-            for (int col = 0; col < headersArr.length; col++) {
-                sheet.autoSizeColumn(col);
-            }
-
+        public ByteArrayInputStream getInputStream() throws IOException {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
+        }
+
+        @Override
+        public void close() throws IOException {
+            workbook.dispose(); // Dispose of temporary files backing this workbook on disk
+            workbook.close();
+        }
+    }
+
+    public static ByteArrayInputStream enterprisesToExcel(List<ResEnterpriseDTO> enterprises) throws IOException {
+        try (EnterpriseExportStreamer streamer = new EnterpriseExportStreamer()) {
+            streamer.writeChunk(enterprises);
+            return streamer.getInputStream();
         }
     }
 

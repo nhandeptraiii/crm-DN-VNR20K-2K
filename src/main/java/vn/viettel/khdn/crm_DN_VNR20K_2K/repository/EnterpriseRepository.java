@@ -27,15 +27,19 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         + "OR LOWER(e.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
                         + "AND (:status IS NULL OR e.status = :status) "
                         + "AND (:industry IS NULL OR e.industry = :industry) "
-                        + "AND (:region IS NULL OR cl.region = :region) "
-                        + "AND (:type IS NULL OR e.type = :type) "
+                        + "AND (:hasRegions = false OR cl.region IN :regions) "
+                        + "AND (:hasTypes = false OR e.type IN :types) "
                         + "AND (:ownerId IS NULL OR e.owner.id = :ownerId) "
                         + "AND (:hasCommunes = false OR c.id IN :communeIds) "
                         + "AND (:hasRestrictTypes = false OR e.type IN :restrictTypes)")
         Page<Enterprise> searchEnterprises(@Param("keyword") String keyword,
                         @Param("status") EnterpriseStatus status,
-                        @Param("industry") Industry industry, @Param("region") RegionEnum region,
-                        @Param("type") EnterpriseTypeEnum type, @Param("ownerId") Long ownerId,
+                        @Param("industry") Industry industry, 
+                        @Param("hasRegions") boolean hasRegions,
+                        @Param("regions") java.util.List<RegionEnum> regions,
+                        @Param("hasTypes") boolean hasTypes,
+                        @Param("types") java.util.List<EnterpriseTypeEnum> types, 
+                        @Param("ownerId") Long ownerId,
                         @Param("hasCommunes") boolean hasCommunes,
                         @Param("communeIds") java.util.List<Long> communeIds,
                         @Param("hasRestrictTypes") boolean hasRestrictTypes,

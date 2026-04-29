@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.DashboardDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.DashboardDTO.AppointmentItemDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.DashboardDTO.DayAppointmentsDTO;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.DashboardDTO.MonthlyTrendDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.DashboardDTO.RegionDistributionDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.DashboardDTO.UncontactedEnterpriseDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.EmployeeInteractionDTO;
@@ -38,10 +39,8 @@ public class DashboardService {
     private final AppointmentRepository appointmentRepo;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    // Timezone của hệ thống — chỉnh lại nếu server dùng UTC khác
     private static final ZoneId ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
-    // Types cần cảnh báo chưa tiếp xúc
     private static final List<EnterpriseTypeEnum> PRIORITY_TYPES =
             Arrays.asList(EnterpriseTypeEnum.VNR2000, EnterpriseTypeEnum.VNR20K);
 
@@ -56,13 +55,13 @@ public class DashboardService {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // CŨ: getDashboard — giữ nguyên logic cũ, thêm các field mới
+    // Public: getDashboard — toàn bộ dashboard
     // ══════════════════════════════════════════════════════════════════════════
 
     public DashboardDTO getDashboard(int month, int year) {
         DashboardDTO dto = new DashboardDTO();
 
-        // --- PHẦN CŨ (giữ nguyên) ---
+        // --- Phần cũ ---
         dto.setTotalUsers(userRepo.count());
         dto.setTotalEnterprises(enterpriseRepo.count());
         dto.setTotalInteractedEnterprises(enterpriseRepo.countInteractedEnterprises());
@@ -74,7 +73,7 @@ public class DashboardService {
         dto.setEmployeeStats(employeeStats);
         dto.setTotalActiveEmployees(employeeStats.size());
 
-        // --- PHẦN MỚI ---
+        // --- Phần mới ---
         fillKpiCards(dto, month, year);
         dto.setRegionDistribution(buildRegionDistribution(month, year));
 
@@ -85,11 +84,14 @@ public class DashboardService {
         dto.setWeeklyCalendar(buildWeeklyCalendar());
         fillUncontactedWarning(dto);
 
+        // --- Lũy kế tháng ---
+        dto.setMonthlyTrend(buildMonthlyTrend(month, year));
+
         return dto;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // CŨ: getEmployeeStatistics — giữ nguyên
+    // Public: getEmployeeStatistics
     // ══════════════════════════════════════════════════════════════════════════
 
     public List<EmployeeInteractionDTO> getEmployeeStatistics() {
@@ -97,7 +99,7 @@ public class DashboardService {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // MỚI: Public methods cho các endpoint tách riêng
+    // Public: các endpoint tách riêng
     // ══════════════════════════════════════════════════════════════════════════
 
     public List<RegionDistributionDTO> getRegionDistribution(int month, int year) {
@@ -124,32 +126,34 @@ public class DashboardService {
         return dto;
     }
 
+    /**
+     * Endpoint riêng cho lũy kế — GET /dashboard/monthly-trend?month=4&year=2026
+     */
+    public List<MonthlyTrendDTO> getMonthlyTrend(int month, int year) {
+        return buildMonthlyTrend(month, year);
+    }
+
     // ══════════════════════════════════════════════════════════════════════════
-    // MỚI: Private helpers
+    // Private helpers
     // ══════════════════════════════════════════════════════════════════════════
 
     private void fillKpiCards(DashboardDTO dto, int month, int year) {
-        // Phân loại DN (điều chỉnh tên enum nếu khác: SME, HKD, DN_2000, DN_20K)
         dto.setTotalSme(enterpriseRepo.countByType(EnterpriseTypeEnum.SME));
         dto.setTotalHkd(enterpriseRepo.countByType(EnterpriseTypeEnum.HKD));
         dto.setTotal2000(enterpriseRepo.countByType(EnterpriseTypeEnum.VNR2000));
         dto.setTotal20k(enterpriseRepo.countByType(EnterpriseTypeEnum.VNR20K));
 
-        // DN mới 30 ngày — dùng Instant
         Instant thirtyDaysAgo = Instant.now().minus(30, ChronoUnit.DAYS);
         dto.setNewEnterprisesLast30Days(enterpriseRepo.countNewEnterprisesSince(thirtyDaysAgo));
 
-        // DN tiếp xúc trong tháng
         dto.setContactedEnterprisesThisMonth(
                 appointmentRepo.countContactedEnterprisesInMonth(month, year));
 
-        // Lịch hẹn tuần (T2 → CN) — dùng Instant
         Instant weekStart =
                 LocalDate.now(ZONE).with(DayOfWeek.MONDAY).atStartOfDay(ZONE).toInstant();
         Instant weekEnd = weekStart.plus(7, ChronoUnit.DAYS);
         dto.setAppointmentsThisWeek(appointmentRepo.countAppointmentsInRange(weekStart, weekEnd));
 
-        // Tỷ lệ chuyển đổi
         long total = appointmentRepo.countTotalInMonth(month, year);
         long confirmed = appointmentRepo.countConfirmedInMonth(month, year);
         dto.setConversionRate(
@@ -177,7 +181,6 @@ public class DashboardService {
     }
 
     private List<AppointmentItemDTO> fetchAppointmentsForDay(LocalDate date) {
-        // Chuyển LocalDate sang Instant theo timezone Việt Nam
         Instant start = date.atStartOfDay(ZONE).toInstant();
         Instant end = date.plusDays(1).atStartOfDay(ZONE).toInstant();
 
@@ -185,7 +188,6 @@ public class DashboardService {
                 .map(row -> new AppointmentItemDTO(((Number) row[0]).longValue(),
                         row[1] != null ? row[1].toString() : "",
                         row[2] != null ? row[2].toString() : "",
-                        // scheduledTime là Instant → convert sang LocalDateTime để hiển thị
                         row[3] != null ? ((Instant) row[3]).atZone(ZONE).toLocalDateTime() : null,
                         row[4] != null ? row[4].toString() : "",
                         row[5] != null ? row[5].toString() : ""))
@@ -221,6 +223,54 @@ public class DashboardService {
                         row[5] != null ? row[5].toString() : ""))
                 .collect(Collectors.toList());
         dto.setUncontactedEnterprises(list);
+    }
+
+    /**
+     * Xây dựng danh sách lũy kế tiếp xúc DN theo từng ngày trong tháng, so sánh song song với tháng
+     * trước (cùng ngày).
+     *
+     * Logic: - Truy vấn số DN CONFIRMED group by DAY() cho tháng hiện tại và tháng trước. - Tích
+     * lũy từ ngày 1 đến hôm nay (nếu là tháng hiện tại) hoặc cuối tháng.
+     */
+    private List<MonthlyTrendDTO> buildMonthlyTrend(int month, int year) {
+        // Tính Instant range cho tháng hiện tại
+        Instant startCurrent = LocalDate.of(year, month, 1).atStartOfDay(ZONE).toInstant();
+        Instant startNext =
+                LocalDate.of(year, month, 1).plusMonths(1).atStartOfDay(ZONE).toInstant();
+
+        // Tháng trước
+        int prevMonth = month == 1 ? 12 : month - 1;
+        int prevYear = month == 1 ? year - 1 : year;
+        Instant startPrev = LocalDate.of(prevYear, prevMonth, 1).atStartOfDay(ZONE).toInstant();
+        Instant startPrevNext =
+                LocalDate.of(prevYear, prevMonth, 1).plusMonths(1).atStartOfDay(ZONE).toInstant();
+
+        // Query
+        Map<Integer, Long> currentMap = new HashMap<>();
+        for (Object[] row : appointmentRepo.countContactedByDayInMonth(startCurrent, startNext)) {
+            currentMap.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
+        }
+
+        Map<Integer, Long> prevMap = new HashMap<>();
+        for (Object[] row : appointmentRepo.countContactedByDayInMonth(startPrev, startPrevNext)) {
+            prevMap.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
+        }
+
+        // Số ngày vẽ
+        int daysInMonth = LocalDate.of(year, month, 1).lengthOfMonth();
+        LocalDate today = LocalDate.now(ZONE);
+        int maxDay =
+                (month == today.getMonthValue() && year == today.getYear()) ? today.getDayOfMonth()
+                        : daysInMonth;
+
+        List<MonthlyTrendDTO> result = new ArrayList<>();
+        long cumCurrent = 0, cumPrev = 0;
+        for (int d = 1; d <= maxDay; d++) {
+            cumCurrent += currentMap.getOrDefault(d, 0L);
+            cumPrev += prevMap.getOrDefault(d, 0L);
+            result.add(new MonthlyTrendDTO(d, cumCurrent, cumPrev));
+        }
+        return result;
     }
 
     private String getDayOfWeekVi(DayOfWeek dow) {

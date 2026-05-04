@@ -169,21 +169,7 @@ public class EnterpriseService {
         boolean hasRestrictTypes = false;
         java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes = java.util.Collections.emptyList();
 
-        if (currentUser.getRole() == RoleEnum.CONSULTANT) {
-            hasRestrictTypes = true;
-            restrictTypes = java.util.List.of(
-                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K,
-                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000,
-                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME
-            );
-            if (!requestedTypes.isEmpty()) {
-                for (vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum t : requestedTypes) {
-                    if (!restrictTypes.contains(t)) {
-                        return Page.empty(pageable); // Trả rỗng nếu cố tình query sai loại quyền
-                    }
-                }
-            }
-        } else if (currentUser.getRole() == RoleEnum.MANAGER) {
+        if (currentUser.getRole() == RoleEnum.MANAGER) {
             RegionEnum managerRegion = currentUser.getRegion();
             if (managerRegion == null) {
                 throw new RuntimeException("Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");
@@ -243,13 +229,7 @@ public class EnterpriseService {
                             "Bạn không có quyền xem doanh nghiệp nằm ngoài Xã mà bạn phụ trách.");
                 }
             } else if (currentUser.getRole() == RoleEnum.CONSULTANT) {
-                if (enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 &&
-                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K &&
-                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME) {
-                    throw new org.springframework.web.server.ResponseStatusException(
-                            org.springframework.http.HttpStatus.FORBIDDEN,
-                            "Tư vấn viên chỉ được phép xem các doanh nghiệp thuộc mảng VNR2000, VNR20K hoặc SME.");
-                }
+                // Mở quyền xem toàn bộ cho CONSULTANT
             }
         }
 
@@ -283,13 +263,7 @@ public class EnterpriseService {
                             "Bạn không có quyền sửa doanh nghiệp nằm ngoài Xã mà bạn phụ trách.");
                 }
             } else if (currentUser.getRole() == RoleEnum.CONSULTANT) {
-                if (enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 &&
-                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K &&
-                    enterprise.getType() != vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME) {
-                    throw new org.springframework.web.server.ResponseStatusException(
-                            org.springframework.http.HttpStatus.FORBIDDEN,
-                            "Tư vấn viên chỉ được phép sửa các doanh nghiệp thuộc mảng VNR2000, VNR20K hoặc SME.");
-                }
+                // Mở quyền sửa toàn bộ cho CONSULTANT
             }
         }
 
@@ -421,22 +395,7 @@ public class EnterpriseService {
         boolean hasRestrictTypes = false;
         java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes = java.util.Collections.emptyList();
 
-        if (currentUser.getRole() == RoleEnum.CONSULTANT) {
-            hasRestrictTypes = true;
-            restrictTypes = java.util.List.of(
-                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K,
-                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000,
-                vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME
-            );
-            if (!requestedTypes.isEmpty()) {
-                for (vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum t : requestedTypes) {
-                    if (!restrictTypes.contains(t)) {
-                        return ExcelExportHelper.enterprisesToExcel(java.util.Collections.emptyList());
-                    }
-                }
-            }
-            ownerIdFilter = currentUser.getId();
-        } else if (currentUser.getRole() == RoleEnum.MANAGER) {
+        if (currentUser.getRole() == RoleEnum.MANAGER) {
             RegionEnum managerRegion = currentUser.getRegion();
             if (managerRegion == null) {
                 throw new RuntimeException("Tài khoản chưa được cấu hình Vùng (Region). Hãy liên hệ Admin.");

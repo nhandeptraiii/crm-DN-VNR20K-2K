@@ -142,9 +142,6 @@ public class AppointmentService {
             regionFilter = currentUser.getRegion();
         } else if (currentUser.getRole() == RoleEnum.ACCOUNT_MANAGER) {
             filterConsultantId = currentUser.getId();
-        } else if (currentUser.getRole() == RoleEnum.CONSULTANT) {
-            hasRestrictTypes = true;
-            restrictTypes = java.util.Arrays.asList(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME);
         }
 
         return appointmentRepository
@@ -318,10 +315,7 @@ public class AppointmentService {
         User currentUser = getCurrentUser();
         boolean isAdminOrOperator = currentUser.getRole() == RoleEnum.ADMIN || currentUser.getRole() == RoleEnum.OPERATOR;
         boolean isManagerAllowed = currentUser.getRole() == RoleEnum.MANAGER && appointment.getEnterprise().getRegion() == currentUser.getRegion();
-        boolean isConsultantAllowed = currentUser.getRole() == RoleEnum.CONSULTANT && 
-                                      (appointment.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K || 
-                                       appointment.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 ||
-                                       appointment.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME);
+        boolean isConsultantAllowed = currentUser.getRole() == RoleEnum.CONSULTANT;
         boolean isOwner = appointment.getConsultant().getId().equals(currentUser.getId());
 
         if (!isAdminOrOperator && !isManagerAllowed && !isConsultantAllowed && !isOwner) {

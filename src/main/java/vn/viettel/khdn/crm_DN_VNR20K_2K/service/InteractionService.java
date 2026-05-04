@@ -107,9 +107,6 @@ public class InteractionService {
             regionFilter = currentUser.getRegion();
         } else if (currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ACCOUNT_MANAGER) {
             filterConsultantId = currentUser.getId();
-        } else if (currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT) {
-            hasRestrictTypes = true;
-            restrictTypes = java.util.Arrays.asList(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME);
         }
 
         Page<Interaction> page = interactionRepository.searchInteractions(enterpriseId, filterConsultantId, type,
@@ -156,10 +153,7 @@ public class InteractionService {
         User currentUser = getCurrentUser();
         boolean isAdminOrOperator = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ADMIN || currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.OPERATOR;
         boolean isManagerAllowed = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.MANAGER && interaction.getEnterprise().getRegion() == currentUser.getRegion();
-        boolean isConsultantAllowed = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT && 
-                                      (interaction.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K || 
-                                       interaction.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 ||
-                                       interaction.getEnterprise().getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.SME);
+        boolean isConsultantAllowed = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT;
         boolean isOwner = interaction.getConsultant().getId().equals(currentUser.getId());
 
         if (!isAdminOrOperator && !isManagerAllowed && !isConsultantAllowed && !isOwner) {

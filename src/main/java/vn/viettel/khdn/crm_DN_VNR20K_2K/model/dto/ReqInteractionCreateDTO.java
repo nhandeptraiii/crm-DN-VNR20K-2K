@@ -2,6 +2,8 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -24,6 +26,7 @@ public class ReqInteractionCreateDTO {
     private InteractionResult result;
 
     @NotNull(message = "Thời gian tương tác không được để trống")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant interactionTime;
 
     @Size(max = 255, message = "Địa điểm tối đa 255 ký tự")

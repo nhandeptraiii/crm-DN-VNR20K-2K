@@ -39,6 +39,9 @@ public class ResInteractionDTO {
     // Mỗi phần tử là đường dẫn public: "appointments/{id}/filename.jpg"
     private List<String> photoPaths;
 
+    // Danh sách các dịch vụ hợp đồng đã ký trong quá trình tiếp xúc này
+    private List<ResUsageDTO> usages;
+
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant createdAt;
 

@@ -25,6 +25,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Interaction;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.User;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqAppointmentCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqAppointmentUpdateDTO;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUsageCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResAppointmentDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResInteractionDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.AppointmentStatus;
@@ -46,6 +47,8 @@ public class AppointmentService {
     private final UserRepository userRepository;
     private final InteractionRepository interactionRepository;
     private final EmailService emailService;
+    private final EnterpriseServiceUsageService usageService;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     @Value("${crm.upload.path:uploads}")
     private String uploadBasePath;
@@ -56,13 +59,17 @@ public class AppointmentService {
             EnterpriseContactRepository contactRepository,
             UserRepository userRepository,
             InteractionRepository interactionRepository,
-            EmailService emailService) {
+            EmailService emailService,
+            EnterpriseServiceUsageService usageService,
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
         this.appointmentRepository = appointmentRepository;
         this.enterpriseRepository = enterpriseRepository;
         this.contactRepository = contactRepository;
         this.userRepository = userRepository;
         this.interactionRepository = interactionRepository;
         this.emailService = emailService;
+        this.usageService = usageService;
+        this.objectMapper = objectMapper;
     }
 
     // ===================== Lấy user hiện tại =====================
@@ -216,6 +223,7 @@ public class AppointmentService {
             Long id,
             InteractionResult result,
             String description,
+            String newUsagesJson,
             MultipartFile[] photos) throws Exception {
 
         Appointment appointment = findAndCheckPermission(id);
@@ -248,6 +256,25 @@ public class AppointmentService {
             interaction.setPhotoPaths(String.join(",", savedPhotoPaths));
         }
         Interaction savedInteraction = interactionRepository.save(interaction);
+
+        // Lưu hợp đồng dịch vụ nếu CLOSED_WON
+        if (result == InteractionResult.CLOSED_WON) {
+            if (newUsagesJson == null || newUsagesJson.isBlank()) {
+                throw new IdInvalidException("Khi chốt hợp đồng thành công (CLOSED_WON), bắt buộc phải nhập ít nhất 1 dịch vụ đã ký.");
+            }
+            try {
+                com.fasterxml.jackson.core.type.TypeReference<List<ReqUsageCreateDTO>> typeRef = new com.fasterxml.jackson.core.type.TypeReference<>() {};
+                List<ReqUsageCreateDTO> usages = objectMapper.readValue(newUsagesJson, typeRef);
+                if (usages.isEmpty()) {
+                    throw new IdInvalidException("Danh sách dịch vụ đã ký không được trống.");
+                }
+                for (ReqUsageCreateDTO usageDto : usages) {
+                    usageService.createUsage(appointment.getEnterprise().getId(), usageDto, savedInteraction);
+                }
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                throw new IdInvalidException("Định dạng dữ liệu dịch vụ đã ký không hợp lệ: " + e.getMessage());
+            }
+        }
 
         // 3. Cập nhật Appointment: đánh dấu đã xác nhận và liên kết Interaction
         appointment.setStatus(AppointmentStatus.CONFIRMED);

@@ -28,15 +28,18 @@ public class InteractionService {
     private final EnterpriseRepository enterpriseRepository;
     private final EnterpriseContactRepository contactRepository;
     private final UserRepository userRepository;
+    private final EnterpriseServiceUsageService usageService;
 
     public InteractionService(InteractionRepository interactionRepository,
             EnterpriseRepository enterpriseRepository,
             EnterpriseContactRepository contactRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            EnterpriseServiceUsageService usageService) {
         this.interactionRepository = interactionRepository;
         this.enterpriseRepository = enterpriseRepository;
         this.contactRepository = contactRepository;
         this.userRepository = userRepository;
+        this.usageService = usageService;
     }
 
     private User getCurrentUser() throws IdInvalidException {
@@ -75,6 +78,17 @@ public class InteractionService {
         interaction.setDescription(dto.getDescription());
 
         Interaction saved = interactionRepository.save(interaction);
+
+        // Xử lý lưu hợp đồng dịch vụ nếu là CLOSED_WON
+        if (dto.getResult() == InteractionResult.CLOSED_WON) {
+            if (dto.getNewUsages() == null || dto.getNewUsages().isEmpty()) {
+                throw new IdInvalidException("Khi chốt hợp đồng thành công (CLOSED_WON), bắt buộc phải nhập ít nhất 1 dịch vụ đã ký.");
+            }
+            for (vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUsageCreateDTO usageDto : dto.getNewUsages()) {
+                usageService.createUsage(enterprise.getId(), usageDto, saved);
+            }
+        }
+
         return toDTO(saved);
     }
 
@@ -127,10 +141,8 @@ public class InteractionService {
 
         checkPermission(interaction);
 
-        if (dto.getInteractionType() != null)
-            interaction.setInteractionType(dto.getInteractionType());
-        if (dto.getResult() != null)
-            interaction.setResult(dto.getResult());
+        // Tối ưu: Chỉ cho phép sửa các trường thông tin phụ trợ (sửa lỗi gõ sai)
+        // Tuyệt đối không cập nhật interactionType và result để bảo vệ tính toàn vẹn lịch sử CRM
         if (dto.getInteractionTime() != null)
             interaction.setInteractionTime(dto.getInteractionTime());
         if (dto.getLocation() != null)
@@ -190,6 +202,32 @@ public class InteractionService {
 
         dto.setCreatedAt(i.getCreatedAt());
         dto.setUpdatedAt(i.getUpdatedAt());
+
+        // Map usages
+        if (i.getUsages() != null && !i.getUsages().isEmpty()) {
+            java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResUsageDTO> usageDTOs = i.getUsages().stream().map(u -> {
+                vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResUsageDTO uDto = new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResUsageDTO();
+                uDto.setId(u.getId());
+                uDto.setEnterpriseId(u.getEnterprise().getId());
+                uDto.setEnterpriseName(u.getEnterprise().getName());
+                uDto.setViettelServiceId(u.getViettelService().getId());
+                uDto.setServiceCode(u.getViettelService().getServiceCode());
+                uDto.setServiceName(u.getViettelService().getServiceName());
+                uDto.setContractNumber(u.getContractNumber());
+                uDto.setStartDate(u.getStartDate());
+                uDto.setQuantity(u.getQuantity());
+                uDto.setStatus(u.getStatus());
+                uDto.setInteractionId(i.getId());
+                uDto.setInteractionType(i.getInteractionType());
+                uDto.setCreatedAt(u.getCreatedAt());
+                uDto.setUpdatedAt(u.getUpdatedAt());
+                return uDto;
+            }).collect(java.util.stream.Collectors.toList());
+            dto.setUsages(usageDTOs);
+        } else {
+            dto.setUsages(new java.util.ArrayList<>());
+        }
+
         return dto;
     }
 }

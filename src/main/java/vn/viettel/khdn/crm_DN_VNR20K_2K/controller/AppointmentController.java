@@ -27,6 +27,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResAppointmentDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResInteractionDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.InteractionResult;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.service.AppointmentService;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.util.error.IdInvalidException;
 
 @RestController
 @RequestMapping("/appointments")
@@ -116,25 +117,23 @@ public class AppointmentController {
      *
      * → Tự động tạo bản ghi Interaction và trả về ResInteractionDTO.
      */
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR','MANAGER','ACCOUNT_MANAGER','CONSULTANT')")
     @PostMapping(value = "/{id}/confirm", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResInteractionDTO> confirm(
             @PathVariable("id") Long id,
-            @RequestPart("result") String resultStr,
-            @RequestPart(value = "description", required = false) String description,
+            @RequestParam("result") String resultStr,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "newUsages", required = false) String newUsagesJson,
             @RequestPart(value = "photos", required = false) MultipartFile[] photos) throws Exception {
 
-        InteractionResult result;
+        InteractionResult result = null;
         try {
-            result = InteractionResult.valueOf(resultStr.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(
-                    "Kết quả không hợp lệ. Các giá trị chấp nhận: "
-                    + "SUCCESSFUL, FAILED, NEED_FOLLOW_UP, PENDING");
+            result = InteractionResult.valueOf(resultStr.toUpperCase());
+        } catch (Exception e) {
+            throw new IdInvalidException("Kết quả cuộc hẹn không hợp lệ.");
         }
 
-        ResInteractionDTO interactionDTO = appointmentService.confirmAppointment(
-                id, result, description, photos);
+        ResInteractionDTO interactionDTO = appointmentService.confirmAppointment(id, result, description, newUsagesJson, photos);
         return ResponseEntity.ok(interactionDTO);
     }
 }

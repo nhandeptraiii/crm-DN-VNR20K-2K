@@ -39,6 +39,10 @@ public class EnterpriseServiceUsage {
     @JoinColumn(name = "viettel_service_id", nullable = false)
     private ViettelService viettelService;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "interaction_id")
+    private Interaction interaction;
+
     @Column(name = "contract_number", length = 100)
     private String contractNumber;
 

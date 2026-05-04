@@ -181,8 +181,8 @@
           "formdata": [
             {
               "key": "result",
-              "value": "SUCCESSFUL",
-              "description": "SUCCESSFUL, FAILED, NEED_FOLLOW_UP",
+              "value": "CLOSED_WON",
+              "description": "PENDING, CLOSED_WON, NEED_FOLLOW_UP",
               "type": "text"
             },
             {
@@ -194,6 +194,11 @@
               "key": "photos",
               "type": "file",
               "src": []
+            },
+            {
+              "key": "newUsages",
+              "value": "[{\"viettelServiceId\": 1, \"contractNumber\": \"HD1000\", \"startDate\": \"2026-05-10\", \"quantity\": 100}]",
+              "type": "text"
             }
           ]
         },

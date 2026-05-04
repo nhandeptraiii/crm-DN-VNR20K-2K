@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Enterprise;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.EnterpriseServiceUsage;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Interaction;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.ViettelService;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUsageCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqUsageUpdateDTO;
@@ -31,7 +32,7 @@ public class EnterpriseServiceUsageService {
         this.viettelServiceRepository = viettelServiceRepository;
     }
 
-    public ResUsageDTO createUsage(Long enterpriseId, ReqUsageCreateDTO dto) {
+    public ResUsageDTO createUsage(Long enterpriseId, ReqUsageCreateDTO dto, Interaction interaction) {
         Enterprise enterprise = enterpriseRepository.findById(enterpriseId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy doanh nghiệp với ID: " + enterpriseId));
 
@@ -42,6 +43,7 @@ public class EnterpriseServiceUsageService {
         EnterpriseServiceUsage usage = new EnterpriseServiceUsage();
         usage.setEnterprise(enterprise);
         usage.setViettelService(viettelService);
+        usage.setInteraction(interaction);
         usage.setContractNumber(dto.getContractNumber());
         usage.setStartDate(dto.getStartDate());
         usage.setStatus(dto.getStatus() != null ? dto.getStatus() : UsageStatus.ACTIVE);
@@ -115,7 +117,13 @@ public class EnterpriseServiceUsageService {
         dto.setServiceName(u.getViettelService().getServiceName());
         dto.setContractNumber(u.getContractNumber());
         dto.setStartDate(u.getStartDate());
-        dto.setStatus(u.getStatus());
+        dto.setQuantity(u.getQuantity());
+
+        if (u.getInteraction() != null) {
+            dto.setInteractionId(u.getInteraction().getId());
+            dto.setInteractionType(u.getInteraction().getInteractionType());
+        }
+
         dto.setCreatedAt(u.getCreatedAt());
         dto.setUpdatedAt(u.getUpdatedAt());
         return dto;

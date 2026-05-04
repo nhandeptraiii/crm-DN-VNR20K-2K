@@ -12,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -63,6 +65,9 @@ public class Interaction {
     // Ví dụ: "appointments/5/abc.jpg,appointments/5/xyz.png"
     @Column(name = "photo_paths", columnDefinition = "TEXT")
     private String photoPaths;
+
+    @OneToMany(mappedBy = "interaction", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private java.util.List<EnterpriseServiceUsage> usages;
 
     @Column(name = "created_at")
     private Instant createdAt;

@@ -6,7 +6,6 @@ public enum InteractionType {
     ONLINE_MEETING,
     OFFLINE_MEETING,
     DEMO,
-    CONTRACT_SIGNING,
     CUSTOMER_SUPPORT,
     OTHER
 }

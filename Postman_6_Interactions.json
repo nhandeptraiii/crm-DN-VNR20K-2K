@@ -13,7 +13,7 @@
         "header": [ { "key": "Content-Type", "value": "application/json" } ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"enterpriseId\": 1,\n  \"contactId\": 1,\n  \"interactionType\": \"PHONE_CALL\",\n  \"result\": \"NEED_FOLLOW_UP\",\n  \"interactionTime\": \"2024-03-10T14:30:00Z\",\n  \"location\": \"Qua điện thoại\",\n  \"description\": \"KH hẹn qua tuần liên hệ chốt dịch vụ\"\n}"
+          "raw": "{\n  \"enterpriseId\": 1,\n  \"contactId\": 1,\n  \"interactionType\": \"PHONE_CALL\",\n  \"result\": \"CLOSED_WON\",\n  \"interactionTime\": \"10/05/2026 14:30\",\n  \"location\": \"Qua điện thoại\",\n  \"description\": \"KH đã đồng ý ký hợp đồng\",\n  \"newUsages\": [\n    {\n      \"viettelServiceId\": 1,\n      \"contractNumber\": \"HD1000\",\n      \"startDate\": \"2026-05-10\",\n      \"quantity\": 100\n    }\n  ]\n}"
         },
         "url": {
           "raw": "http://localhost:8080/interactions",
@@ -40,7 +40,7 @@
             { "key": "enterpriseId", "value": "" },
             { "key": "consultantId", "value": "" },
             { "key": "type", "value": "", "description": "PHONE_CALL, EMAIL_QUOTE..." },
-            { "key": "result", "value": "", "description": "PENDING, SUCCESSFUL..." },
+            { "key": "result", "value": "", "description": "PENDING, CLOSED_WON, NEED_FOLLOW_UP..." },
             { "key": "page", "value": "0" },
             { "key": "size", "value": "10" }
           ]
@@ -70,7 +70,7 @@
         "header": [ { "key": "Content-Type", "value": "application/json" } ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"result\": \"SUCCESSFUL\",\n  \"description\": \"Đã lên đơn thành công\"\n}"
+          "raw": "{\n  \"interactionTime\": \"10/05/2026 14:35\",\n  \"location\": \"Trụ sở KH\",\n  \"description\": \"Bổ sung ghi chú: Khách yêu cầu VAT\"\n}"
         },
         "url": {
           "raw": "http://localhost:8080/interactions/1",

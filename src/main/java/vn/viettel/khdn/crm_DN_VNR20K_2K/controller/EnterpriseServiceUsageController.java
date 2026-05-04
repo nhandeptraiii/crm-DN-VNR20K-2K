@@ -38,7 +38,7 @@ public class EnterpriseServiceUsageController {
     public ResponseEntity<ResUsageDTO> create(
             @PathVariable("enterpriseId") Long enterpriseId,
             @Valid @RequestBody ReqUsageCreateDTO dto) {
-        ResUsageDTO created = usageService.createUsage(enterpriseId, dto);
+        ResUsageDTO created = usageService.createUsage(enterpriseId, dto, null);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

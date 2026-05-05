@@ -47,6 +47,7 @@ public class EnterpriseServiceUsageService {
         usage.setContractNumber(dto.getContractNumber());
         usage.setStartDate(dto.getStartDate());
         usage.setStatus(dto.getStatus() != null ? dto.getStatus() : UsageStatus.ACTIVE);
+        usage.setQuantity(dto.getQuantity());
 
         EnterpriseServiceUsage saved = usageRepository.save(usage);
         return toDTO(saved);

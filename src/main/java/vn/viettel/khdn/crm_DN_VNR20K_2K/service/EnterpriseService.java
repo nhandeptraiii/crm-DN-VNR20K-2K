@@ -22,6 +22,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseContactRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseRepository;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseServiceUsageRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.UserRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.ExcelExportHelper;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.util.ExcelUtils;
@@ -37,15 +38,18 @@ public class EnterpriseService {
     private final EnterpriseContactRepository enterpriseContactRepository;
     private final UserRepository userRepository;
     private final CommuneRepository communeRepository;
+    private final EnterpriseServiceUsageRepository usageRepository;
 
     public EnterpriseService(EnterpriseRepository enterpriseRepository,
             EnterpriseContactRepository enterpriseContactRepository,
             UserRepository userRepository,
-            CommuneRepository communeRepository) {
+            CommuneRepository communeRepository,
+            EnterpriseServiceUsageRepository usageRepository) {
         this.enterpriseRepository = enterpriseRepository;
         this.enterpriseContactRepository = enterpriseContactRepository;
         this.userRepository = userRepository;
         this.communeRepository = communeRepository;
+        this.usageRepository = usageRepository;
     }
 
     // --- Tạo mới ---
@@ -481,6 +485,12 @@ public class EnterpriseService {
                     java.util.Map<Long, EnterpriseContact> contactMap = primaryContacts.stream()
                             .collect(Collectors.toMap(c -> c.getEnterprise().getId(), c -> c, (c1, c2) -> c1));
 
+                    java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.EnterpriseServiceUsage> usages = usageRepository
+                            .findByEnterpriseIdInAndStatus(enterpriseIds, vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.UsageStatus.ACTIVE);
+                    java.util.Map<Long, String> usageMap = usages.stream()
+                            .collect(Collectors.groupingBy(u -> u.getEnterprise().getId(),
+                                    Collectors.mapping(u -> u.getViettelService().getServiceName(), Collectors.joining(", "))));
+
                     for (ResEnterpriseDTO dto : dtos) {
                         EnterpriseContact contact = contactMap.get(dto.getId());
                         if (contact != null) {
@@ -488,6 +498,11 @@ public class EnterpriseService {
                             dto.setContactEmail(contact.getEmail());
                             dto.setContactPhone(contact.getPhone());
                             dto.setContactPosition(contact.getPosition());
+                        }
+                        
+                        String usedServices = usageMap.get(dto.getId());
+                        if (usedServices != null) {
+                            dto.setUsedViettelServices(usedServices);
                         }
                     }
                 }

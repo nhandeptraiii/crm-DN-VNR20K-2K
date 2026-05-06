@@ -3,7 +3,7 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
+
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -23,11 +23,11 @@ public class ExcelExportHelper {
 
     public static String[] HEADERS = {
             "STT", "Tên doanh nghiệp (*)", "Mã số thuế (*)", "Cơ quan thuế", "Lĩnh vực", "Số nhân viên",
-            "Địa chỉ", "Website", "Ngày thành lập", "Điện thoại", "Loại hình",
+            "Địa chỉ", "Website", "Điện thoại", "Loại hình",
             "DT < 500tr (X)", "DT 500tr - 1 tỷ (X)", "DT > 1 tỷ (X)",
             "Tên xã", "Ghi chú",
             "Họ tên NĐD", "Email NĐD", "SĐT NĐD", "Chức vụ NĐD",
-            "AM phụ trách", "NV tư vấn phụ trách"
+            "AM phụ trách", "NV tư vấn phụ trách", "Dịch vụ Viettel"
     };
 
     public static String SHEET_NAME = "Doanh Nghiep";
@@ -36,7 +36,6 @@ public class ExcelExportHelper {
         private SXSSFWorkbook workbook;
         private Sheet sheet;
         private int rowIdx = 1;
-        private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         public EnterpriseExportStreamer() {
             // Keep maximum 500 rows in memory, exceeding rows will be flushed to disk
@@ -78,41 +77,37 @@ public class ExcelExportHelper {
                 row.createCell(6).setCellValue(enterprise.getAddress() != null ? enterprise.getAddress() : "");
                 row.createCell(7).setCellValue(enterprise.getWebsite() != null ? enterprise.getWebsite() : "");
 
-                if (enterprise.getEstablishedDate() != null) {
-                    row.createCell(8).setCellValue(enterprise.getEstablishedDate().format(dtf));
-                } else {
-                    row.createCell(8).setCellValue("");
-                }
+                row.createCell(8).setCellValue(enterprise.getPhone() != null ? enterprise.getPhone() : "");
+                row.createCell(9).setCellValue(enterprise.getType() != null ? enterprise.getType().name() : "");
 
-                row.createCell(9).setCellValue(enterprise.getPhone() != null ? enterprise.getPhone() : "");
-                row.createCell(10).setCellValue(enterprise.getType() != null ? enterprise.getType().name() : "");
-
-                row.createCell(11).setCellValue(enterprise
+                row.createCell(10).setCellValue(enterprise
                         .getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.UNDER_500M ? "X"
                                 : "");
-                row.createCell(12).setCellValue(enterprise
+                row.createCell(11).setCellValue(enterprise
                         .getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.FROM_500M_TO_1B
                                 ? "X"
                                 : "");
-                row.createCell(13)
+                row.createCell(12)
                         .setCellValue(enterprise
                                 .getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.OVER_1B
                                         ? "X"
                                         : "");
 
-                row.createCell(14).setCellValue(enterprise.getCommuneName() != null ? enterprise.getCommuneName() : "");
-                row.createCell(15).setCellValue(enterprise.getNote() != null ? enterprise.getNote() : "");
-                row.createCell(16)
+                row.createCell(13).setCellValue(enterprise.getCommuneName() != null ? enterprise.getCommuneName() : "");
+                row.createCell(14).setCellValue(enterprise.getNote() != null ? enterprise.getNote() : "");
+                row.createCell(15)
                         .setCellValue(enterprise.getContactFullName() != null ? enterprise.getContactFullName() : "");
-                row.createCell(17)
+                row.createCell(16)
                         .setCellValue(enterprise.getContactEmail() != null ? enterprise.getContactEmail() : "");
-                row.createCell(18)
+                row.createCell(17)
                         .setCellValue(enterprise.getContactPhone() != null ? enterprise.getContactPhone() : "");
-                row.createCell(19)
+                row.createCell(18)
                         .setCellValue(enterprise.getContactPosition() != null ? enterprise.getContactPosition() : "");
-                row.createCell(20).setCellValue(enterprise.getAmName() != null ? enterprise.getAmName() : "");
-                row.createCell(21)
+                row.createCell(19).setCellValue(enterprise.getAmName() != null ? enterprise.getAmName() : "");
+                row.createCell(20)
                         .setCellValue(enterprise.getConsultantName() != null ? enterprise.getConsultantName() : "");
+                row.createCell(21)
+                        .setCellValue(enterprise.getUsedViettelServices() != null ? enterprise.getUsedViettelServices() : "");
 
                 rowIdx++;
             }
@@ -170,22 +165,22 @@ public class ExcelExportHelper {
             exampleRow.createCell(5).setCellValue(50);
             exampleRow.createCell(6).setCellValue("Hà Nội");
             exampleRow.createCell(7).setCellValue("https://example.com");
-            exampleRow.createCell(8).setCellValue("01-01-2020");
-            exampleRow.createCell(9).setCellValue("0901234567");
+            exampleRow.createCell(8).setCellValue("0901234567");
 
-            exampleRow.createCell(10).setCellValue("HKD"); // Type
-            exampleRow.createCell(11).setCellValue(""); // DT < 500tr
-            exampleRow.createCell(12).setCellValue("X"); // DT 500tr - 1 tỷ
-            exampleRow.createCell(13).setCellValue(""); // DT > 1 tỷ
+            exampleRow.createCell(9).setCellValue("HKD"); // Type
+            exampleRow.createCell(10).setCellValue(""); // DT < 500tr
+            exampleRow.createCell(11).setCellValue("X"); // DT 500tr - 1 tỷ
+            exampleRow.createCell(12).setCellValue(""); // DT > 1 tỷ
 
-            exampleRow.createCell(14).setCellValue("Phường An Thới Đông"); // Tên xã
-            exampleRow.createCell(15).setCellValue("Đây là dữ liệu mẫu, vui lòng xóa dòng này trước khi import");
-            exampleRow.createCell(16).setCellValue("Nguyễn Văn Mẫu");
-            exampleRow.createCell(17).setCellValue("mau@example.com");
-            exampleRow.createCell(18).setCellValue("0901234567");
-            exampleRow.createCell(19).setCellValue("Giám đốc");
-            exampleRow.createCell(20).setCellValue(""); // AM phụ trách
-            exampleRow.createCell(21).setCellValue(""); // Consultant phụ trách
+            exampleRow.createCell(13).setCellValue("Phường An Thới Đông"); // Tên xã
+            exampleRow.createCell(14).setCellValue("Đây là dữ liệu mẫu, vui lòng xóa dòng này trước khi import");
+            exampleRow.createCell(15).setCellValue("Nguyễn Văn Mẫu");
+            exampleRow.createCell(16).setCellValue("mau@example.com");
+            exampleRow.createCell(17).setCellValue("0901234567");
+            exampleRow.createCell(18).setCellValue("Giám đốc");
+            exampleRow.createCell(19).setCellValue(""); // AM phụ trách
+            exampleRow.createCell(20).setCellValue(""); // Consultant phụ trách
+            exampleRow.createCell(21).setCellValue(""); // Dịch vụ Viettel
 
             // Auto size columns
             for (int col = 0; col < headersArr.length; col++) {

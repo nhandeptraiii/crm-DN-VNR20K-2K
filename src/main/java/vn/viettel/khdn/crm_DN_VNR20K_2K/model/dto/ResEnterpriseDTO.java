@@ -44,4 +44,6 @@ public class ResEnterpriseDTO {
     
     private String communeCode;
     private String communeName;
+    
+    private String usedViettelServices;
 }

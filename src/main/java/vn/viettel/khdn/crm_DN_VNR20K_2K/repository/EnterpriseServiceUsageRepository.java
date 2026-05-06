@@ -21,4 +21,6 @@ public interface EnterpriseServiceUsageRepository extends JpaRepository<Enterpri
             Pageable pageable);
 
     void deleteAllByEnterpriseId(Long enterpriseId);
+
+    java.util.List<EnterpriseServiceUsage> findByEnterpriseIdInAndStatus(java.util.List<Long> enterpriseIds, UsageStatus status);
 }

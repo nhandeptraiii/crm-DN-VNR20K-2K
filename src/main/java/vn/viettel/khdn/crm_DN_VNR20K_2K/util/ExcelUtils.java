@@ -154,32 +154,23 @@ public class ExcelUtils {
                     dto.setRevenueRange(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.OVER_1B);
                 }
 
-                // Cột 14: Vùng
-                String regionStr = getCellValueAsString(row.getCell(14));
-                if (regionStr != null && !regionStr.isBlank()) {
-                    try {
-                        dto.setRegion(RegionEnum.valueOf(regionStr.trim().toUpperCase()));
-                    } catch (IllegalArgumentException e) {
-                    }
-                }
+                // Cột 14: Xã
+                dto.setCommuneName(getCellValueAsString(row.getCell(14)));
 
-                // Cột 15: Xã
-                dto.setCommuneName(getCellValueAsString(row.getCell(15)));
-
-                // Cột 16: Ghi chú
-                dto.setNote(getCellValueAsString(row.getCell(16)));
+                // Cột 15: Ghi chú
+                dto.setNote(getCellValueAsString(row.getCell(15)));
                 
-                // Cột 17: Họ tên NĐD
-                dto.setContactFullName(getCellValueAsString(row.getCell(17)));
+                // Cột 16: Họ tên NĐD
+                dto.setContactFullName(getCellValueAsString(row.getCell(16)));
                 
-                // Cột 18: Email NĐD
-                dto.setContactEmail(getCellValueAsString(row.getCell(18)));
+                // Cột 17: Email NĐD
+                dto.setContactEmail(getCellValueAsString(row.getCell(17)));
                 
-                // Cột 19: SĐT NĐD
-                dto.setContactPhone(getCellValueAsString(row.getCell(19)));
+                // Cột 18: SĐT NĐD
+                dto.setContactPhone(getCellValueAsString(row.getCell(18)));
                 
-                // Cột 20: Chức vụ NĐD
-                dto.setContactPosition(getCellValueAsString(row.getCell(20)));
+                // Cột 19: Chức vụ NĐD
+                dto.setContactPosition(getCellValueAsString(row.getCell(19)));
 
                 enterprises.add(dto);
             }

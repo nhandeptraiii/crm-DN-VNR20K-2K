@@ -25,7 +25,7 @@ public class ExcelExportHelper {
             "STT", "Tên doanh nghiệp (*)", "Mã số thuế (*)", "Cơ quan thuế", "Lĩnh vực", "Số nhân viên",
             "Địa chỉ", "Website", "Ngày thành lập", "Điện thoại", "Loại hình", 
             "DT < 500tr (X)", "DT 500tr - 1 tỷ (X)", "DT > 1 tỷ (X)", 
-            "Vùng", "Tên xã", "Ghi chú",
+            "Tên xã", "Ghi chú",
             "Họ tên NĐD", "Email NĐD", "SĐT NĐD", "Chức vụ NĐD"
     };
 
@@ -87,13 +87,12 @@ public class ExcelExportHelper {
                 row.createCell(12).setCellValue(enterprise.getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.FROM_500M_TO_1B ? "X" : "");
                 row.createCell(13).setCellValue(enterprise.getRevenueRange() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.OVER_1B ? "X" : "");
 
-                row.createCell(14).setCellValue(enterprise.getRegion() != null ? enterprise.getRegion().name() : "");
-                row.createCell(15).setCellValue(enterprise.getCommuneName() != null ? enterprise.getCommuneName() : "");
-                row.createCell(16).setCellValue(enterprise.getNote() != null ? enterprise.getNote() : "");
-                row.createCell(17).setCellValue(enterprise.getContactFullName() != null ? enterprise.getContactFullName() : "");
-                row.createCell(18).setCellValue(enterprise.getContactEmail() != null ? enterprise.getContactEmail() : "");
-                row.createCell(19).setCellValue(enterprise.getContactPhone() != null ? enterprise.getContactPhone() : "");
-                row.createCell(20).setCellValue(enterprise.getContactPosition() != null ? enterprise.getContactPosition() : "");
+                row.createCell(14).setCellValue(enterprise.getCommuneName() != null ? enterprise.getCommuneName() : "");
+                row.createCell(15).setCellValue(enterprise.getNote() != null ? enterprise.getNote() : "");
+                row.createCell(16).setCellValue(enterprise.getContactFullName() != null ? enterprise.getContactFullName() : "");
+                row.createCell(17).setCellValue(enterprise.getContactEmail() != null ? enterprise.getContactEmail() : "");
+                row.createCell(18).setCellValue(enterprise.getContactPhone() != null ? enterprise.getContactPhone() : "");
+                row.createCell(19).setCellValue(enterprise.getContactPosition() != null ? enterprise.getContactPosition() : "");
 
                 rowIdx++;
             }
@@ -159,13 +158,12 @@ public class ExcelExportHelper {
             exampleRow.createCell(12).setCellValue("X"); // DT 500tr - 1 tỷ
             exampleRow.createCell(13).setCellValue(""); // DT > 1 tỷ
 
-            exampleRow.createCell(14).setCellValue("CTO"); // Region
-            exampleRow.createCell(15).setCellValue("Phường An Thới Đông"); // Tên xã
-            exampleRow.createCell(16).setCellValue("Đây là dữ liệu mẫu, vui lòng xóa dòng này trước khi import");
-            exampleRow.createCell(17).setCellValue("Nguyễn Văn Mẫu");
-            exampleRow.createCell(18).setCellValue("mau@example.com");
-            exampleRow.createCell(19).setCellValue("0901234567");
-            exampleRow.createCell(20).setCellValue("Giám đốc");
+            exampleRow.createCell(14).setCellValue("Phường An Thới Đông"); // Tên xã
+            exampleRow.createCell(15).setCellValue("Đây là dữ liệu mẫu, vui lòng xóa dòng này trước khi import");
+            exampleRow.createCell(16).setCellValue("Nguyễn Văn Mẫu");
+            exampleRow.createCell(17).setCellValue("mau@example.com");
+            exampleRow.createCell(18).setCellValue("0901234567");
+            exampleRow.createCell(19).setCellValue("Giám đốc");
 
             // Auto size columns
             for (int col = 0; col < headersArr.length; col++) {

@@ -63,7 +63,7 @@ public class ReqEnterpriseCreateDTO {
     @jakarta.validation.constraints.NotNull(message = "Loại hình doanh nghiệp không được để trống")
     private EnterpriseTypeEnum type;
     
-    private Long ownerId;
+    private Long consultantId;
     
     @Size(max = 50, message = "Mã xã tối đa 50 ký tự")
     private String communeCode;

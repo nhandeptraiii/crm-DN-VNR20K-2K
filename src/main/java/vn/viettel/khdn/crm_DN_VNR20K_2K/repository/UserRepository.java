@@ -35,4 +35,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("keyword") String keyword, 
             @Param("regionFilter") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter,
             Pageable pageable);
+
+    @Query("SELECT c.id, u FROM User u JOIN u.managedCommunes c WHERE u.role = :role AND c.id IN :communeIds")
+    java.util.List<Object[]> findUsersByRoleAndCommuneIds(@Param("role") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, @Param("communeIds") java.util.List<Long> communeIds);
+
+    @Query("SELECT u FROM User u JOIN u.managedCommunes c WHERE u.role = :role AND c.id = :communeId")
+    java.util.List<User> findUsersByRoleAndCommuneId(@Param("role") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, @Param("communeId") Long communeId);
 }

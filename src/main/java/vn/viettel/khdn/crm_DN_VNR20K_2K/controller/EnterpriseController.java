@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.InputStreamResource;
@@ -64,7 +63,8 @@ public class EnterpriseController {
             @RequestParam(value = "size", defaultValue = "10") int size) {
         int safeSize = Math.min(Math.max(size, 1), 50);
         Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(Sort.Order.desc("createdAt")));
-        Page<ResEnterpriseDTO> result = enterpriseService.searchEnterprises(keyword, status, industry, region, type, pageable);
+        Page<ResEnterpriseDTO> result = enterpriseService.searchEnterprises(keyword, status, industry, region, type,
+                pageable);
         return ResponseEntity.ok(result);
     }
 
@@ -90,8 +90,10 @@ public class EnterpriseController {
 
     @GetMapping("/industries")
     public ResponseEntity<java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResIndustryDTO>> getIndustries() {
-        java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResIndustryDTO> industries = java.util.Arrays.stream(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry.values())
-                .map(industry -> new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResIndustryDTO(industry.name(), industry.getDisplayName()))
+        java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResIndustryDTO> industries = java.util.Arrays
+                .stream(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry.values())
+                .map(industry -> new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResIndustryDTO(industry.name(),
+                        industry.getDisplayName()))
                 .collect(java.util.stream.Collectors.toList());
         return ResponseEntity.ok(industries);
     }
@@ -105,7 +107,7 @@ public class EnterpriseController {
             @RequestParam(value = "region", required = false) java.util.List<String> region,
             @RequestParam(value = "type", required = false) java.util.List<String> type,
             @RequestParam(value = "group", required = false, defaultValue = "VNR") String group) throws IOException {
-        
+
         ByteArrayInputStream in = enterpriseService.exportToExcel(keyword, status, industry, region, type);
 
         HttpHeaders headers = new HttpHeaders();
@@ -114,7 +116,8 @@ public class EnterpriseController {
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(in));
     }
 
@@ -129,7 +132,8 @@ public class EnterpriseController {
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(in));
     }
 

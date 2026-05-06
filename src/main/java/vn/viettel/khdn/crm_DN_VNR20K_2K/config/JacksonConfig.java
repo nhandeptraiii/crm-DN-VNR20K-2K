@@ -1,7 +1,6 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.cfg.CoercionAction;
@@ -14,7 +13,8 @@ import org.springframework.context.annotation.Primary;
 
 /**
  * Cấu hình Jackson để xử lý các trường hợp đặc biệt khi parse JSON:
- * - Chuỗi rỗng "" sẽ được convert thành null thay vì throw lỗi (áp dụng cho Enum).
+ * - Chuỗi rỗng "" sẽ được convert thành null thay vì throw lỗi (áp dụng cho
+ * Enum).
  * - Unrecognized fields sẽ bị bỏ qua thay vì throw lỗi.
  */
 @Configuration

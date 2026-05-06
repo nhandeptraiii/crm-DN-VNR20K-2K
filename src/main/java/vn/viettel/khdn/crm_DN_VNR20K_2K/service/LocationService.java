@@ -5,8 +5,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Cluster;
-import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Commune;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResClusterDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResCommuneDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;

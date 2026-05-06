@@ -1,6 +1,5 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.service;
 
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,6 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.CommuneRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Commune;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,7 +24,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final CommuneRepository communeRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CommuneRepository communeRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+            CommuneRepository communeRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.communeRepository = communeRepository;
@@ -44,17 +43,20 @@ public class UserService {
         user.setPhone(dto.getPhone());
         user.setGender(dto.getGender());
         user.setDateOfBirth(dto.getDateOfBirth());
-        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication()
+                .getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
 
         RoleEnum assignedRole = dto.getRole() != null ? dto.getRole() : RoleEnum.CONSULTANT;
 
         if (currentUser.getRole() == RoleEnum.OPERATOR && assignedRole == RoleEnum.ADMIN) {
-            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Quản lý điều hành không thể tạo tài khoản ADMIN.");
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "Quản lý điều hành không thể tạo tài khoản ADMIN.");
         }
 
         user.setRole(assignedRole);
-        
+
         applyRoleConstraints(user, assignedRole, dto.getRegion(), dto.getCommuneIds());
 
         user.setStatus("ACTIVE");
@@ -87,16 +89,18 @@ public class UserService {
     public org.springframework.data.domain.Page<ResUserDTO> searchUsers(
             vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, String keyword,
             org.springframework.data.domain.Pageable pageable) {
-        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication()
+                .getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
 
         vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter = null;
         if (currentUser.getRole() == RoleEnum.MANAGER || currentUser.getRole() == RoleEnum.CONSULTANT) {
             regionFilter = currentUser.getRegion();
         }
 
-        org.springframework.data.domain.Page<User> page =
-                userRepository.searchUsers(role, keyword, regionFilter, pageable);
+        org.springframework.data.domain.Page<User> page = userRepository.searchUsers(role, keyword, regionFilter,
+                pageable);
         return page.map(this::convertToResUserDTO);
     }
 
@@ -123,15 +127,19 @@ public class UserService {
             user.setRole(dto.getRole());
         }
 
-        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication()
+                .getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
 
         if (currentUser.getRole() == RoleEnum.OPERATOR) {
             if (user.getRole() == RoleEnum.ADMIN || dto.getRole() == RoleEnum.ADMIN) {
-                throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Quản lý điều hành không thể sửa tài khoản ADMIN hoặc cấp quyền ADMIN.");
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.FORBIDDEN,
+                        "Quản lý điều hành không thể sửa tài khoản ADMIN hoặc cấp quyền ADMIN.");
             }
         }
-        
+
         RoleEnum tempRole = user.getRole();
         applyRoleConstraints(user, tempRole, dto.getRegion(), dto.getCommuneIds());
 
@@ -143,11 +151,14 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User không tồn tại: " + id));
 
-        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication()
+                .getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
 
         if (currentUser.getRole() == RoleEnum.OPERATOR && user.getRole() == RoleEnum.ADMIN) {
-            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Quản lý điều hành không thể xóa tài khoản ADMIN.");
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "Quản lý điều hành không thể xóa tài khoản ADMIN.");
         }
 
         userRepository.delete(user);
@@ -191,9 +202,10 @@ public class UserService {
 
     /**
      * Áp dụng ràng buộc dữ liệu theo Role:
-     * - MANAGER   : Bắt buộc region, KHÔNG có communes (tự động xóa nếu có).
+     * - MANAGER : Bắt buộc region, KHÔNG có communes (tự động xóa nếu có).
      * - ACCOUNT_MANAGER: Bắt buộc region VÀ communes.
-     * - ADMIN / OPERATOR / CONSULTANT: KHÔNG cho phép region và communes (tự động xóa).
+     * - ADMIN / OPERATOR / CONSULTANT: KHÔNG cho phép region và communes (tự động
+     * xóa).
      */
     private void applyRoleConstraints(User user, RoleEnum role,
             vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum region,

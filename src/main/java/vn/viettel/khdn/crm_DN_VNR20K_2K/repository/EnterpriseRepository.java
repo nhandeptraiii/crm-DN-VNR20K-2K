@@ -29,7 +29,7 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         + "AND (:industry IS NULL OR e.industry = :industry) "
                         + "AND (:hasRegions = false OR cl.region IN :regions) "
                         + "AND (:hasTypes = false OR e.type IN :types) "
-                        + "AND (:ownerId IS NULL OR e.owner.id = :ownerId) "
+                        + "AND (:consultantId IS NULL OR e.consultant.id = :consultantId) "
                         + "AND (:hasCommunes = false OR c.id IN :communeIds) "
                         + "AND (:hasRestrictTypes = false OR e.type IN :restrictTypes)")
         Page<Enterprise> searchEnterprises(@Param("keyword") String keyword,
@@ -39,7 +39,7 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         @Param("regions") java.util.List<RegionEnum> regions,
                         @Param("hasTypes") boolean hasTypes,
                         @Param("types") java.util.List<EnterpriseTypeEnum> types, 
-                        @Param("ownerId") Long ownerId,
+                        @Param("consultantId") Long consultantId,
                         @Param("hasCommunes") boolean hasCommunes,
                         @Param("communeIds") java.util.List<Long> communeIds,
                         @Param("hasRestrictTypes") boolean hasRestrictTypes,
@@ -97,7 +97,7 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
         long countUncontactedByType(@Param("type") EnterpriseTypeEnum type);
 
         // Danh sách DN 2000 + 20K chưa tiếp xúc
-        @Query("SELECT e.id, e.name, e.taxCode, e.type, e.commune.cluster.region, e.owner.fullName "
+        @Query("SELECT e.id, e.name, e.taxCode, e.type, e.commune.cluster.region, e.consultant.fullName "
                         + "FROM Enterprise e " + "WHERE e.type IN :types AND e.status != 'DELETED' "
                         + "AND e.id NOT IN ("
                         + "    SELECT DISTINCT a.enterprise.id FROM Appointment a "

@@ -73,8 +73,8 @@ public class Enterprise {
     private EnterpriseTypeEnum type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
-    private User owner; // Người phụ trách
+    @JoinColumn(name = "consultant_id")
+    private User consultant; // Người phụ trách (Consultant)
 
     @Column(length = 1000)
     private String note;

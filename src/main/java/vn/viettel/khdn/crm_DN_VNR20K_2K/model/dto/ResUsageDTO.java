@@ -25,6 +25,7 @@ public class ResUsageDTO {
     // Usage Info
     private String contractNumber;
     private LocalDate startDate;
+    private LocalDate endDate;
     private UsageStatus status;
     private Integer quantity;
 

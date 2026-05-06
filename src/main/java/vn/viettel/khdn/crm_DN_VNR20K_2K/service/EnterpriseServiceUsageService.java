@@ -46,6 +46,7 @@ public class EnterpriseServiceUsageService {
         usage.setInteraction(interaction);
         usage.setContractNumber(dto.getContractNumber());
         usage.setStartDate(dto.getStartDate());
+        usage.setEndDate(dto.getEndDate());
         usage.setStatus(dto.getStatus() != null ? dto.getStatus() : UsageStatus.ACTIVE);
         usage.setQuantity(dto.getQuantity());
 
@@ -84,6 +85,8 @@ public class EnterpriseServiceUsageService {
             usage.setContractNumber(dto.getContractNumber());
         if (dto.getStartDate() != null)
             usage.setStartDate(dto.getStartDate());
+        if (dto.getEndDate() != null)
+            usage.setEndDate(dto.getEndDate());
         if (dto.getStatus() != null)
             usage.setStatus(dto.getStatus());
 
@@ -118,6 +121,7 @@ public class EnterpriseServiceUsageService {
         dto.setServiceName(u.getViettelService().getServiceName());
         dto.setContractNumber(u.getContractNumber());
         dto.setStartDate(u.getStartDate());
+        dto.setEndDate(u.getEndDate());
         dto.setQuantity(u.getQuantity());
 
         if (u.getInteraction() != null) {

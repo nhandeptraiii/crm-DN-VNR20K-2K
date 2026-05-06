@@ -50,6 +50,10 @@ public class EnterpriseServiceUsage {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate startDate;
 
+    @Column(name = "end_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private LocalDate endDate;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 30)
     private UsageStatus status;

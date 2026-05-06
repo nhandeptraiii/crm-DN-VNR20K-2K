@@ -23,6 +23,8 @@ public class ReqUsageCreateDTO {
     @NotNull(message = "Ngày bắt đầu không được để trống")
     private LocalDate startDate;
 
+    private LocalDate endDate;
+
     private UsageStatus status;
 
     private Integer quantity;

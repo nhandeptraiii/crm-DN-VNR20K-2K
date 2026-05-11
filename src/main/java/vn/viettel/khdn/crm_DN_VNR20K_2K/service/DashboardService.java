@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
 
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.DashboardDTO.RegionDistributio
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.DashboardDTO.UncontactedEnterpriseDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.EmployeeInteractionDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
+import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.AppointmentRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.EnterpriseRepository;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.repository.InteractionRepository;
@@ -133,6 +135,13 @@ public class DashboardService {
         return buildMonthlyTrend(month, year);
     }
 
+    public List<DashboardDTO.RegionDetailDTO> getRegionDetail(int month, int year) {
+        List<DashboardDTO.RegionDetailDTO> result = new ArrayList<>();
+        for (RegionEnum region : List.of(RegionEnum.CTO, RegionEnum.HUG, RegionEnum.STG)) {
+            result.add(buildRegionDetail(region, month, year));
+        }
+        return result;
+    }
     // ══════════════════════════════════════════════════════════════════════════
     // Private helpers
     // ══════════════════════════════════════════════════════════════════════════
@@ -271,6 +280,38 @@ public class DashboardService {
             result.add(new MonthlyTrendDTO(d, cumCurrent, cumPrev));
         }
         return result;
+    }
+
+    private DashboardDTO.RegionDetailDTO buildRegionDetail(RegionEnum region, int month, int year) {
+        // Tổng DN theo từng cụm trong region này
+        Map<String, Long> totalByCluster = new LinkedHashMap<>();
+        for (Object[] row : enterpriseRepo.countByClusterInRegion(region)) {
+            totalByCluster.put(row[0].toString(), ((Number) row[1]).longValue());
+        }
+
+        // DN đã tiếp xúc (CONFIRMED) theo từng cụm trong tháng
+        Map<String, Long> contactedByCluster = new HashMap<>();
+        for (Object[] row : appointmentRepo.countContactedByClusterInRegion(region, month, year)) {
+            contactedByCluster.put(row[0].toString(), ((Number) row[1]).longValue());
+        }
+
+        // DN theo loại (SME / HKD / VNR2000 / VNR20K) trong region này
+        Map<String, Long> byType = new LinkedHashMap<>();
+        for (Object[] row : enterpriseRepo.countByTypeInRegion(region)) {
+            byType.put(row[0].toString(), ((Number) row[1]).longValue());
+        }
+
+        // Gộp thành danh sách ClusterStatDTO
+        List<DashboardDTO.ClusterStatDTO> clusters = totalByCluster.entrySet().stream()
+                .map(e -> new DashboardDTO.ClusterStatDTO(e.getKey(), e.getValue(),
+                        contactedByCluster.getOrDefault(e.getKey(), 0L)))
+                .collect(Collectors.toList());
+
+        long total = clusters.stream().mapToLong(DashboardDTO.ClusterStatDTO::getTotal).sum();
+        long contacted =
+                clusters.stream().mapToLong(DashboardDTO.ClusterStatDTO::getContacted).sum();
+
+        return new DashboardDTO.RegionDetailDTO(region.name(), total, contacted, clusters, byType);
     }
 
     private String getDayOfWeekVi(DayOfWeek dow) {

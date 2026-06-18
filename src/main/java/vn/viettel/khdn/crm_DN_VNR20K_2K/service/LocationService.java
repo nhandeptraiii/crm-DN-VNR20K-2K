@@ -46,6 +46,19 @@ public class LocationService {
             dto.setName(c.getName());
             dto.setCode(c.getCode());
             dto.setClusterId(c.getCluster().getId());
+            dto.setClusterName(c.getCluster().getName());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public List<ResCommuneDTO> searchCommunes(String keyword) {
+        return communeRepository.searchByName(keyword).stream().map(c -> {
+            ResCommuneDTO dto = new ResCommuneDTO();
+            dto.setId(c.getId());
+            dto.setName(c.getName());
+            dto.setCode(c.getCode());
+            dto.setClusterId(c.getCluster().getId());
+            dto.setClusterName(c.getCluster().getName());
             return dto;
         }).collect(Collectors.toList());
     }

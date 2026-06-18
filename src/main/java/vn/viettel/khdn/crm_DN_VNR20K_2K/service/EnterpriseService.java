@@ -65,6 +65,7 @@ public class EnterpriseService {
         enterprise.setWebsite(dto.getWebsite());
         enterprise.setEstablishedDate(dto.getEstablishedDate());
         enterprise.setPhone(dto.getPhone());
+        enterprise.setEmail(dto.getEmail());
         enterprise.setNote(dto.getNote());
         enterprise.setTaxAuthority(dto.getTaxAuthority());
         enterprise.setType(dto.getType());
@@ -80,13 +81,11 @@ public class EnterpriseService {
                     .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có ID: " + dto.getCommuneId()));
             enterprise.setCommune(commune);
         } else if (dto.getCommuneCode() != null && !dto.getCommuneCode().isBlank()) {
-            Commune commune = communeRepository.findByCode(dto.getCommuneCode())
-                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có mã: " + dto.getCommuneCode()));
-            enterprise.setCommune(commune);
+            communeRepository.findByCode(dto.getCommuneCode())
+                    .ifPresent(enterprise::setCommune);
         } else if (dto.getCommuneName() != null && !dto.getCommuneName().isBlank()) {
-            Commune commune = communeRepository.findFirstByName(dto.getCommuneName())
-                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy Xã có tên: " + dto.getCommuneName()));
-            enterprise.setCommune(commune);
+            communeRepository.findFirstByName(dto.getCommuneName())
+                    .ifPresent(enterprise::setCommune);
         }
 
         if (dto.getConsultantId() != null) {
@@ -311,6 +310,8 @@ public class EnterpriseService {
             enterprise.setEstablishedDate(dto.getEstablishedDate());
         if (dto.getPhone() != null)
             enterprise.setPhone(dto.getPhone());
+        if (dto.getEmail() != null)
+            enterprise.setEmail(dto.getEmail());
         if (dto.getStatus() != null)
             enterprise.setStatus(dto.getStatus());
         if (dto.getNote() != null)
@@ -574,6 +575,7 @@ public class EnterpriseService {
         dto.setWebsite(e.getWebsite());
         dto.setEstablishedDate(e.getEstablishedDate());
         dto.setPhone(e.getPhone());
+        dto.setEmail(e.getEmail());
         dto.setStatus(e.getStatus());
         dto.setNote(e.getNote());
         dto.setTaxAuthority(e.getTaxAuthority());
@@ -587,6 +589,7 @@ public class EnterpriseService {
         if (e.getConsultant() != null) {
             dto.setConsultantId(e.getConsultant().getId());
             dto.setConsultantName(e.getConsultant().getFullName());
+            dto.setConsultantPhone(e.getConsultant().getPhone());
         }
 
         // AM phụ trách (Lấy tự động dựa theo Xã)
@@ -594,8 +597,10 @@ public class EnterpriseService {
             User am = amMap.get(e.getCommune().getId());
             dto.setAmId(am.getId());
             dto.setAmName(am.getFullName());
+            dto.setAmPhone(am.getPhone());
         }
 
+        dto.setCommuneId(e.getCommune() != null ? e.getCommune().getId() : null);
         dto.setCommuneCode(e.getCommune() != null ? e.getCommune().getCode() : null);
         dto.setCommuneName(e.getCommune() != null ? e.getCommune().getName() : null);
         return dto;

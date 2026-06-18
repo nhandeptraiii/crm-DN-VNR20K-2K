@@ -61,6 +61,9 @@ public class Enterprise {
     @Column(length = 100)
     private String phone;
 
+    @Column(length = 255)
+    private String email;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 30)
     private EnterpriseStatus status;

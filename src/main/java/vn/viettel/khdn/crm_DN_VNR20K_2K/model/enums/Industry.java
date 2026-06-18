@@ -9,7 +9,7 @@ public enum Industry {
     TOURISM_RESTAURANT("Du lịch, vui chơi giải trí", new String[] { "Du lịch, nhà hàng", "Khach san", "An uong", "Am thuc", "Du lich", "vui chơi", "giải trí" }),
     OTHER_SERVICES("Các dịch vụ khác", new String[] {}),
     IT_SOFTWARE("Công nghệ, phần mềm", new String[] { "IT", "Phan mem", "Cong nghe", "CNTT", "Phần mềm", "Công nghệ thông tin" }),
-    MEDIA_ADVERTISING("Truyền thông, quảng cáo", new String[] { "Truyen thong", "Quang cao", "Marketing", "Ads" }),
+    MEDIA_ADVERTISING("Truyền thông - Viễn thông", new String[] { "Truyen thong", "Vien thong", "Quang cao", "Marketing", "Ads", "Viễn thông" }),
     AGRICULTURE_AQUACULTURE("Nông - lâm - thủy sản", new String[] { "Nông nghiệp, thủy sản", "Nong nghiep", "Thuy san", "Hai san", "Lâm nghiệp", "Nông lâm thủy sản" }),
     COMMERCE_DISTRIBUTION("DV bán buôn và bán lẻ", new String[] { "Thương mại, phân phối", "Thuong mai", "Phan phoi", "Ban le", "Dich vu", "Bán buôn", "Bán lẻ" }),
     SANITATION_SECURITY("Vệ sinh, Bảo vệ", new String[] { "Ve sinh", "Bao ve", "An ninh" }),

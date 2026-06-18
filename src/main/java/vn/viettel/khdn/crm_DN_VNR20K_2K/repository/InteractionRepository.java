@@ -16,12 +16,14 @@ import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.InteractionResult;
 @Repository
 public interface InteractionRepository extends JpaRepository<Interaction, Long> {
 
-        @Query("SELECT i FROM Interaction i WHERE "
-                        + "(:enterpriseId IS NULL OR i.enterprise.id = :enterpriseId) "
+        @Query("SELECT i FROM Interaction i "
+                        + "LEFT JOIN i.enterprise.commune c "
+                        + "LEFT JOIN c.cluster cl "
+                        + "WHERE (:enterpriseId IS NULL OR i.enterprise.id = :enterpriseId) "
                         + "AND (:consultantId IS NULL OR i.consultant.id = :consultantId) "
                         + "AND (:type IS NULL OR i.interactionType = :type) "
                         + "AND (:result IS NULL OR i.result = :result) "
-                        + "AND (:regionFilter IS NULL OR i.enterprise.commune.cluster.region = :regionFilter) "
+                        + "AND (:regionFilter IS NULL OR cl.region = :regionFilter) "
                         + "AND (:hasRestrictTypes = false OR i.enterprise.type IN :restrictTypes)")
         Page<Interaction> searchInteractions(@Param("enterpriseId") Long enterpriseId,
                         @Param("consultantId") Long consultantId,

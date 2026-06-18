@@ -23,6 +23,7 @@ public class ResEnterpriseDTO {
     private String website;
     private LocalDate establishedDate;
     private String phone;
+    private String email;
     private EnterpriseStatus status;
     private String note;
     private String taxAuthority;
@@ -33,8 +34,10 @@ public class ResEnterpriseDTO {
     private EnterpriseTypeEnum type;   
     private Long consultantId;
     private String consultantName;
+    private String consultantPhone;
     private Long amId;
     private String amName;
+    private String amPhone;
     
     // Thêm các trường cho xuất Excel (Người đại diện)
     private String contactFullName;
@@ -42,6 +45,7 @@ public class ResEnterpriseDTO {
     private String contactPhone;
     private String contactPosition;
     
+    private Long communeId;
     private String communeCode;
     private String communeName;
     

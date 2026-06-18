@@ -31,4 +31,9 @@ public class LocationController {
     public ResponseEntity<List<ResCommuneDTO>> getCommunesByClusterId(@RequestParam("clusterId") Long clusterId) {
         return ResponseEntity.ok(locationService.getCommunesByCluster(clusterId));
     }
+
+    @GetMapping("/communes/search")
+    public ResponseEntity<List<ResCommuneDTO>> searchCommunes(@RequestParam("keyword") String keyword) {
+        return ResponseEntity.ok(locationService.searchCommunes(keyword));
+    }
 }

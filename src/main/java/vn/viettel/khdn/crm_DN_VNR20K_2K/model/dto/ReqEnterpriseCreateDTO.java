@@ -38,6 +38,9 @@ public class ReqEnterpriseCreateDTO {
     @Size(max = 100, message = "SĐT tối đa 100 ký tự")
     private String phone;
 
+    @Size(max = 255, message = "Email doanh nghiệp tối đa 255 ký tự")
+    private String email;
+
     @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
     private String note;
 

@@ -178,6 +178,7 @@ public class InteractionService {
         dto.setId(i.getId());
         dto.setEnterpriseId(i.getEnterprise().getId());
         dto.setEnterpriseName(i.getEnterprise().getName());
+        dto.setEnterpriseEmail(i.getEnterprise().getEmail());
 
         if (i.getContact() != null) {
             dto.setContactId(i.getContact().getId());

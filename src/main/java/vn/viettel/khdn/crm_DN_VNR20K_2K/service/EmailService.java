@@ -194,6 +194,7 @@ public class EmailService {
         return switch (type) {
             case "PHONE_CALL" -> "📞 Gọi điện";
             case "EMAIL_QUOTE" -> "📧 Gửi email / Báo giá";
+            case "SEND_MAIL" -> "✉️ Gửi mail";
             case "ONLINE_MEETING" -> "💻 Họp online";
             case "OFFLINE_MEETING" -> "🤝 Gặp mặt trực tiếp";
             case "DEMO" -> "🖥️ Demo sản phẩm";

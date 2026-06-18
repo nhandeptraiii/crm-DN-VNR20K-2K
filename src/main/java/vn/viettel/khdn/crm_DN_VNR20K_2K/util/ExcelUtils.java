@@ -128,8 +128,14 @@ public class ExcelUtils {
                 // Cột 8: Điện thoại
                 dto.setPhone(getCellValueAsString(row.getCell(8)));
                 
-                // Cột 9: Loại hình
-                String typeStr = getCellValueAsString(row.getCell(9));
+                // Cột 9: Email doanh nghiệp
+                dto.setEmail(getCellValueAsString(row.getCell(9)));
+                
+                // Cột 10: Ngày thành lập
+                dto.setEstablishedDate(parseFlexibleDate(getCellValueAsString(row.getCell(10))));
+
+                // Cột 11: Loại hình
+                String typeStr = getCellValueAsString(row.getCell(11));
                 if (typeStr != null && !typeStr.isBlank()) {
                     try {
                         dto.setType(EnterpriseTypeEnum.valueOf(typeStr.trim().toUpperCase()));
@@ -137,10 +143,10 @@ public class ExcelUtils {
                     }
                 }
                 
-                // Cột 10, 11, 12: Đánh dấu check "X" Doanh thu
-                String rev1 = getCellValueAsString(row.getCell(10));
-                String rev2 = getCellValueAsString(row.getCell(11));
-                String rev3 = getCellValueAsString(row.getCell(12));
+                // Cột 12, 13, 14: Đánh dấu check "X" Doanh thu
+                String rev1 = getCellValueAsString(row.getCell(12));
+                String rev2 = getCellValueAsString(row.getCell(13));
+                String rev3 = getCellValueAsString(row.getCell(14));
                 
                 if (rev1 != null && rev1.trim().equalsIgnoreCase("X")) {
                     dto.setRevenueRange(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.UNDER_500M);
@@ -150,23 +156,23 @@ public class ExcelUtils {
                     dto.setRevenueRange(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.OVER_1B);
                 }
 
-                // Cột 13: Xã
-                dto.setCommuneName(getCellValueAsString(row.getCell(13)));
+                // Cột 15: Xã
+                dto.setCommuneName(getCellValueAsString(row.getCell(15)));
 
-                // Cột 14: Ghi chú
-                dto.setNote(getCellValueAsString(row.getCell(14)));
+                // Cột 16: Ghi chú
+                dto.setNote(getCellValueAsString(row.getCell(16)));
                 
-                // Cột 15: Họ tên NĐD
-                dto.setContactFullName(getCellValueAsString(row.getCell(15)));
+                // Cột 17: Họ tên NĐD
+                dto.setContactFullName(getCellValueAsString(row.getCell(17)));
                 
-                // Cột 16: Email NĐD
-                dto.setContactEmail(getCellValueAsString(row.getCell(16)));
+                // Cột 18: Email NĐD
+                dto.setContactEmail(getCellValueAsString(row.getCell(18)));
                 
-                // Cột 17: SĐT NĐD
-                dto.setContactPhone(getCellValueAsString(row.getCell(17)));
+                // Cột 19: SĐT NĐD
+                dto.setContactPhone(getCellValueAsString(row.getCell(19)));
                 
-                // Cột 18: Chức vụ NĐD
-                dto.setContactPosition(getCellValueAsString(row.getCell(18)));
+                // Cột 20: Chức vụ NĐD
+                dto.setContactPosition(getCellValueAsString(row.getCell(20)));
 
                 enterprises.add(dto);
             }

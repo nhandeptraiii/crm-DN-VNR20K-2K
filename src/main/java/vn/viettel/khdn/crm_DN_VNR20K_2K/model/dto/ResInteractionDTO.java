@@ -17,6 +17,7 @@ public class ResInteractionDTO {
 
     private Long enterpriseId;
     private String enterpriseName;
+    private String enterpriseEmail;
 
     private Long contactId;
     private String contactName;

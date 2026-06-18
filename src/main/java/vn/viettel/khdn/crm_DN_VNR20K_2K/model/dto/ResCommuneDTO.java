@@ -10,4 +10,5 @@ public class ResCommuneDTO {
     private String name;
     private String code;
     private Long clusterId;
+    private String clusterName;
 }

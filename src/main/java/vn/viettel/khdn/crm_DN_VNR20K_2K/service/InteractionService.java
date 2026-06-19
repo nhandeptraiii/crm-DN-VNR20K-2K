@@ -128,6 +128,42 @@ public class InteractionService {
         return page.map(this::toDTO);
     }
 
+    /**
+     * Trả về danh sách doanh nghiệp kèm thống kê tiếp xúc (phân trang phía server).
+     * Mỗi dòng = 1 doanh nghiệp: tên, số lần tiếp xúc, ngày tiếp xúc gần nhất.
+     */
+    public org.springframework.data.domain.Page<vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResEnterpriseInteractionSummaryDTO>
+            getEnterpriseInteractionSummary(Pageable pageable) throws Exception {
+
+        User currentUser = getCurrentUser();
+        Long filterConsultantId = null;
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter = null;
+        boolean hasRestrictTypes = false;
+        java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes = null;
+
+        if (currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.MANAGER) {
+            regionFilter = currentUser.getRegion();
+        } else if (currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ACCOUNT_MANAGER) {
+            filterConsultantId = currentUser.getId();
+        }
+
+        org.springframework.data.domain.Page<Object[]> rawPage = interactionRepository
+                .searchEnterpriseInteractionSummary(
+                        filterConsultantId, regionFilter,
+                        hasRestrictTypes, restrictTypes, pageable);
+
+        return rawPage.map(row -> {
+            vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResEnterpriseInteractionSummaryDTO dto =
+                new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResEnterpriseInteractionSummaryDTO();
+            dto.setEnterpriseId(((Number) row[0]).longValue());
+            dto.setEnterpriseName((String) row[1]);
+            dto.setInteractionCount(((Number) row[2]).longValue());
+            dto.setLatestInteractionDate((java.time.Instant) row[3]);
+            dto.setConsultantName((String) row[4]);
+            return dto;
+        });
+    }
+
     public ResInteractionDTO getInteractionById(Long id) throws Exception {
         Interaction interaction = interactionRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhật ký tương tác với ID: " + id));

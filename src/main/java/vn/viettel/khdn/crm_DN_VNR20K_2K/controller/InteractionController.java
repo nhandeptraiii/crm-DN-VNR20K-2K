@@ -50,12 +50,29 @@ public class InteractionController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) throws Exception {
 
-        int safeSize = Math.min(Math.max(size, 1), 50);
+        int safeSize = Math.min(Math.max(size, 1), 200);
         Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(Sort.Order.desc("interactionTime")));
 
         Page<ResInteractionDTO> pageResult = interactionService.searchInteractions(enterpriseId, consultantId, type,
                 result, pageable);
         return ResponseEntity.ok(pageResult);
+    }
+
+    /**
+     * GET /interactions/enterprise-summary?page=0&size=10
+     * Trả về danh sách doanh nghiệp kèm số lần tiếp xúc và ngày tiếp xúc gần nhất.
+     * Mỗi dòng = 1 doanh nghiệp. Dùng cho trang "Quản lý tiếp xúc" phía FE.
+     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/enterprise-summary")
+    public ResponseEntity<Page<vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ResEnterpriseInteractionSummaryDTO>> listByEnterprise(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) throws Exception {
+
+        int safeSize = Math.min(Math.max(size, 1), 100);
+        Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize);
+
+        return ResponseEntity.ok(interactionService.getEnterpriseInteractionSummary(pageable));
     }
 
     @PreAuthorize("isAuthenticated()")

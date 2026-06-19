@@ -34,6 +34,29 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
                         @Param("restrictTypes") java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes,
                         Pageable pageable);
 
+        /**
+         * Trả về danh sách doanh nghiệp kèm số lần tiếp xúc và ngày tiếp xúc gần nhất,
+         * hỗ trợ phân trang phía server. Mỗi phần tử là Object[]{enterpriseId, enterpriseName,
+         * count, latestTime, consultantName}
+         */
+        @Query("SELECT i.enterprise.id, i.enterprise.name, COUNT(i), MAX(i.interactionTime), " +
+               "MAX(i.consultant.fullName) " +
+               "FROM Interaction i " +
+               "LEFT JOIN i.enterprise.commune c " +
+               "LEFT JOIN c.cluster cl " +
+               "WHERE (:consultantId IS NULL OR i.consultant.id = :consultantId) " +
+               "AND (:regionFilter IS NULL OR cl.region = :regionFilter) " +
+               "AND (:hasRestrictTypes = false OR i.enterprise.type IN :restrictTypes) " +
+               "GROUP BY i.enterprise.id, i.enterprise.name " +
+               "ORDER BY MAX(i.interactionTime) DESC")
+        Page<Object[]> searchEnterpriseInteractionSummary(
+                        @Param("consultantId") Long consultantId,
+                        @Param("regionFilter") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter,
+                        @Param("hasRestrictTypes") boolean hasRestrictTypes,
+                        @Param("restrictTypes") java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes,
+                        Pageable pageable);
+
+
         @Query("SELECT new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.EmployeeInteractionDTO(c.fullName, COUNT(i)) "
                         + "FROM Interaction i JOIN i.consultant c "
                         + "WHERE MONTH(i.createdAt) = MONTH(CURRENT_DATE) "

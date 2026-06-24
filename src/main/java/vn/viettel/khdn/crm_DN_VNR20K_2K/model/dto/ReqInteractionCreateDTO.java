@@ -29,7 +29,6 @@ public class ReqInteractionCreateDTO {
     private InteractionResult result;
 
     @NotNull(message = "Thời gian tương tác không được để trống")
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant interactionTime;
 
     @Size(max = 255, message = "Địa điểm tối đa 255 ký tự")

@@ -18,7 +18,6 @@ public class ReqInteractionUpdateDTO {
 
     private InteractionResult result;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant interactionTime;
 
     @Size(max = 255, message = "Địa điểm tối đa 255 ký tự")

@@ -28,9 +28,8 @@ public class ResInteractionDTO {
     private InteractionType interactionType;
     private InteractionResult result;
 
-    // Trả về ISO 8601 (vd: "2026-04-16T02:00:00Z") để JavaScript có thể
-    // parse bằng new Date() ở mọi nơi trong frontend
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
+    // Trả về chuẩn ISO 8601 (vd: "2026-04-16T02:00:00Z") mặc định của Jackson
+    // để JS parse bằng new Date() ở mọi nơi trong frontend một cách chính xác
     private Instant interactionTime;
 
     private String location;
@@ -43,9 +42,7 @@ public class ResInteractionDTO {
     // Danh sách các dịch vụ hợp đồng đã ký trong quá trình tiếp xúc này
     private List<ResUsageDTO> usages;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant createdAt;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant updatedAt;
 }

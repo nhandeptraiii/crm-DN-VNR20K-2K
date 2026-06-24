@@ -26,7 +26,6 @@ public class ResEnterpriseInteractionSummaryDTO {
     private Long interactionCount;
 
     /** Thời gian tiếp xúc gần nhất */
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Instant latestInteractionDate;
 
     /** Nhân viên phụ trách tiếp xúc gần nhất */

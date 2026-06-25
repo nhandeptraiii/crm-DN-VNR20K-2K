@@ -28,6 +28,7 @@ public class ResUsageDTO {
     private LocalDate endDate;
     private UsageStatus status;
     private Integer quantity;
+    private Double revenue;
 
     // Liên kết với Interaction (nếu hợp đồng sinh ra từ tiếp xúc/chốt sale)
     private Long interactionId;

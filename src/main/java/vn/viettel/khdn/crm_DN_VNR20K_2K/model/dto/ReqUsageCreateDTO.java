@@ -16,7 +16,6 @@ public class ReqUsageCreateDTO {
     @NotNull(message = "ID Dịch vụ Viettel không được để trống")
     private Long viettelServiceId;
 
-    @NotBlank(message = "Số hợp đồng không được để trống")
     @Size(max = 100, message = "Số hợp đồng tối đa 100 ký tự")
     private String contractNumber;
 
@@ -28,4 +27,7 @@ public class ReqUsageCreateDTO {
     private UsageStatus status;
 
     private Integer quantity;
+
+    @NotNull(message = "Doanh thu không được để trống")
+    private Double revenue;
 }

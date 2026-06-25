@@ -65,7 +65,19 @@ public class InteractionService {
             }
         }
 
-        User consultant = getCurrentUser();
+        User consultant = enterprise.getConsultant();
+        if (consultant == null) {
+            if (enterprise.getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 || 
+                enterprise.getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR20K) {
+                if (dto.getConsultantId() == null) {
+                    throw new IdInvalidException("Doanh nghiệp chưa có người phụ trách. Vui lòng chọn người phụ trách cho lượt tiếp xúc này.");
+                }
+                consultant = userRepository.findById(dto.getConsultantId())
+                        .orElseThrow(() -> new IdInvalidException("Không tìm thấy người phụ trách với ID: " + dto.getConsultantId()));
+            } else {
+                consultant = getCurrentUser();
+            }
+        }
 
         Interaction interaction = new Interaction();
         interaction.setEnterprise(enterprise);

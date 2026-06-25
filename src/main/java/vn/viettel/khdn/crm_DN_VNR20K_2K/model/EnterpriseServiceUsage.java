@@ -61,6 +61,9 @@ public class EnterpriseServiceUsage {
     @Column(name = "quantity")
     private Integer quantity;
 
+    @Column(name = "revenue")
+    private Double revenue;
+
     @Column(name = "created_at")
     private Instant createdAt;
 

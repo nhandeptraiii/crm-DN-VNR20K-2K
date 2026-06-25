@@ -36,6 +36,8 @@ public class ReqInteractionCreateDTO {
 
     private String description;
 
+    private Long consultantId;
+
     @Valid
     private List<ReqUsageCreateDTO> newUsages;
 }

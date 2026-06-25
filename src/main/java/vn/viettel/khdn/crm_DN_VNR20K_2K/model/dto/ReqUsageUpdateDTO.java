@@ -21,4 +21,6 @@ public class ReqUsageUpdateDTO {
     private UsageStatus status;
 
     private Integer quantity;
+
+    private Double revenue;
 }

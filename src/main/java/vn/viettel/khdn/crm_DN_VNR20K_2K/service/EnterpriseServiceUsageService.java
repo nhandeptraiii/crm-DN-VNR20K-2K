@@ -49,6 +49,7 @@ public class EnterpriseServiceUsageService {
         usage.setEndDate(dto.getEndDate());
         usage.setStatus(dto.getStatus() != null ? dto.getStatus() : UsageStatus.ACTIVE);
         usage.setQuantity(dto.getQuantity());
+        usage.setRevenue(dto.getRevenue());
 
         EnterpriseServiceUsage saved = usageRepository.save(usage);
         return toDTO(saved);
@@ -89,6 +90,8 @@ public class EnterpriseServiceUsageService {
             usage.setEndDate(dto.getEndDate());
         if (dto.getStatus() != null)
             usage.setStatus(dto.getStatus());
+        if (dto.getRevenue() != null)
+            usage.setRevenue(dto.getRevenue());
 
         EnterpriseServiceUsage updated = usageRepository.save(usage);
         return toDTO(updated);
@@ -123,6 +126,7 @@ public class EnterpriseServiceUsageService {
         dto.setStartDate(u.getStartDate());
         dto.setEndDate(u.getEndDate());
         dto.setQuantity(u.getQuantity());
+        dto.setRevenue(u.getRevenue());
 
         if (u.getInteraction() != null) {
             dto.setInteractionId(u.getInteraction().getId());

@@ -83,6 +83,102 @@ public class DashboardDTO {
         }
     }
 
+    public static class ClusterStatDTO {
+        private String clusterName;
+        private long total;
+        private long contacted;
+
+        public ClusterStatDTO() {}
+
+        public ClusterStatDTO(String clusterName, long total, long contacted) {
+            this.clusterName = clusterName;
+            this.total = total;
+            this.contacted = contacted;
+        }
+
+        public String getClusterName() {
+            return clusterName;
+        }
+
+        public void setClusterName(String clusterName) {
+            this.clusterName = clusterName;
+        }
+
+        public long getTotal() {
+            return total;
+        }
+
+        public void setTotal(long total) {
+            this.total = total;
+        }
+
+        public long getContacted() {
+            return contacted;
+        }
+
+        public void setContacted(long contacted) {
+            this.contacted = contacted;
+        }
+    }
+
+    public static class RegionDetailDTO {
+        private String region;
+        private long totalEnterprises;
+        private long contacted;
+        private List<ClusterStatDTO> clusters;
+        private java.util.Map<String, Long> byType;
+
+        public RegionDetailDTO() {}
+
+        public RegionDetailDTO(String region, long totalEnterprises, long contacted,
+                List<ClusterStatDTO> clusters, java.util.Map<String, Long> byType) {
+            this.region = region;
+            this.totalEnterprises = totalEnterprises;
+            this.contacted = contacted;
+            this.clusters = clusters;
+            this.byType = byType;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
+
+        public long getTotalEnterprises() {
+            return totalEnterprises;
+        }
+
+        public void setTotalEnterprises(long totalEnterprises) {
+            this.totalEnterprises = totalEnterprises;
+        }
+
+        public long getContacted() {
+            return contacted;
+        }
+
+        public void setContacted(long contacted) {
+            this.contacted = contacted;
+        }
+
+        public List<ClusterStatDTO> getClusters() {
+            return clusters;
+        }
+
+        public void setClusters(List<ClusterStatDTO> clusters) {
+            this.clusters = clusters;
+        }
+
+        public java.util.Map<String, Long> getByType() {
+            return byType;
+        }
+
+        public void setByType(java.util.Map<String, Long> byType) {
+            this.byType = byType;
+        }
+    }
     public static class RegionDistributionDTO {
         private String region;
         private long totalEnterprises;

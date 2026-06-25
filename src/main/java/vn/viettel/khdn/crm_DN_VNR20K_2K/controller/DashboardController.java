@@ -96,4 +96,16 @@ public class DashboardController {
             @RequestParam(name = "year", required = false, defaultValue = "2026") int year) {
         return ResponseEntity.ok(dashboardService.getMonthlyTrend(month, year));
     }
+
+    /**
+     * GET /dashboard/region-detail?month=4&year=2026 Chi tiết từng khu vực CTO/HUG/STG: breakdown
+     * theo cụm + loại DN.
+     */
+    @GetMapping("/region-detail")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<DashboardDTO.RegionDetailDTO>> getRegionDetail(
+            @RequestParam(name = "month", required = false, defaultValue = "3") int month,
+            @RequestParam(name = "year", required = false, defaultValue = "2026") int year) {
+        return ResponseEntity.ok(dashboardService.getRegionDetail(month, year));
+    }
 }

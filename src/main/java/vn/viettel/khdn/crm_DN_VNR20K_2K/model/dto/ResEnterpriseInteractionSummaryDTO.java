@@ -2,8 +2,6 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 
 import java.time.Instant;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

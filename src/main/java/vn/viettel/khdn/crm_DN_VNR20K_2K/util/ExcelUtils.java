@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.ReqEnterpriseCreateDTO;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry;
-import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum;
 
 public class ExcelUtils {
@@ -29,15 +28,16 @@ public class ExcelUtils {
     }
 
     public static LocalDate parseFlexibleDate(String dateStr) {
-        if (dateStr == null || dateStr.isBlank()) return null;
-        
+        if (dateStr == null || dateStr.isBlank())
+            return null;
+
         String[] patterns = {
-            "dd-MM-yyyy", "dd/MM/yyyy", "dd.MM.yyyy",
-            "yyyy-MM-dd", "yyyy/MM/dd",
-            "d/M/yyyy", "d-M-yyyy",
-            "dd-MM-yy",
-            "MM-dd-yyyy", "MM/dd/yyyy", 
-            "M-d-yyyy", "M/d/yyyy"
+                "dd-MM-yyyy", "dd/MM/yyyy", "dd.MM.yyyy",
+                "yyyy-MM-dd", "yyyy/MM/dd",
+                "d/M/yyyy", "d-M-yyyy",
+                "dd-MM-yy",
+                "MM-dd-yyyy", "MM/dd/yyyy",
+                "M-d-yyyy", "M/d/yyyy"
         };
 
         for (String pattern : patterns) {
@@ -50,7 +50,8 @@ public class ExcelUtils {
     }
 
     private static String getCellValueAsString(Cell cell) {
-        if (cell == null) return null;
+        if (cell == null)
+            return null;
         switch (cell.getCellType()) {
             case STRING:
                 return cell.getStringCellValue().trim();
@@ -74,7 +75,8 @@ public class ExcelUtils {
     }
 
     private static Integer getCellValueAsInteger(Cell cell) {
-        if (cell == null) return null;
+        if (cell == null)
+            return null;
         if (cell.getCellType() == CellType.NUMERIC) {
             return (int) cell.getNumericCellValue();
         } else if (cell.getCellType() == CellType.STRING) {
@@ -102,35 +104,35 @@ public class ExcelUtils {
                 }
 
                 ReqEnterpriseCreateDTO dto = new ReqEnterpriseCreateDTO();
-                
+
                 // Cột 1: Tên doanh nghiệp
                 dto.setName(getCellValueAsString(row.getCell(1)));
-                
+
                 // Cột 2: Mã số thuế
                 dto.setTaxCode(getCellValueAsString(row.getCell(2)));
-                
+
                 // Cột 3: Cơ quan thuế
                 dto.setTaxAuthority(getCellValueAsString(row.getCell(3)));
-                
+
                 // Cột 4: Lĩnh vực
                 String industryStr = getCellValueAsString(row.getCell(4));
                 dto.setIndustry(Industry.fromValue(industryStr));
-                
+
                 // Cột 5: Số nhân viên
                 dto.setEmployeeCount(getCellValueAsInteger(row.getCell(5)));
-                
+
                 // Cột 6: Địa chỉ
                 dto.setAddress(getCellValueAsString(row.getCell(6)));
-                
+
                 // Cột 7: Website
                 dto.setWebsite(getCellValueAsString(row.getCell(7)));
-                
+
                 // Cột 8: Điện thoại
                 dto.setPhone(getCellValueAsString(row.getCell(8)));
-                
+
                 // Cột 9: Email doanh nghiệp
                 dto.setEmail(getCellValueAsString(row.getCell(9)));
-                
+
                 // Cột 10: Ngày thành lập
                 dto.setEstablishedDate(parseFlexibleDate(getCellValueAsString(row.getCell(10))));
 
@@ -142,12 +144,12 @@ public class ExcelUtils {
                     } catch (IllegalArgumentException e) {
                     }
                 }
-                
+
                 // Cột 12, 13, 14: Đánh dấu check "X" Doanh thu
                 String rev1 = getCellValueAsString(row.getCell(12));
                 String rev2 = getCellValueAsString(row.getCell(13));
                 String rev3 = getCellValueAsString(row.getCell(14));
-                
+
                 if (rev1 != null && rev1.trim().equalsIgnoreCase("X")) {
                     dto.setRevenueRange(vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RevenueRange.UNDER_500M);
                 } else if (rev2 != null && rev2.trim().equalsIgnoreCase("X")) {
@@ -161,16 +163,16 @@ public class ExcelUtils {
 
                 // Cột 16: Ghi chú
                 dto.setNote(getCellValueAsString(row.getCell(16)));
-                
+
                 // Cột 17: Họ tên NĐD
                 dto.setContactFullName(getCellValueAsString(row.getCell(17)));
-                
+
                 // Cột 18: Email NĐD
                 dto.setContactEmail(getCellValueAsString(row.getCell(18)));
-                
+
                 // Cột 19: SĐT NĐD
                 dto.setContactPhone(getCellValueAsString(row.getCell(19)));
-                
+
                 // Cột 20: Chức vụ NĐD
                 dto.setContactPosition(getCellValueAsString(row.getCell(20)));
 

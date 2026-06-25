@@ -3,8 +3,6 @@ package vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto;
 import java.time.Instant;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.Getter;
 import lombok.Setter;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.InteractionResult;

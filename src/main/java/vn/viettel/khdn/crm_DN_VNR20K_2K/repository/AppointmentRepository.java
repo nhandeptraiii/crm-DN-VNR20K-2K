@@ -118,3 +118,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             @Param("restrictTypes") java.util.List<vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum> restrictTypes,
             Pageable pageable);
 }
+

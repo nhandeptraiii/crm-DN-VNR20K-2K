@@ -34,11 +34,11 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         + "AND (:hasRestrictTypes = false OR e.type IN :restrictTypes)")
         Page<Enterprise> searchEnterprises(@Param("keyword") String keyword,
                         @Param("status") EnterpriseStatus status,
-                        @Param("industry") Industry industry, 
+                        @Param("industry") Industry industry,
                         @Param("hasRegions") boolean hasRegions,
                         @Param("regions") java.util.List<RegionEnum> regions,
                         @Param("hasTypes") boolean hasTypes,
-                        @Param("types") java.util.List<EnterpriseTypeEnum> types, 
+                        @Param("types") java.util.List<EnterpriseTypeEnum> types,
                         @Param("consultantId") Long consultantId,
                         @Param("hasCommunes") boolean hasCommunes,
                         @Param("communeIds") java.util.List<Long> communeIds,
@@ -103,4 +103,16 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         + "ORDER BY e.type, e.name")
         List<Object[]> findUncontactedEnterprises2000And20K(
                         @Param("types") List<EnterpriseTypeEnum> types);
+
+        // Đếm tổng DN theo từng cụm trong một region
+        @Query("SELECT e.commune.cluster.name, COUNT(e) " + "FROM Enterprise e "
+                        + "WHERE e.commune.cluster.region = :region AND e.status != 'DELETED' "
+                        + "GROUP BY e.commune.cluster.name " + "ORDER BY e.commune.cluster.name")
+        List<Object[]> countByClusterInRegion(@Param("region") RegionEnum region);
+
+        // Đếm DN theo loại (SME/HKD/VNR2000/VNR20K) trong một region
+        @Query("SELECT e.type, COUNT(e) " + "FROM Enterprise e "
+                        + "WHERE e.commune.cluster.region = :region AND e.status != 'DELETED' "
+                        + "GROUP BY e.type")
+        List<Object[]> countByTypeInRegion(@Param("region") RegionEnum region);
 }

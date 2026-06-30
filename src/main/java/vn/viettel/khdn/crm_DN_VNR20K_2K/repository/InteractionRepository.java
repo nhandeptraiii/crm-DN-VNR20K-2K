@@ -20,7 +20,7 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
                         + "LEFT JOIN i.enterprise.commune c "
                         + "LEFT JOIN c.cluster cl "
                         + "WHERE (:enterpriseId IS NULL OR i.enterprise.id = :enterpriseId) "
-                        + "AND (:consultantId IS NULL OR i.consultant.id = :consultantId) "
+                        + "AND (:consultantId IS NULL OR i.enterprise.consultant.id = :consultantId) "
                         + "AND (:type IS NULL OR i.interactionType = :type) "
                         + "AND (:result IS NULL OR i.result = :result) "
                         + "AND (:regionFilter IS NULL OR cl.region = :regionFilter) "
@@ -40,11 +40,11 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
          * count, latestTime, consultantName}
          */
         @Query("SELECT i.enterprise.id, i.enterprise.name, COUNT(i), MAX(i.interactionTime), " +
-               "MAX(i.consultant.fullName) " +
+               "MAX(i.enterprise.consultant.fullName) " +
                "FROM Interaction i " +
                "LEFT JOIN i.enterprise.commune c " +
                "LEFT JOIN c.cluster cl " +
-               "WHERE (:consultantId IS NULL OR i.consultant.id = :consultantId) " +
+               "WHERE (:consultantId IS NULL OR i.enterprise.consultant.id = :consultantId) " +
                "AND (:regionFilter IS NULL OR cl.region = :regionFilter) " +
                "AND (:hasRestrictTypes = false OR i.enterprise.type IN :restrictTypes) " +
                "GROUP BY i.enterprise.id, i.enterprise.name " +
@@ -58,20 +58,35 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
 
 
         @Query("SELECT new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.EmployeeInteractionDTO(c.fullName, COUNT(i)) "
-                        + "FROM Interaction i JOIN i.consultant c "
+                        + "FROM Interaction i JOIN i.enterprise.consultant c "
                         + "WHERE MONTH(i.createdAt) = MONTH(CURRENT_DATE) "
                         + "AND YEAR(i.createdAt) = YEAR(CURRENT_DATE) "
                         + "GROUP BY c.id, c.fullName")
         List<EmployeeInteractionDTO> countInteractionsByEmployeeThisMonth();
 
         @Query("SELECT new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.EmployeeInteractionDTO(c.fullName, COUNT(i)) "
-                        + "FROM Interaction i JOIN i.consultant c " + "GROUP BY c.id, c.fullName")
+                        + "FROM Interaction i JOIN i.enterprise.consultant c " + "GROUP BY c.id, c.fullName")
         List<EmployeeInteractionDTO> countInteractionsByEmployee();
 
         @Query("SELECT new vn.viettel.khdn.crm_DN_VNR20K_2K.model.dto.EmployeeInteractionDTO(c.fullName, COUNT(i)) "
-                        + "FROM Interaction i JOIN i.consultant c "
+                        + "FROM Interaction i JOIN i.enterprise.consultant c "
                         + "WHERE MONTH(i.createdAt) = :month " + "AND YEAR(i.createdAt) = :year "
                         + "GROUP BY c.id, c.fullName")
         List<EmployeeInteractionDTO> countInteractionsByMonthAndYear(@Param("month") int month,
                         @Param("year") int year);
+
+        @Query("SELECT COUNT(DISTINCT i.enterprise.id) FROM Interaction i "
+                        + "WHERE MONTH(i.interactionTime) = :month AND YEAR(i.interactionTime) = :year")
+        long countContactedEnterprisesInMonth(@Param("month") int month, @Param("year") int year);
+
+        @Query(value = "SELECT DAY(CONVERT_TZ(interaction_time, '+00:00', '+07:00')), "
+                        + "COUNT(DISTINCT enterprise_id) "
+                        + "FROM interactions "
+                        + "WHERE interaction_time >= :startOfMonth "
+                        + "AND interaction_time < :startOfNextMonth "
+                        + "GROUP BY DAY(CONVERT_TZ(interaction_time, '+00:00', '+07:00'))",
+                        nativeQuery = true)
+        java.util.List<Object[]> countContactedByDayInMonth(
+                        @Param("startOfMonth") java.time.Instant startOfMonth,
+                        @Param("startOfNextMonth") java.time.Instant startOfNextMonth);
 }

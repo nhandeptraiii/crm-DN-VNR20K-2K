@@ -41,8 +41,8 @@ public class Interaction {
     private EnterpriseContact contact;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "consultant_id", nullable = false)
-    private User consultant;
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "interaction_type", nullable = false, length = 50)

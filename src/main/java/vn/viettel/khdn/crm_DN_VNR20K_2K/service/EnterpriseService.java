@@ -113,7 +113,7 @@ public class EnterpriseService {
 
     // --- Lấy danh sách (phân trang + tìm kiếm) ---
     public Page<ResEnterpriseDTO> searchEnterprises(String keyword, String status,
-            String industryStr, List<String> regionStrs, List<String> typeStrs, Pageable pageable) {
+            String industryStr, List<String> regionStrs, List<String> typeStrs, Long consultantId, Pageable pageable) {
         EnterpriseStatus enumStatus = null;
         vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.Industry enumIndustry = null;
 
@@ -142,7 +142,7 @@ public class EnterpriseService {
             }
         }
 
-        Long consultantIdFilter = null;
+        Long consultantIdFilter = consultantId;
 
         if (status != null && !status.isBlank()) {
             try {

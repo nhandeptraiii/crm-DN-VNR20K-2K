@@ -245,7 +245,7 @@ public class AppointmentService {
         Interaction interaction = new Interaction();
         interaction.setEnterprise(appointment.getEnterprise());
         interaction.setContact(appointment.getContact());
-        interaction.setConsultant(appointment.getConsultant());
+        interaction.setCreatedBy(getCurrentUser());
         interaction.setInteractionType(appointment.getAppointmentType());
         interaction.setInteractionTime(appointment.getScheduledTime());
         interaction.setLocation(appointment.getLocation());
@@ -401,8 +401,14 @@ public class AppointmentService {
             dto.setContactName(i.getContact().getFullName());
         }
 
-        dto.setConsultantId(i.getConsultant().getId());
-        dto.setConsultantName(i.getConsultant().getFullName());
+        vn.viettel.khdn.crm_DN_VNR20K_2K.model.User entConsultant = i.getEnterprise().getConsultant();
+        if (entConsultant != null) {
+            dto.setConsultantId(entConsultant.getId());
+            dto.setConsultantName(entConsultant.getFullName());
+        } else {
+            dto.setConsultantId(null);
+            dto.setConsultantName(null);
+        }
         dto.setInteractionType(i.getInteractionType());
         dto.setResult(i.getResult());
         dto.setInteractionTime(i.getInteractionTime());

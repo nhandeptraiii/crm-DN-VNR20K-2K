@@ -65,6 +65,8 @@ public class InteractionService {
             }
         }
 
+        User currentUser = getCurrentUser();
+
         User consultant = enterprise.getConsultant();
         if (consultant == null) {
             if (enterprise.getType() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.EnterpriseTypeEnum.VNR2000 || 
@@ -74,15 +76,16 @@ public class InteractionService {
                 }
                 consultant = userRepository.findById(dto.getConsultantId())
                         .orElseThrow(() -> new IdInvalidException("Không tìm thấy người phụ trách với ID: " + dto.getConsultantId()));
-            } else {
-                consultant = getCurrentUser();
+                
+                enterprise.setConsultant(consultant);
+                enterpriseRepository.save(enterprise);
             }
         }
 
         Interaction interaction = new Interaction();
         interaction.setEnterprise(enterprise);
         interaction.setContact(contact);
-        interaction.setConsultant(consultant);
+        interaction.setCreatedBy(currentUser);
         interaction.setInteractionType(dto.getInteractionType());
         interaction.setResult(dto.getResult());
         interaction.setInteractionTime(dto.getInteractionTime());
@@ -214,7 +217,9 @@ public class InteractionService {
         boolean isAdminOrOperator = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.ADMIN || currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.OPERATOR;
         boolean isManagerAllowed = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.MANAGER && interaction.getEnterprise().getRegion() == currentUser.getRegion();
         boolean isConsultantAllowed = currentUser.getRole() == vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.CONSULTANT;
-        boolean isOwner = interaction.getConsultant().getId().equals(currentUser.getId());
+        User entConsultant = interaction.getEnterprise().getConsultant();
+        boolean isOwner = (entConsultant != null && entConsultant.getId().equals(currentUser.getId())) 
+                       || interaction.getCreatedBy().getId().equals(currentUser.getId());
 
         if (!isAdminOrOperator && !isManagerAllowed && !isConsultantAllowed && !isOwner) {
             throw new Exception("Bạn không có quyền truy cập nhật ký tương tác này!");
@@ -233,8 +238,14 @@ public class InteractionService {
             dto.setContactName(i.getContact().getFullName());
         }
 
-        dto.setConsultantId(i.getConsultant().getId());
-        dto.setConsultantName(i.getConsultant().getFullName());
+        User entConsultant = i.getEnterprise().getConsultant();
+        if (entConsultant != null) {
+            dto.setConsultantId(entConsultant.getId());
+            dto.setConsultantName(entConsultant.getFullName());
+        } else {
+            dto.setConsultantId(null);
+            dto.setConsultantName(null);
+        }
 
         dto.setInteractionType(i.getInteractionType());
         dto.setResult(i.getResult());

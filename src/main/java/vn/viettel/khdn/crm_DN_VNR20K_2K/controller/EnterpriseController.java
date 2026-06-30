@@ -59,12 +59,13 @@ public class EnterpriseController {
             @RequestParam(value = "industry", required = false) String industry,
             @RequestParam(value = "region", required = false) java.util.List<String> region,
             @RequestParam(value = "type", required = false) java.util.List<String> type,
+            @RequestParam(value = "consultantId", required = false) Long consultantId,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         int safeSize = Math.min(Math.max(size, 1), 50);
         Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(Sort.Order.desc("createdAt")));
         Page<ResEnterpriseDTO> result = enterpriseService.searchEnterprises(keyword, status, industry, region, type,
-                pageable);
+                consultantId, pageable);
         return ResponseEntity.ok(result);
     }
 

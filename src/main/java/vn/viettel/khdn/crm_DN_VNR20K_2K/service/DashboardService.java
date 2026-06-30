@@ -147,7 +147,7 @@ public class DashboardService {
         dto.setNewEnterprisesLast30Days(enterpriseRepo.countNewEnterprisesSince(thirtyDaysAgo));
 
         dto.setContactedEnterprisesThisMonth(
-                appointmentRepo.countContactedEnterprisesInMonth(month, year));
+                interactionRepo.countContactedEnterprisesInMonth(month, year));
 
         Instant weekStart =
                 LocalDate.now(ZONE).with(DayOfWeek.MONDAY).atStartOfDay(ZONE).toInstant();
@@ -247,12 +247,12 @@ public class DashboardService {
 
         // Query
         Map<Integer, Long> currentMap = new HashMap<>();
-        for (Object[] row : appointmentRepo.countContactedByDayInMonth(startCurrent, startNext)) {
+        for (Object[] row : interactionRepo.countContactedByDayInMonth(startCurrent, startNext)) {
             currentMap.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
         }
 
         Map<Integer, Long> prevMap = new HashMap<>();
-        for (Object[] row : appointmentRepo.countContactedByDayInMonth(startPrev, startPrevNext)) {
+        for (Object[] row : interactionRepo.countContactedByDayInMonth(startPrev, startPrevNext)) {
             prevMap.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
         }
 

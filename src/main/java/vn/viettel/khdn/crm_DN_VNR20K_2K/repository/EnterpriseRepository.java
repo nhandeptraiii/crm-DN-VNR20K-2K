@@ -92,16 +92,15 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
         // Đếm DN 2000/20K chưa tiếp xúc (theo từng type)
         @Query("SELECT COUNT(e) FROM Enterprise e "
                         + "WHERE e.type = :type AND e.status != 'DELETED' " + "AND e.id NOT IN ("
-                        + "    SELECT DISTINCT a.enterprise.id FROM Appointment a "
-                        + "    WHERE a.status = 'CONFIRMED')")
+                        + "    SELECT DISTINCT i.enterprise.id FROM Interaction i)")
         long countUncontactedByType(@Param("type") EnterpriseTypeEnum type);
 
         // Danh sách DN 2000 + 20K chưa tiếp xúc
         @Query("SELECT e.id, e.name, e.taxCode, e.type, e.commune.cluster.region, e.consultant.fullName "
                         + "FROM Enterprise e " + "WHERE e.type IN :types AND e.status != 'DELETED' "
                         + "AND e.id NOT IN ("
-                        + "    SELECT DISTINCT a.enterprise.id FROM Appointment a "
-                        + "    WHERE a.status = 'CONFIRMED') " + "ORDER BY e.type, e.name")
+                        + "    SELECT DISTINCT i.enterprise.id FROM Interaction i) "
+                        + "ORDER BY e.type, e.name")
         List<Object[]> findUncontactedEnterprises2000And20K(
                         @Param("types") List<EnterpriseTypeEnum> types);
 }

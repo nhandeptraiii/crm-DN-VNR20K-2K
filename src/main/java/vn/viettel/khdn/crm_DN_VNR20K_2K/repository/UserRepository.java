@@ -22,6 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = """
             SELECT u FROM User u
             WHERE (:role IS NULL OR u.role = :role)
+              AND (:status IS NULL OR UPPER(u.status) = UPPER(:status))
               AND (:regionFilter IS NULL OR u.managedRegion = :regionFilter)
               AND (
                 :keyword IS NULL
@@ -31,7 +32,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
               )
             """)
     Page<User> searchUsers(
-            @Param("role") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, 
+            @Param("role") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role,
+            @Param("status") String status,
             @Param("keyword") String keyword, 
             @Param("regionFilter") vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RegionEnum regionFilter,
             Pageable pageable);

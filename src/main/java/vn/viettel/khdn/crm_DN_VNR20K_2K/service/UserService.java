@@ -87,7 +87,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public org.springframework.data.domain.Page<ResUserDTO> searchUsers(
-            vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, String keyword,
+            vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum role, String status, String keyword,
             org.springframework.data.domain.Pageable pageable) {
         String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication()
                 .getName();
@@ -99,7 +99,9 @@ public class UserService {
             regionFilter = currentUser.getRegion();
         }
 
-        org.springframework.data.domain.Page<User> page = userRepository.searchUsers(role, keyword, regionFilter,
+        String kwFilter = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+
+        org.springframework.data.domain.Page<User> page = userRepository.searchUsers(role, status, kwFilter, regionFilter,
                 pageable);
         return page.map(this::convertToResUserDTO);
     }

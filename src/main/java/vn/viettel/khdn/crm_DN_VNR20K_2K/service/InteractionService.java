@@ -1,10 +1,21 @@
 package vn.viettel.khdn.crm_DN_VNR20K_2K.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.Enterprise;
 import vn.viettel.khdn.crm_DN_VNR20K_2K.model.EnterpriseContact;
@@ -30,6 +41,9 @@ public class InteractionService {
     private final UserRepository userRepository;
     private final EnterpriseServiceUsageService usageService;
 
+    @Value("${crm.upload.path:uploads}")
+    private String uploadBasePath;
+
     public InteractionService(InteractionRepository interactionRepository,
             EnterpriseRepository enterpriseRepository,
             EnterpriseContactRepository contactRepository,
@@ -49,6 +63,10 @@ public class InteractionService {
     }
 
     public ResInteractionDTO createInteraction(ReqInteractionCreateDTO dto) throws Exception {
+        return createInteraction(dto, null);
+    }
+
+    public ResInteractionDTO createInteraction(ReqInteractionCreateDTO dto, MultipartFile[] photos) throws Exception {
         Enterprise enterprise = enterpriseRepository.findById(dto.getEnterpriseId())
                 .orElseThrow(
                         () -> new IdInvalidException("Không tìm thấy doanh nghiệp với ID: " + dto.getEnterpriseId()));
@@ -94,6 +112,12 @@ public class InteractionService {
 
         Interaction saved = interactionRepository.save(interaction);
 
+        List<String> savedPhotoPaths = savePhotos(saved.getId(), photos);
+        if (!savedPhotoPaths.isEmpty()) {
+            saved.setPhotoPaths(String.join(",", savedPhotoPaths));
+            saved = interactionRepository.save(saved);
+        }
+
         // Xử lý lưu hợp đồng dịch vụ nếu là CLOSED_WON
         if (dto.getResult() == InteractionResult.CLOSED_WON) {
             if (dto.getNewUsages() == null || dto.getNewUsages().isEmpty()) {
@@ -105,6 +129,45 @@ public class InteractionService {
         }
 
         return toDTO(saved);
+    }
+
+    private List<String> savePhotos(Long interactionId, MultipartFile[] photos) throws IOException {
+        List<String> paths = new ArrayList<>();
+        if (photos == null || photos.length == 0) {
+            return paths;
+        }
+
+        Path baseDir;
+        Path configuredPath = Paths.get(uploadBasePath);
+        if (configuredPath.isAbsolute()) {
+            baseDir = configuredPath;
+        } else {
+            baseDir = Paths.get(System.getProperty("user.dir")).resolve(uploadBasePath);
+        }
+
+        Path dir = baseDir.resolve("interactions").resolve(String.valueOf(interactionId));
+        Files.createDirectories(dir);
+
+        for (MultipartFile photo : photos) {
+            if (photo == null || photo.isEmpty()) continue;
+
+            String originalName = photo.getOriginalFilename();
+            String ext = "";
+            if (originalName != null && originalName.contains(".")) {
+                ext = originalName.substring(originalName.lastIndexOf("."));
+            }
+
+            String fileName = UUID.randomUUID().toString() + ext;
+            Path filePath = dir.resolve(fileName);
+
+            try (InputStream inputStream = photo.getInputStream()) {
+                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            paths.add("interactions/" + interactionId + "/" + fileName);
+        }
+
+        return paths;
     }
 
     public Page<ResInteractionDTO> searchInteractions(Long enterpriseId, Long consultantId, String typeStr,

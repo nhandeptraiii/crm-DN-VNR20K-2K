@@ -54,21 +54,41 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<ResUserDTO>> getUsers(
             @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "role", required = false) String role,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "isActive", required = false) Boolean isActive,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
         int safeSize = Math.min(Math.max(size, 1), 50);
         Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(Sort.Order.asc("fullName")));
 
+        String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword : search;
+
         vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum roleEnum = null;
-        if (role != null && !role.trim().isEmpty()) {
+        if (role != null && !role.trim().isEmpty() && !role.trim().equalsIgnoreCase("ALL")) {
             try {
                 roleEnum = vn.viettel.khdn.crm_DN_VNR20K_2K.model.enums.RoleEnum.valueOf(role.trim().toUpperCase());
             } catch (Exception ignored) {
             }
         }
-        Page<ResUserDTO> result = userService.searchUsers(roleEnum, keyword, pageable);
+
+        String statusFilter = null;
+        if (status != null && !status.trim().isEmpty() && !status.trim().equalsIgnoreCase("ALL")) {
+            String st = status.trim();
+            if (st.equalsIgnoreCase("true") || st.equalsIgnoreCase("ACTIVE")) {
+                statusFilter = "ACTIVE";
+            } else if (st.equalsIgnoreCase("false") || st.equalsIgnoreCase("INACTIVE")) {
+                statusFilter = "INACTIVE";
+            } else {
+                statusFilter = st.toUpperCase();
+            }
+        } else if (statusFilter == null && isActive != null) {
+            statusFilter = isActive ? "ACTIVE" : "INACTIVE";
+        }
+
+        Page<ResUserDTO> result = userService.searchUsers(roleEnum, statusFilter, kw, pageable);
         return ResponseEntity.ok(result);
     }
 

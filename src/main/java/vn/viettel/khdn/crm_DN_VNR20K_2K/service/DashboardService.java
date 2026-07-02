@@ -208,13 +208,15 @@ public class DashboardService {
     }
 
     private void fillUncontactedWarning(DashboardDTO dto) {
+        Instant threshold = LocalDate.now(ZONE).minusMonths(3).atStartOfDay(ZONE).toInstant();
+
         dto.setUncontacted2000Count(
-                enterpriseRepo.countUncontactedByType(EnterpriseTypeEnum.VNR2000));
+                enterpriseRepo.countUncontactedByType(EnterpriseTypeEnum.VNR2000, threshold));
         dto.setUncontacted20kCount(
-                enterpriseRepo.countUncontactedByType(EnterpriseTypeEnum.VNR20K));
+                enterpriseRepo.countUncontactedByType(EnterpriseTypeEnum.VNR20K, threshold));
 
         List<UncontactedEnterpriseDTO> list = enterpriseRepo
-                .findUncontactedEnterprises2000And20K(PRIORITY_TYPES).stream()
+                .findUncontactedEnterprises2000And20K(PRIORITY_TYPES, threshold).stream()
                 .map(row -> new UncontactedEnterpriseDTO(((Number) row[0]).longValue(),
                         row[1] != null ? row[1].toString() : "",
                         row[2] != null ? row[2].toString() : "",

@@ -89,18 +89,19 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
                         + "WHERE e.status != 'DELETED' " + "GROUP BY e.commune.cluster.region")
         List<Object[]> countGroupByRegion();
 
-        // Đếm DN 2000/20K chưa tiếp xúc (theo từng type)
+        // Đếm DN 2000/20K chưa tiếp xúc trong 3 tháng (hoặc chưa từng tiếp xúc)
         @Query("SELECT COUNT(e) FROM Enterprise e "
-                        + "WHERE e.type = :type AND e.status != 'DELETED' " + "AND e.id NOT IN ("
-                        + "    SELECT DISTINCT i.enterprise.id FROM Interaction i)")
-        long countUncontactedByType(@Param("type") EnterpriseTypeEnum type);
+                        + "WHERE e.type = :type AND e.status != 'DELETED' "
+                        + "AND e.id NOT IN ("
+                        + "    SELECT i.enterprise.id FROM Interaction i WHERE i.interactionTime >= :threshold)")
+        long countUncontactedByType(@Param("type") EnterpriseTypeEnum type, @Param("threshold") Instant threshold);
 
-        // Danh sách DN 2000 + 20K chưa tiếp xúc
+        // Danh sách DN 2000 + 20K chưa tiếp xúc trong 3 tháng (hoặc chưa từng tiếp xúc)
         @Query("SELECT e.id, e.name, e.taxCode, e.type, e.commune.cluster.region, e.consultant.fullName "
                         + "FROM Enterprise e " + "WHERE e.type IN :types AND e.status != 'DELETED' "
                         + "AND e.id NOT IN ("
-                        + "    SELECT DISTINCT i.enterprise.id FROM Interaction i) "
+                        + "    SELECT i.enterprise.id FROM Interaction i WHERE i.interactionTime >= :threshold) "
                         + "ORDER BY e.type, e.name")
         List<Object[]> findUncontactedEnterprises2000And20K(
-                        @Param("types") List<EnterpriseTypeEnum> types);
+                        @Param("types") List<EnterpriseTypeEnum> types, @Param("threshold") Instant threshold);
 }
